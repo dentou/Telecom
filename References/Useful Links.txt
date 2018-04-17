@@ -1,0 +1,3 @@
+http://chi.cs.uchicago.edu/chirc/irc.html
+
+https://blog.initprogram.com/2010/10/14/a-quick-basic-primer-on-the-irc-protocol/
