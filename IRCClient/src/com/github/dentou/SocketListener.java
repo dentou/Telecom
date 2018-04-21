@@ -5,6 +5,7 @@ import java.util.List;
 
 public class SocketListener implements Runnable{
     private IRCSocket ircSocket;
+    private boolean isClosed = false;
 
     public SocketListener(IRCSocket ircSocket) {
         this.ircSocket = ircSocket;
@@ -13,6 +14,14 @@ public class SocketListener implements Runnable{
     @Override
     public void run() {
         while (true) {
+            if (isClosed) {
+                try {
+                    ircSocket.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+                return;
+            }
             try {
                 List<IRCMessage> messages = readMessages();
                 for (IRCMessage message : messages) {
@@ -34,5 +43,9 @@ public class SocketListener implements Runnable{
 
         }
         return messages;
+    }
+
+    public void close() {
+        isClosed = true;
     }
 }

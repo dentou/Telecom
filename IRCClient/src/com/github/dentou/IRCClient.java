@@ -20,7 +20,7 @@ public class IRCClient {
 
     public void start() throws IOException{
         this.socketListener = new SocketListener(ircSocket);
-        this.socketSpeaker = new SocketSpeaker(ircSocket);
+        this.socketSpeaker = new SocketSpeaker(ircSocket, this);
 
         Thread listenerThread = new Thread(socketListener);
         Thread speakerThread = new Thread(socketSpeaker);
@@ -28,5 +28,10 @@ public class IRCClient {
         listenerThread.start();
         speakerThread.start();
 
+    }
+
+    public void exit() {
+        socketListener.close();
+        socketSpeaker.close();
     }
 }

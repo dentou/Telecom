@@ -5,9 +5,12 @@ import java.util.Scanner;
 
 public class SocketSpeaker implements Runnable{
     private IRCSocket ircSocket;
+    private IRCClient client;
+    private boolean isClosed = false;
 
-    public SocketSpeaker(IRCSocket ircSocket) {
+    public SocketSpeaker(IRCSocket ircSocket, IRCClient client) {
         this.ircSocket = ircSocket;
+        this.client = client;
     }
 
     @Override
@@ -19,13 +22,9 @@ public class SocketSpeaker implements Runnable{
             String line = scanner.nextLine();
 
             if (line.equals("exit")) {
-                try {
-                    ircSocket.close();
-                    break;
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    return;
-                }
+                isClosed = true;
+                client.exit();
+                return;
             }
 
             String message = line + "\r\n";
@@ -45,5 +44,9 @@ public class SocketSpeaker implements Runnable{
             ircSocket.enqueue(message);
             ircSocket.sendMessages();
         }
+    }
+
+    public void close() {
+        isClosed = true;
     }
 }

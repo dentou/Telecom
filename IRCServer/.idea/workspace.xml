@@ -271,12 +271,12 @@
       <workItem from="1524270835448" duration="13579000" />
       <workItem from="1524284766400" duration="3000" />
       <workItem from="1524296260108" duration="14594000" />
-      <workItem from="1524316208036" duration="9766000" />
+      <workItem from="1524316208036" duration="10749000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="45663000" />
+    <option name="totallyTimeSpent" value="46646000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -296,7 +296,7 @@
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
-      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32838285" />
+      <window_info anchor="bottom" id="Run" order="2" weight="0.32838285" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32838285" />
       <window_info id="Designer" order="2" />
