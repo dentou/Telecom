@@ -5,23 +5,18 @@ import java.util.List;
 
 public class SocketListener implements Runnable{
     private IRCSocket ircSocket;
-    private boolean isClosed = false;
+    private IRCClient ircClient;
+    private volatile boolean isClosed = false;
 
-    public SocketListener(IRCSocket ircSocket) {
+    public SocketListener(IRCSocket ircSocket, IRCClient ircClient) {
+
         this.ircSocket = ircSocket;
+        this.ircClient = ircClient;
     }
 
     @Override
     public void run() {
-        while (true) {
-            if (isClosed) {
-                try {
-                    ircSocket.close();
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-                return;
-            }
+        while (!isClosed) {
             try {
                 List<IRCMessage> messages = readMessages();
                 for (IRCMessage message : messages) {
@@ -29,6 +24,7 @@ public class SocketListener implements Runnable{
                 }
             } catch (IOException e) {
                 e.printStackTrace();
+                return;
             }
         }
 
@@ -42,10 +38,17 @@ public class SocketListener implements Runnable{
             messages = ircSocket.getMessages();
 
         }
+        if (ircSocket.isEndOfStreamReached()) {
+            System.out.println("Socket closed");
+            ircClient.exit();
+        }
         return messages;
     }
 
     public void close() {
         isClosed = true;
+    }
+    public boolean isClosed() {
+        return isClosed;
     }
 }

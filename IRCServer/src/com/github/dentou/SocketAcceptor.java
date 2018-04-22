@@ -24,7 +24,7 @@ public class SocketAcceptor implements Runnable{
         try {
             this.serverChannel = ServerSocketChannel.open();
             this.serverChannel.bind(new InetSocketAddress(tcpPort));
-            System.out.println("Server starts at " + serverChannel.getLocalAddress());
+            System.out.println("Server starts at " + serverChannel.socket().getLocalSocketAddress());
         } catch (IOException e) {
             e.printStackTrace();
             return;

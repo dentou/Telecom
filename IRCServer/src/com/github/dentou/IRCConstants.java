@@ -28,8 +28,12 @@ public class IRCConstants {
 
 
     public enum ErrorReplies {
-        ERR_NICKNAMEINUSE("433")
-
+        ERR_NICKNAMEINUSE("433"),
+        ERR_NONICKNAMEGIVEN("431"),
+        ERR_NEEDMOREPARAMS("461"),
+        ERR_NORECIPIENT("411"),
+        ERR_NOTEXTTOSEND("412"),
+        ERR_NOSUCHNICK("401")
         ;
 
         private String numericCode;

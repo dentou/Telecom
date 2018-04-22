@@ -38,6 +38,7 @@ public class IRCSocket {
         return this.socketChannel.keyFor(selector);
     }
 
+
     public boolean isEndOfStreamReached() {
         return endOfStreamReached;
     }

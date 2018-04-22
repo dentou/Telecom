@@ -12,7 +12,7 @@ public class UserHandler {
     private List<IRCChannel> channels;
 
     public enum StatusCode {
-        SUCCESS, NEW_USER, NICK_DUPLICATE, ID_DUPLICATE, USER_NOT_EXIST, UNKNOWN_OPERATION,
+        SUCCESS, NEW_USER, NICK_DUPLICATE, ID_DUPLICATE, ID_NOT_EXIST, UNKNOWN_OPERATION,
         INVALID_CHANNEL_NAME;
     }
 
@@ -24,7 +24,11 @@ public class UserHandler {
     }
 
     public long getUserId(String nick) {
-        return nickToId.get(nick);
+        Long longId = nickToId.get(nick);
+        if (longId == null) {
+            return -1;
+        }
+        return longId.longValue();
     }
 
     public List<Long> getUserId(List<String> nicks) {
@@ -61,11 +65,22 @@ public class UserHandler {
         return StatusCode.SUCCESS;
     }
 
+    public StatusCode removeUser(long id) {
+        User user = idToUser.get(id);
+        if (user == null) {
+            return StatusCode.ID_NOT_EXIST;
+        }
+        nickToId.remove(user.getNick());
+        users.remove(user);
+        idToUser.remove(id);
+        return StatusCode.SUCCESS;
+    }
+
     public StatusCode changeUserInfo(long id, String parameter, String newValue) {
         User user = idToUser.get(id);
 
         if (user == null) {
-            return StatusCode.USER_NOT_EXIST;
+            return StatusCode.ID_NOT_EXIST;
         }
 
         switch (parameter) {

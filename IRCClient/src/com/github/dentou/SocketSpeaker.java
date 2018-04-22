@@ -5,25 +5,24 @@ import java.util.Scanner;
 
 public class SocketSpeaker implements Runnable{
     private IRCSocket ircSocket;
-    private IRCClient client;
-    private boolean isClosed = false;
+    private IRCClient ircClient;
+    private volatile boolean isClosed = false;
 
-    public SocketSpeaker(IRCSocket ircSocket, IRCClient client) {
+    public SocketSpeaker(IRCSocket ircSocket, IRCClient ircClient) {
         this.ircSocket = ircSocket;
-        this.client = client;
+        this.ircClient = ircClient;
     }
 
     @Override
     public void run() {
         Scanner scanner = new Scanner(System.in);
 
-        while (true) {
+        while (!isClosed) {
             System.out.print("Input: ");
             String line = scanner.nextLine();
 
-            if (line.equals("exit")) {
-                isClosed = true;
-                client.exit();
+            if (line.equals("exit") || isClosed) {
+                ircClient.exit();
                 return;
             }
 
@@ -33,6 +32,7 @@ public class SocketSpeaker implements Runnable{
                 sendMessage(message);
             } catch (IOException e) {
                 e.printStackTrace();
+                return;
             }
 
         }
@@ -48,5 +48,8 @@ public class SocketSpeaker implements Runnable{
 
     public void close() {
         isClosed = true;
+    }
+    public boolean isClosed() {
+        return isClosed;
     }
 }

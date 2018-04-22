@@ -21,15 +21,19 @@ public class IRCMessageWriter { // todo handle partial write (for file transfer)
             System.out.println("Writer is empty");
             return;
         }
+        if (currentMessage == null) {
+            currentMessage = writeQueue.poll();
+            String message = currentMessage;
+            buffer.clear();
+            buffer.put(message.getBytes());
+            buffer.flip();
+        }
 
-        currentMessage = writeQueue.poll();
-        String message = currentMessage;
-        System.out.println("Message before sent: " + message);
-        buffer.clear();
-        buffer.put(message.getBytes());
-        buffer.flip();
+        System.out.println("Message before sent: " + currentMessage);
         ircSocket.write(buffer);
-
+        if (!buffer.hasRemaining()) {
+            currentMessage = null;
+        }
 
     }
 

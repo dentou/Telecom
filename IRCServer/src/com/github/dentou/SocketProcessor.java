@@ -1,12 +1,16 @@
 package com.github.dentou;
 
 import java.io.IOException;
-import java.net.Socket;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
 
+import static com.github.dentou.IRCUtils.createErrorReplies;
+import static com.github.dentou.IRCUtils.createCommandResponse;
+import static com.github.dentou.IRCUtils.createRelayMessage;
+import static com.github.dentou.IRCConstants.*;
+import static com.github.dentou.UserHandler.StatusCode;
 
 public class SocketProcessor implements Runnable {
     private Queue<IRCSocket> socketQueue;
@@ -25,7 +29,7 @@ public class SocketProcessor implements Runnable {
     private Set<IRCSocket> emptyToNonEmptySockets = new HashSet<>();
     private Set<IRCSocket> nonEmptyToEmptySockets = new HashSet<>();
 
-    public SocketProcessor(Queue<IRCSocket> socketQueue) throws IOException{
+    public SocketProcessor(Queue<IRCSocket> socketQueue) throws IOException {
         this.socketQueue = socketQueue;
 
         this.readSelector = Selector.open();
@@ -69,6 +73,15 @@ public class SocketProcessor implements Runnable {
         }
     }
 
+    private void closeSocket(IRCSocket socket) throws IOException {
+        System.out.println("Socket closed: " + socket.getId());
+        this.socketMap.remove(socket.getId());
+        SelectionKey readKey = socket.getSelectionKey(readSelector);
+        readKey.attach(null);
+        readKey.cancel();
+        readKey.channel().close();
+    }
+
     private void readFromSocket(SelectionKey key) throws IOException {
         IRCSocket socket = (IRCSocket) key.attachment();
         List<IRCMessage> requests = socket.getMessages();
@@ -81,11 +94,7 @@ public class SocketProcessor implements Runnable {
         }
 
         if (socket.isEndOfStreamReached()) {
-            System.out.println("Socket closed: " + socket.getId());
-            this.socketMap.remove(socket.getId());
-            key.attach(null);
-            key.cancel();
-            key.channel().close();
+            closeSocket(socket);
         }
     }
 
@@ -96,7 +105,7 @@ public class SocketProcessor implements Runnable {
             Set<SelectionKey> selectedKeys = this.readSelector.selectedKeys();
             Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
-            while(keyIterator.hasNext()) {
+            while (keyIterator.hasNext()) {
                 SelectionKey key = keyIterator.next();
 
                 readFromSocket(key);
@@ -107,7 +116,7 @@ public class SocketProcessor implements Runnable {
         }
     }
 
-    private void processRequests() throws IOException{
+    private void processRequests() throws IOException {
         while (true) {
             IRCMessage request = requestQueue.poll();
             if (request == null) {
@@ -121,33 +130,83 @@ public class SocketProcessor implements Runnable {
     }
 
 
-
-    private void processRequest(IRCMessage request) { // Process command and add response to send queue
-
+    private void processRequest(IRCMessage request) throws IOException { // Process command and add response to send queue
+        if (request.getMessage() == null || request.getMessage().trim() == "") {
+            return;
+        }
         List<String> requestParts = IRCUtils.parseRequest(request.getMessage());
         System.out.println("Request " + requestParts);
         String command = requestParts.get(0);
 
-        UserHandler.StatusCode statusCode;
         switch (command) {
             case "NICK": // NICK <nick>
-                statusCode = userHandler.addUser(request.getFromId(), requestParts.get(1));
-                if (statusCode == UserHandler.StatusCode.NICK_DUPLICATE) {
-                    sendQueue.add(createErrorReplies(IRCConstants.ErrorReplies.ERR_NICKNAMEINUSE, request, requestParts));
-                }
+                handleNickCommand(request, requestParts);
                 break;
             case "USER":
-                statusCode = userHandler.changeUserInfo(request.getFromId(), "userName", requestParts.get(1));
-                if (statusCode == UserHandler.StatusCode.NEW_USER) {
-                    sendQueue.add(createCommandResponse(IRCConstants.CommandResponse.RPL_WELCOME, request, requestParts));
-                    System.out.println("Welcome sent");
-                }
-                statusCode = userHandler.changeUserInfo(request.getFromId(), "userFullName", requestParts.get(4));
+                handleUSerCommand(request, requestParts);
+                break;
+            case "QUIT":
+                handleQuitCommand(request, requestParts);
+                break;
+            case "PRIVMSG":
+                handlePrivmsgCommand(request, requestParts);
+                break;
+            default:
                 break;
         }
 
     }
 
+    private void handleNickCommand(IRCMessage request, List<String> requestParts) {
+        if (requestParts.size() < 2) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts));
+            return;
+        }
+        StatusCode statusCode = userHandler.addUser(request.getFromId(), requestParts.get(1));
+        if (statusCode == StatusCode.NICK_DUPLICATE) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NICKNAMEINUSE, request, requestParts));
+        }
+    }
+
+    private void handleUSerCommand(IRCMessage request, List<String> requestParts) {
+        if (requestParts.size() < 5) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts));
+            return;
+        }
+        StatusCode statusCode = userHandler.changeUserInfo(request.getFromId(), "userName", requestParts.get(1));
+        if (statusCode == StatusCode.NEW_USER) {
+            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
+            System.out.println("Welcome sent");
+        }
+        userHandler.changeUserInfo(request.getFromId(), "userFullName", requestParts.get(4));
+    }
+
+    private void handleQuitCommand(IRCMessage request, List<String> requestParts) throws IOException {
+        StatusCode statusCode = userHandler.removeUser(request.getFromId());
+        IRCSocket ircSocket = socketMap.get(request.getFromId());
+        closeSocket(ircSocket);
+    }
+
+    private void handlePrivmsgCommand(IRCMessage request, List<String> requestParts) {
+        if (requestParts.size() <= 1) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts));
+            return;
+        }
+        if (requestParts.size() < 3) { // Only PRIVMSG and a parameter given
+            if (request.getMessage().contains(":")) { // If only text is given, no nickname
+                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts));
+            } else { // Only nickname is given, no text to send
+                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTEXTTOSEND, request, requestParts));
+            }
+            return;
+        }
+        long toId = userHandler.getUserId(requestParts.get(1));
+        if (toId == -1) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts));
+            return;
+        }
+        sendQueue.add(createRelayMessage(request, userHandler, toId));
+    }
 
     private void writeResponses() throws IOException {
         pullAllRequest();
@@ -160,16 +219,16 @@ public class SocketProcessor implements Runnable {
 
         if (writeReady > 0) {
             Set<SelectionKey> selectedKeys = writeSelector.selectedKeys();
-            Iterator<SelectionKey> keyIterator   = selectedKeys.iterator();
+            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
 
-            while(keyIterator.hasNext()){
+            while (keyIterator.hasNext()) {
                 SelectionKey key = keyIterator.next();
 
                 IRCSocket ircSocket = (IRCSocket) key.attachment();
 
                 ircSocket.sendMessages();
 
-                if(ircSocket.isWriterEmpty()){
+                if (ircSocket.isWriterEmpty()) {
                     this.nonEmptyToEmptySockets.add(ircSocket);
                 }
 
@@ -181,7 +240,7 @@ public class SocketProcessor implements Runnable {
     }
 
     private void registerNonEmptySockets() throws ClosedChannelException {
-        for(IRCSocket ircSocket : emptyToNonEmptySockets){
+        for (IRCSocket ircSocket : emptyToNonEmptySockets) {
             SelectionKey key = ircSocket.register(this.writeSelector, SelectionKey.OP_WRITE);
             key.attach(ircSocket);
         }
@@ -189,14 +248,14 @@ public class SocketProcessor implements Runnable {
     }
 
     private void cancelEmptySockets() {
-        for(IRCSocket ircSocket : nonEmptyToEmptySockets){
+        for (IRCSocket ircSocket : nonEmptyToEmptySockets) {
             SelectionKey key = ircSocket.getSelectionKey(this.writeSelector);
             key.cancel();
         }
         nonEmptyToEmptySockets.clear();
     }
 
-    private void pullAllRequest() throws IOException{
+    private void pullAllRequest() {
         while (true) {
             IRCMessage outMessage = sendQueue.poll();
             if (outMessage == null) {
@@ -214,58 +273,6 @@ public class SocketProcessor implements Runnable {
             }
         }
 
-
-    }
-
-
-    private IRCMessage createCommandResponse(IRCConstants.CommandResponse responseType, IRCMessage request, List<String> requestParts) {
-        String serverName = "localhost"; // todo change to real serverName
-        long requesterId = request.getFromId();
-        String requesterNick = userHandler.getUserNick(requesterId);
-        String requesterUserName = userHandler.getUserName(requesterId);
-
-        String serverHeader = IRCUtils.createServerHeader(serverName);
-        String userHeader = IRCUtils.createUserHeader(serverName, requesterNick, requesterUserName);
-
-        long receiverId = 0;
-
-        StringBuilder sb = new StringBuilder();
-
-        switch (responseType) {
-            case RPL_WELCOME:
-                receiverId = requesterId;
-                userHeader = IRCUtils.createUserHeader(serverName, requesterNick, userHandler.getUserName(requesterId));
-                System.out.println("User header: " + userHeader);
-                sb.append(":");
-                String responseString = IRCUtils.createResponseString(serverHeader, responseType.getNumericCode(),
-                        requesterNick, "Welcome to the Internet Relay Network", userHeader);
-                sb.append(responseString);
-                break;
-        }
-        return new IRCMessage(sb.toString(), 0, receiverId);
-    }
-
-    private IRCMessage createErrorReplies(IRCConstants.ErrorReplies errorType, IRCMessage request, List<String> requestParts) {
-        String serverName = "localhost"; // todo change to real serverName
-        long requesterId = request.getFromId();
-
-        String serverHeader = IRCUtils.createServerHeader(serverName);
-
-        long receiverId = requesterId;
-
-        StringBuilder sb = new StringBuilder();
-
-        switch (errorType) {
-            case ERR_NICKNAMEINUSE:
-                sb.append(":");
-                String responseString = IRCUtils.createResponseString(serverHeader, errorType.getNumericCode(),
-                        requestParts.get(1), ":Nickname is already in use");
-                sb.append(responseString);
-                break;
-
-        }
-
-        return new IRCMessage(sb.toString(), 0, receiverId);
     }
 
 

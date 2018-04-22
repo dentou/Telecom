@@ -12,11 +12,11 @@
   </component>
   <component name="FileEditorManager">
     <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="IRCServer.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCServer.java">
+      <file leaf-file-name="SocketProcessor.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/SocketProcessor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="215">
-              <caret line="24" column="63" selection-start-line="24" selection-start-column="63" selection-end-line="24" selection-end-column="63" />
+            <state relative-caret-position="130">
+              <caret line="133" column="71" selection-start-line="133" selection-start-column="71" selection-end-line="133" selection-end-column="71" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -24,14 +24,20 @@
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SocketProcessor.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/SocketProcessor.java">
+      <file leaf-file-name="IRCMessage.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessage.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="720">
-              <caret line="237" column="63" selection-start-line="237" selection-start-column="63" selection-end-line="237" selection-end-column="63" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
+            <state relative-caret-position="-112">
+              <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="IRCConstants.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCConstants.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="39">
+              <caret line="32" column="34" lean-forward="true" selection-start-line="32" selection-start-column="34" selection-end-line="32" selection-end-column="34" />
             </state>
           </provider>
         </entry>
@@ -39,28 +45,12 @@
       <file leaf-file-name="IRCSocket.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCSocket.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state>
-              <caret line="51" column="30" selection-start-line="51" selection-start-column="30" selection-end-line="51" selection-end-column="30" />
+            <state relative-caret-position="215">
+              <caret line="39" selection-start-line="39" selection-end-line="39" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#932#933#0" expanded="true" />
                 <element signature="e#953#954#0" expanded="true" />
-                <element signature="e#900#901#0" expanded="true" />
-                <element signature="e#938#939#0" expanded="true" />
-                <element signature="e#1091#1092#0" expanded="true" />
-                <element signature="e#1130#1131#0" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="UserHandler.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/UserHandler.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="176">
-              <caret line="77" column="17" selection-start-line="77" selection-start-column="17" selection-end-line="77" selection-end-column="17" />
-              <folding>
-                <element signature="imports" expanded="true" />
+                <element signature="e#1011#1012#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -69,10 +59,28 @@
       <file leaf-file-name="IRCUtils.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="416">
-              <caret line="26" column="56" selection-start-line="26" selection-start-column="56" selection-end-line="26" selection-end-column="56" />
+            <state relative-caret-position="144">
+              <caret line="54" column="72" selection-start-line="54" selection-start-column="72" selection-end-line="54" selection-end-column="72" />
               <folding>
                 <element signature="imports" expanded="true" />
+              </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file leaf-file-name="UserHandler.java" pinned="false" current-in-tab="false">
+        <entry file="file://$PROJECT_DIR$/src/com/github/dentou/UserHandler.java">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="183">
+              <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
+              <folding>
+                <element signature="imports" expanded="true" />
+                <element signature="e#1124#1125#0" expanded="true" />
+                <element signature="e#1173#1174#0" expanded="true" />
+                <element signature="e#1303#1304#0" expanded="true" />
+                <element signature="e#1352#1353#0" expanded="true" />
+                <element signature="e#1394#1395#0" expanded="true" />
+                <element signature="e#1441#1442#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -81,7 +89,7 @@
       <file leaf-file-name="User.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/dentou/User.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="96">
+            <state relative-caret-position="-281">
               <caret line="10" column="38" selection-start-line="10" selection-start-column="38" selection-end-line="10" selection-end-column="38" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -93,15 +101,10 @@
       <file leaf-file-name="IRCMessageWriter.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageWriter.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="247">
-              <caret line="23" column="35" lean-forward="true" selection-start-line="23" selection-start-column="35" selection-end-line="23" selection-end-column="35" />
+            <state relative-caret-position="-48">
+              <caret line="20" column="41" selection-start-line="20" selection-start-column="41" selection-end-line="20" selection-end-column="41" />
               <folding>
                 <element signature="imports" expanded="true" />
-                <element signature="e#273#281#0" expanded="true" />
-                <element signature="e#1349#1350#0" expanded="true" />
-                <element signature="e#1393#1394#0" expanded="true" />
-                <element signature="e#1425#1426#0" expanded="true" />
-                <element signature="e#1504#1505#0" expanded="true" />
               </folding>
             </state>
           </provider>
@@ -110,7 +113,7 @@
       <file leaf-file-name="IRCMessageReader.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageReader.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-96">
+            <state relative-caret-position="-32">
               <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -138,6 +141,12 @@
       <find>socketId</find>
       <find>size</find>
       <find>readFromAllSockets</find>
+      <find>get</find>
+      <find>Utils</find>
+      <find>Constan</find>
+      <find>stat</find>
+      <find>IRCUti</find>
+      <find>UserHandler.Sta</find>
     </findStrings>
     <replaceStrings>
       <replace>nickToUser</replace>
@@ -157,22 +166,22 @@
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCUtil.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCServer.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/Main.java" />
-        <option value="$PROJECT_DIR$/src/com/github/dentou/SocketAcceptor.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCChannel.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/Message.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCMessage.java" />
-        <option value="$PROJECT_DIR$/src/com/github/dentou/IRCConstants.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCMessageReader.java" />
-        <option value="$PROJECT_DIR$/src/com/github/dentou/IRCSocket.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/User.java" />
-        <option value="$PROJECT_DIR$/src/com/github/dentou/UserHandler.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCMessageWriter.java" />
-        <option value="$PROJECT_DIR$/src/com/github/dentou/SocketProcessor.java" />
+        <option value="$PROJECT_DIR$/src/com/github/dentou/SocketAcceptor.java" />
+        <option value="$PROJECT_DIR$/src/com/github/dentou/IRCSocket.java" />
+        <option value="$PROJECT_DIR$/src/com/github/dentou/IRCConstants.java" />
+        <option value="$PROJECT_DIR$/src/com/github/dentou/UserHandler.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/IRCUtils.java" />
+        <option value="$PROJECT_DIR$/src/com/github/dentou/SocketProcessor.java" />
       </list>
     </option>
   </component>
-  <component name="ProjectFrameBounds" extendedState="6">
+  <component name="ProjectFrameBounds" extendedState="7">
     <option name="x" value="-4" />
     <option name="y" value="-8" />
     <option name="width" value="1386" />
@@ -184,6 +193,7 @@
     </navigator>
     <panes>
       <pane id="Scope" />
+      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -206,7 +216,6 @@
           <select />
         </subPane>
       </pane>
-      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -272,11 +281,12 @@
       <workItem from="1524284766400" duration="3000" />
       <workItem from="1524296260108" duration="14594000" />
       <workItem from="1524316208036" duration="10749000" />
+      <workItem from="1524359982714" duration="10288000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="46646000" />
+    <option name="totallyTimeSpent" value="56934000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -296,22 +306,22 @@
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
-      <window_info anchor="bottom" id="Run" order="2" weight="0.32838285" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
+      <window_info active="true" anchor="bottom" id="Run" order="2" visible="true" weight="0.32838285" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32838285" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2685325" />
-      <window_info anchor="bottom" id="Find" order="1" weight="0.32838285" />
+      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.27231467" />
       <window_info id="Learn" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
       <window_info id="Favorites" order="2" side_tool="true" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
+      <window_info anchor="bottom" id="Find" order="1" weight="0.32838285" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -346,11 +356,6 @@
           <caret line="14" column="35" selection-start-line="14" selection-start-column="35" selection-end-line="14" selection-end-column="35" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#273#281#0" expanded="true" />
-            <element signature="e#1349#1350#0" expanded="true" />
-            <element signature="e#1393#1394#0" expanded="true" />
-            <element signature="e#1425#1426#0" expanded="true" />
-            <element signature="e#1504#1505#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -393,8 +398,6 @@
           <caret line="12" column="77" selection-start-line="12" selection-start-column="77" selection-end-line="12" selection-end-column="77" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#614#615#0" expanded="true" />
-            <element signature="e#649#650#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -439,6 +442,8 @@
           <caret line="25" column="47" selection-start-line="25" selection-start-column="43" selection-end-line="25" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#953#954#0" expanded="true" />
+            <element signature="e#1011#1012#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -449,6 +454,12 @@
           <caret line="27" column="19" selection-start-line="27" selection-start-column="19" selection-end-line="27" selection-end-column="19" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#1124#1125#0" expanded="true" />
+            <element signature="e#1173#1174#0" expanded="true" />
+            <element signature="e#1303#1304#0" expanded="true" />
+            <element signature="e#1352#1353#0" expanded="true" />
+            <element signature="e#1394#1395#0" expanded="true" />
+            <element signature="e#1441#1442#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -486,8 +497,6 @@
           <caret line="12" column="77" selection-start-line="12" selection-start-column="77" selection-end-line="12" selection-end-column="77" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#614#615#0" expanded="true" />
-            <element signature="e#649#650#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -532,6 +541,8 @@
           <caret line="25" column="47" selection-start-line="25" selection-start-column="43" selection-end-line="25" selection-end-column="47" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#953#954#0" expanded="true" />
+            <element signature="e#1011#1012#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -542,6 +553,12 @@
           <caret line="27" column="19" selection-start-line="27" selection-start-column="19" selection-end-line="27" selection-end-column="19" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#1124#1125#0" expanded="true" />
+            <element signature="e#1173#1174#0" expanded="true" />
+            <element signature="e#1303#1304#0" expanded="true" />
+            <element signature="e#1352#1353#0" expanded="true" />
+            <element signature="e#1394#1395#0" expanded="true" />
+            <element signature="e#1441#1442#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -603,6 +620,8 @@
           <caret line="15" column="110" selection-start-line="15" selection-start-column="110" selection-end-line="15" selection-end-column="110" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#953#954#0" expanded="true" />
+            <element signature="e#1011#1012#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -650,6 +669,8 @@
           <caret line="34" selection-start-line="34" selection-end-line="34" />
           <folding>
             <element signature="imports" expanded="true" />
+            <element signature="e#953#954#0" expanded="true" />
+            <element signature="e#1011#1012#0" expanded="true" />
           </folding>
         </state>
       </provider>
@@ -666,23 +687,6 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/MessageBuffer.java" />
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCUtil.java" />
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/SocketAcceptor.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="302">
-          <caret line="26" column="84" selection-start-line="26" selection-start-column="84" selection-end-line="26" selection-end-column="84" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessage.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="286">
-          <caret line="28" selection-start-line="28" selection-end-line="28" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCChannel.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-34">
@@ -695,23 +699,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="448">
-          <caret line="32" column="8" selection-start-line="32" selection-start-column="8" selection-end-line="32" selection-end-column="8" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/User.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="10" column="38" selection-start-line="10" selection-start-column="38" selection-end-line="10" selection-end-column="38" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/Main.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -719,20 +706,40 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageReader.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCServer.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-96">
-          <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
+        <state relative-caret-position="352">
+          <caret line="24" column="63" selection-start-line="24" selection-start-column="63" selection-end-line="24" selection-end-column="63" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/UserHandler.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageWriter.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="176">
-          <caret line="77" column="17" selection-start-line="77" selection-start-column="17" selection-end-line="77" selection-end-column="17" />
+        <state relative-caret-position="-48">
+          <caret line="20" column="41" selection-start-line="20" selection-start-column="41" selection-end-line="20" selection-end-column="41" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/SocketAcceptor.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="158">
+          <caret line="26" column="99" selection-start-line="26" selection-start-column="99" selection-end-line="26" selection-end-column="99" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageReader.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-32">
+          <caret line="16" column="34" selection-start-line="16" selection-start-column="34" selection-end-line="16" selection-end-column="34" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
@@ -741,59 +748,70 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCSocket.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state>
-          <caret line="51" column="30" selection-start-line="51" selection-start-column="30" selection-end-line="51" selection-end-column="30" />
+        <state relative-caret-position="215">
+          <caret line="39" selection-start-line="39" selection-end-line="39" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#932#933#0" expanded="true" />
             <element signature="e#953#954#0" expanded="true" />
-            <element signature="e#900#901#0" expanded="true" />
-            <element signature="e#938#939#0" expanded="true" />
-            <element signature="e#1091#1092#0" expanded="true" />
-            <element signature="e#1130#1131#0" expanded="true" />
+            <element signature="e#1011#1012#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessageWriter.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/User.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="247">
-          <caret line="23" column="35" lean-forward="true" selection-start-line="23" selection-start-column="35" selection-end-line="23" selection-end-column="35" />
+        <state relative-caret-position="-281">
+          <caret line="10" column="38" selection-start-line="10" selection-start-column="38" selection-end-line="10" selection-end-column="38" />
           <folding>
             <element signature="imports" expanded="true" />
-            <element signature="e#273#281#0" expanded="true" />
-            <element signature="e#1349#1350#0" expanded="true" />
-            <element signature="e#1393#1394#0" expanded="true" />
-            <element signature="e#1425#1426#0" expanded="true" />
-            <element signature="e#1504#1505#0" expanded="true" />
+          </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="39">
+          <caret line="32" column="34" lean-forward="true" selection-start-line="32" selection-start-column="34" selection-end-line="32" selection-end-column="34" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/UserHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="183">
+          <caret line="30" column="33" selection-start-line="30" selection-start-column="33" selection-end-line="30" selection-end-column="33" />
+          <folding>
+            <element signature="imports" expanded="true" />
+            <element signature="e#1124#1125#0" expanded="true" />
+            <element signature="e#1173#1174#0" expanded="true" />
+            <element signature="e#1303#1304#0" expanded="true" />
+            <element signature="e#1352#1353#0" expanded="true" />
+            <element signature="e#1394#1395#0" expanded="true" />
+            <element signature="e#1441#1442#0" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="416">
-          <caret line="26" column="56" selection-start-line="26" selection-start-column="56" selection-end-line="26" selection-end-column="56" />
+        <state relative-caret-position="144">
+          <caret line="54" column="72" selection-start-line="54" selection-start-column="72" selection-end-line="54" selection-end-column="72" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCServer.java">
+    <entry file="file://$PROJECT_DIR$/src/com/github/dentou/IRCMessage.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="215">
-          <caret line="24" column="63" selection-start-line="24" selection-start-column="63" selection-end-line="24" selection-end-column="63" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="-112">
+          <caret line="5" column="13" selection-start-line="5" selection-start-column="13" selection-end-line="5" selection-end-column="13" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/com/github/dentou/SocketProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="720">
-          <caret line="237" column="63" selection-start-line="237" selection-start-column="63" selection-end-line="237" selection-end-column="63" />
+        <state relative-caret-position="130">
+          <caret line="133" column="71" selection-start-line="133" selection-start-column="71" selection-end-line="133" selection-end-column="71" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
