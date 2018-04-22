@@ -11,7 +11,14 @@ public class IRCConstants {
     public enum CommandResponse {
         RPL_WELCOME("001"),
         RPL_YOURHOST("002"),
-        RPL_CREATED("003")
+        RPL_CREATED("003"),
+        RPL_MYINFO("004"),
+        RPL_WHOISUSER("311"),
+        RPL_WHOISSERVER("312"),
+        RPL_ENDOFWHOIS("318"),
+        RPL_TOPIC("332"),
+        RPL_NAMEREPLY("353"),
+        RPL_ENDOFNAMES("366")
 
         ;
 
@@ -33,7 +40,9 @@ public class IRCConstants {
         ERR_NEEDMOREPARAMS("461"),
         ERR_NORECIPIENT("411"),
         ERR_NOTEXTTOSEND("412"),
-        ERR_NOSUCHNICK("401")
+        ERR_NOSUCHNICK("401"),
+        ERR_UNKNOWNCOMMAND("421"),
+        ERR_NOTREGISTERED("451")
         ;
 
         private String numericCode;

@@ -11,7 +11,10 @@ public class IRCConstants {
     public enum CommandResponse {
         RPL_WELCOME("001"),
         RPL_YOURHOST("002"),
-        RPL_CREATED("003")
+        RPL_CREATED("003"),
+        RPL_WHOISUSER("311"),
+        RPL_WHOISSERVER("312"),
+        RPL_ENDOFWHOIS("318")
 
         ;
 

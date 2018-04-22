@@ -6,13 +6,29 @@ import java.util.List;
 import java.util.Set;
 
 public class IRCChannel {
-    private List<User> userList;
+    private List<User> userList = new ArrayList<User>();
     private String name;
     private String topic;
 
     public IRCChannel(String name) {
+        this(name, "");
+    }
+
+    public IRCChannel(String name, String topic) {
         this.name = name;
-        this.userList = new ArrayList<User>();
+        this.topic = topic;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public String getTopic() {
+        return topic;
+    }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
     }
 
     public void addUser(User user) {
@@ -32,5 +48,13 @@ public class IRCChannel {
             ids.add(user.getId());
         }
         return ids;
+    }
+
+    public List<String> getAllNicks() {
+        List<String> nicks = new ArrayList<>();
+        for (User user : userList) {
+            nicks.add(user.getNick());
+        }
+        return nicks;
     }
 }

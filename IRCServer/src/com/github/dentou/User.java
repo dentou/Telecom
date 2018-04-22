@@ -6,13 +6,12 @@ import java.util.Objects;
 
 public class User {
     private final long id;
-    private final String nick;
+    private String nick = null;
     private String userName = null;
     private String userFullName = null;
 
-    public User(long id, String nick) {
+    public User(long id) {
         this.id = id;
-        this.nick = nick;
     }
 
     public long getId() {
@@ -31,6 +30,10 @@ public class User {
         return userFullName;
     }
 
+
+    public void setNick(String nick) {
+        this.nick = nick;
+    }
 
     public void setUserName(String userName) {
         this.userName = userName;

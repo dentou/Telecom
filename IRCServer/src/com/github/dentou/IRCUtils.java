@@ -16,7 +16,7 @@ public class IRCUtils {
         return parts;
     }
 
-    public static String createResponseString(String ... fields) { // Create string with fields separated by space
+    public static StringBuilder createResponseStringBuilder(String... fields) { // Create string with fields separated by space
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < fields.length; i++) {
             sb.append(fields[i]);
@@ -24,8 +24,7 @@ public class IRCUtils {
                 sb.append(" ");
             }
         }
-        sb.append("\r\n"); // todo check this line break
-        return sb.toString();
+        return sb;
     }
 
     public static String createServerHeader(String serverName) {
@@ -50,39 +49,73 @@ public class IRCUtils {
         String userHeader = createUserHeader(serverName, userHandler.getUserNick(fromId), userHandler.getUserName(fromId));
         StringBuilder sb = new StringBuilder();
         sb.append(":");
-        String responseString = createResponseString(userHeader, request.getMessage());
+        String responseString = createResponseStringBuilder(userHeader, request.getMessage()).toString();
         sb.append(responseString);
         return new IRCMessage(sb.toString(), request.getFromId(), toId);
     }
 
     public static IRCMessage createCommandResponse(IRCConstants.CommandResponse responseType, IRCMessage request,
-                                             List<String> requestParts, UserHandler userHandler) {
+                                                   List<String> requestParts, UserHandler userHandler) {
         String serverName = "localhost"; // todo change to real serverName
         long requesterId = request.getFromId();
         String requesterNick = userHandler.getUserNick(requesterId);
+        if (requesterNick == null) {
+            requesterNick = "*";
+        }
 
         String serverHeader = createServerHeader(serverName);
-        String userHeader;
+        String userHeader = createUserHeader(serverName, requesterNick, userHandler.getUserName(requesterId));;
 
-        long receiverId = 0;
 
         StringBuilder sb = new StringBuilder();
+        sb.append(":");
+        StringBuilder responseStringBuilder = new StringBuilder();
+
+
 
         switch (responseType) {
             case RPL_WELCOME:
-                receiverId = requesterId;
-                userHeader = createUserHeader(serverName, requesterNick, userHandler.getUserName(requesterId));
-                System.out.println("User header: " + userHeader);
-                sb.append(":");
-                String responseString = createResponseString(serverHeader, responseType.getNumericCode(),
-                        requesterNick, "Welcome to the Internet Relay Network", userHeader);
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, ":Welcome to the Internet Relay Network", userHeader);
+                break;
+            case RPL_YOURHOST:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, ":Your host is", userHeader);
+                break;
+            case RPL_WHOISUSER:
+                long userId = userHandler.getUserId(requestParts.get(1));
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, userHandler.getUserNick(userId), userHandler.getUserName(userId), serverName,
+                        "*", ":" + userHandler.getUserFullName(userId));
+                break;
+            case RPL_TOPIC:
+                String topic = userHandler.getChannel(requestParts.get(1)).getTopic();
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":" + topic);
+                break;
+            case RPL_NAMEREPLY:
+                List<String> nicks = userHandler.getChannelMemberNicks(requestParts.get(1));
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, "=", requestParts.get(1), ":");
+                for (int i = 0; i < nicks.size(); i++) {
+                    responseStringBuilder.append(nicks.get(i));
+                    if (i < nicks.size() - 1) {
+                        responseStringBuilder.append(" ");
+                    }
+                }
+                break;
+            case RPL_ENDOFNAMES:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, "=", requestParts.get(1), ":End of NAMES list");
                 break;
         }
-        return new IRCMessage(sb.toString(), 0, receiverId);
+        sb.append(responseStringBuilder.toString());
+        sb.append("\r\n"); // Line break after every messages
+        return new IRCMessage(sb.toString(), 0, requesterId);
     }
 
-    public static IRCMessage createErrorReplies(IRCConstants.ErrorReplies errorType, IRCMessage request, List<String> requestParts) {
+    public static IRCMessage createErrorReplies(IRCConstants.ErrorReplies errorType, IRCMessage request,
+                                                List<String> requestParts , UserHandler userHandler) {
         String serverName = "localhost"; // todo change to real serverName
         long receiverId = request.getFromId();
 
@@ -91,41 +124,50 @@ public class IRCUtils {
 
         StringBuilder sb = new StringBuilder();
         sb.append(":");
-        String responseString = "";
+        StringBuilder responseStringBuilder = new StringBuilder();
+
+        String requesterNick = userHandler.getUserNick(request.getFromId());
+        if (requesterNick == null) {
+            requesterNick = "*";
+        }
 
         switch (errorType) {
             case ERR_NICKNAMEINUSE:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        requestParts.get(1), ":Nickname is already in use");
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Nickname is already in use");
                 break;
             case ERR_NONICKNAMEGIVEN:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        ":No nickname given");
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, ":No nickname given");
                 break;
             case ERR_NEEDMOREPARAMS:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        requestParts.get(0), ":No nickname given");
-                sb.append(responseString);
+
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, requestParts.get(0), ":Not enough parameters");
                 break;
             case ERR_NORECIPIENT:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        requestParts.get(0), ":No recipient given");
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                       requesterNick , requestParts.get(0), ":No recipient given");
                 break;
             case ERR_NOSUCHNICK:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        requestParts.get(1), ":No such nick/channel");
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":No such nick/channel");
                 break;
             case ERR_NOTEXTTOSEND:
-                responseString = createResponseString(serverHeader, errorType.getNumericCode(),
-                        ":No text to send");
-                sb.append(responseString);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, ":No text to send");
+                break;
+            case ERR_UNKNOWNCOMMAND:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, requestParts.get(0), ":Unknown command");
+                break;
+            case ERR_NOTREGISTERED:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, errorType.getNumericCode(),
+                        requesterNick, ":You have not registered");
                 break;
         }
-
+        sb.append(responseStringBuilder.toString());
+        sb.append("\r\n"); // Line break after every messages
         return new IRCMessage(sb.toString(), 0, receiverId);
     }
 

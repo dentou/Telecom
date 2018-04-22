@@ -12,6 +12,10 @@ import static com.github.dentou.IRCUtils.createRelayMessage;
 import static com.github.dentou.IRCConstants.*;
 import static com.github.dentou.UserHandler.StatusCode;
 
+
+/**
+ *
+ */
 public class SocketProcessor implements Runnable {
     private Queue<IRCSocket> socketQueue;
     private Map<Long, IRCSocket> socketMap = new HashMap<Long, IRCSocket>();
@@ -40,6 +44,7 @@ public class SocketProcessor implements Runnable {
 
     @Override
     public void run() {
+        userHandler.createChannel("#All", "Everything is discussed");
         while (true) {
             try {
                 registerNewSockets();
@@ -57,6 +62,7 @@ public class SocketProcessor implements Runnable {
         }
     }
 
+
     private void registerNewSockets() throws ClosedChannelException {
 
         while (true) {
@@ -68,6 +74,7 @@ public class SocketProcessor implements Runnable {
 
             newSocket.setId(nextSocketId++);
             this.socketMap.put(newSocket.getId(), newSocket);
+            this.userHandler.addUser(newSocket.getId());
             SelectionKey key = newSocket.register(this.readSelector, SelectionKey.OP_READ);
             key.attach(newSocket);
         }
@@ -89,7 +96,9 @@ public class SocketProcessor implements Runnable {
 
         if (requests.size() > 0) {
             for (IRCMessage request : requests) {
-                this.requestQueue.add(request);
+                if (request.getMessage() != null & !request.getMessage().trim().isEmpty()) {
+                    this.requestQueue.add(request);
+                }
             }
         }
 
@@ -115,6 +124,7 @@ public class SocketProcessor implements Runnable {
             selectedKeys.clear();
         }
     }
+
 
     private void processRequests() throws IOException {
         while (true) {
@@ -151,7 +161,17 @@ public class SocketProcessor implements Runnable {
             case "PRIVMSG":
                 handlePrivmsgCommand(request, requestParts);
                 break;
+            case "PING":
+                handlePingCommand(request, requestParts);
+                break;
+            case "WHOIS":
+                handleWhoisCommand(request, requestParts);
+                break;
+            case "JOIN":
+                handleJoinCommand(request, requestParts);//todo implements channel
+                break;
             default:
+                sendQueue.add(createErrorReplies(ErrorReplies.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
                 break;
         }
 
@@ -159,26 +179,37 @@ public class SocketProcessor implements Runnable {
 
     private void handleNickCommand(IRCMessage request, List<String> requestParts) {
         if (requestParts.size() < 2) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts));
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
             return;
         }
-        StatusCode statusCode = userHandler.addUser(request.getFromId(), requestParts.get(1));
+        boolean isRegisteredBefore = userHandler.isRegistered(request.getFromId());
+        StatusCode statusCode = userHandler.changeUserInfo(request.getFromId(), "nick", requestParts.get(1));
         if (statusCode == StatusCode.NICK_DUPLICATE) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NICKNAMEINUSE, request, requestParts));
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NICKNAMEINUSE, request, requestParts, userHandler));
+            return;
+        }
+        boolean isRegisteredAfter = userHandler.isRegistered(request.getFromId());
+        if (!isRegisteredBefore && isRegisteredAfter) {
+            System.out.println("Welcome sent");
+            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
         }
     }
 
     private void handleUSerCommand(IRCMessage request, List<String> requestParts) {
         if (requestParts.size() < 5) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts));
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
+        boolean isRegisteredBefore = userHandler.isRegistered(request.getFromId());
         StatusCode statusCode = userHandler.changeUserInfo(request.getFromId(), "userName", requestParts.get(1));
-        if (statusCode == StatusCode.NEW_USER) {
-            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
-            System.out.println("Welcome sent");
-        }
         userHandler.changeUserInfo(request.getFromId(), "userFullName", requestParts.get(4));
+        boolean isRegisteredAfter = userHandler.isRegistered(request.getFromId());
+        if (!isRegisteredBefore && isRegisteredAfter) {
+            System.out.println("Welcome sent");
+            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
+        }
+
+
     }
 
     private void handleQuitCommand(IRCMessage request, List<String> requestParts) throws IOException {
@@ -189,23 +220,67 @@ public class SocketProcessor implements Runnable {
 
     private void handlePrivmsgCommand(IRCMessage request, List<String> requestParts) {
         if (requestParts.size() <= 1) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts));
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         if (requestParts.size() < 3) { // Only PRIVMSG and a parameter given
             if (request.getMessage().contains(":")) { // If only text is given, no nickname
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts));
+                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
             } else { // Only nickname is given, no text to send
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTEXTTOSEND, request, requestParts));
+                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTEXTTOSEND, request, requestParts, userHandler));
             }
+            return;
+        }
+        if (!userHandler.isRegistered(request.getFromId())){
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         long toId = userHandler.getUserId(requestParts.get(1));
         if (toId == -1) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts));
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
         sendQueue.add(createRelayMessage(request, userHandler, toId));
+    }
+
+    private void handlePingCommand(IRCMessage request, List<String> requestParts) {
+        sendQueue.add(new IRCMessage("PONG\r\n", 0, request.getFromId()));
+    }
+
+    private void handleWhoisCommand(IRCMessage request, List<String> requestParts) {
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            return;
+        }
+        if (requestParts.size() < 2) {
+            // Not sending ERR_NEEDMOREPARAMS
+            return;
+        }
+        if (!userHandler.containsNick(requestParts.get(1))) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            return;
+        }
+        sendQueue.add(createCommandResponse(CommandResponse.RPL_WHOISUSER, request, requestParts, userHandler));
+
+    }
+
+    private void handleJoinCommand(IRCMessage request, List<String> requestParts) {
+        if (requestParts.size() < 2) {
+            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            return;
+        }
+        IRCChannel channel = userHandler.getChannel(requestParts.get(1));
+        if (channel == null) {
+            // todo check if channel name has correct form and create new channel
+            return;
+        }
+        userHandler.addUserToChannel(request.getFromId(), requestParts.get(1));
+        if (channel.getTopic() != null || !channel.getTopic().isEmpty()) {
+            sendQueue.add(createCommandResponse(CommandResponse.RPL_TOPIC, request, requestParts, userHandler));
+        }
+        sendQueue.add(createCommandResponse(CommandResponse.RPL_NAMEREPLY, request, requestParts, userHandler));
+        sendQueue.add(createCommandResponse(CommandResponse.RPL_ENDOFNAMES, request, requestParts, userHandler));
+        return;
     }
 
     private void writeResponses() throws IOException {
