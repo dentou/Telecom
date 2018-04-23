@@ -55,6 +55,13 @@ public class UserHandler {
     public boolean containsId(long id) {
         return idToUser.containsKey(id);
     }
+    public boolean containsId(long id, String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return false;
+        }
+        return channel.containsUser(idToUser.get(id));
+    }
 
     public boolean isRegistered(long id) {
         User user = idToUser.get(id);
@@ -86,6 +93,9 @@ public class UserHandler {
         idToUser.remove(id);
         if (user.getNick() != null) {
             nickToId.remove(user.getNick());
+        }
+        for (IRCChannel channel : channels) {
+            channel.removeUser(user);
         }
         return StatusCode.SUCCESS;
     }
@@ -151,6 +161,15 @@ public class UserHandler {
         }
         return channel.getAllNicks();
     }
+
+    public List<Long> getChannelMemberIds(String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return null;
+        }
+        return channel.getAllIds();
+    }
+
 
 
 }

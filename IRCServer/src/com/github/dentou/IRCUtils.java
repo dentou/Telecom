@@ -7,6 +7,10 @@ import java.util.regex.Pattern;
 
 public class IRCUtils {
 
+    public static boolean isValidChannelName(String name) {
+        return name.matches("#[a-zA-Z0-9!@#$%^&*()]{1,49}");
+    }
+
     public static List<String> parseRequest(String request) {
         List<String> parts = new ArrayList<String>();
         Matcher m = Pattern.compile("(?<=:).+|[^ :]+").matcher(request);
@@ -51,6 +55,7 @@ public class IRCUtils {
         sb.append(":");
         String responseString = createResponseStringBuilder(userHeader, request.getMessage()).toString();
         sb.append(responseString);
+        sb.append("\r\n"); // End of message
         return new IRCMessage(sb.toString(), request.getFromId(), toId);
     }
 
@@ -110,7 +115,7 @@ public class IRCUtils {
                 break;
         }
         sb.append(responseStringBuilder.toString());
-        sb.append("\r\n"); // Line break after every messages
+        sb.append("\r\n"); // End of message
         return new IRCMessage(sb.toString(), 0, requesterId);
     }
 
@@ -167,7 +172,7 @@ public class IRCUtils {
                 break;
         }
         sb.append(responseStringBuilder.toString());
-        sb.append("\r\n"); // Line break after every messages
+        sb.append("\r\n"); // End of message
         return new IRCMessage(sb.toString(), 0, receiverId);
     }
 

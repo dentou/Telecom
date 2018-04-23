@@ -2,10 +2,8 @@ package com.github.dentou;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.channels.Selector;
 import java.nio.channels.SocketChannel;
-import java.util.List;
-import java.util.Scanner;
+
 
 public class IRCClient {
     private IRCSocket ircSocket;

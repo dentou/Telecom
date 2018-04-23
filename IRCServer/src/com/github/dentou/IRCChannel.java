@@ -39,10 +39,13 @@ public class IRCChannel {
     }
 
     public void removeUser(User user) {
-        userList.remove(user);
+        if (user != null) {
+            userList.remove(user);
+        }
+
     }
 
-    public List<Long> getAllId() {
+    public List<Long> getAllIds() {
         List<Long> ids = new ArrayList<Long>();
         for (User user : userList) {
             ids.add(user.getId());
@@ -56,5 +59,12 @@ public class IRCChannel {
             nicks.add(user.getNick());
         }
         return nicks;
+    }
+
+    public boolean containsUser(User user) {
+        if (user == null) {
+            return false;
+        }
+        return this.userList.contains(user);
     }
 }
