@@ -1,51 +1,32 @@
 package com.github.dentou;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class UserHandler {
-    private Map<String, Long> nickToId;
-    private Map<Long, User> idToUser;
+    private Set<User> userList = new HashSet<>();
+    private Map<String, Long> nickToId = new HashMap<String, Long>();
+    private Map<Long, User> idToUser = new HashMap<Long, User>();
+    private Map<User, Set<IRCChannel>> userToChannels = new HashMap<>();
+
+    private Set<IRCChannel> channels = new HashSet<>();
     private Map<String, IRCChannel> nameToChannel = new HashMap<>();
-    private List<User> users;
-    private List<IRCChannel> channels;
+
 
     public enum StatusCode {
         SUCCESS, NICK_DUPLICATE, ID_DUPLICATE, ID_NOT_EXIST, UNKNOWN_OPERATION,
-        INVALID_CHANNEL_NAME;
+        ;
     }
 
     public UserHandler() {
-        this.nickToId = new HashMap<String, Long>();
-        this.idToUser = new HashMap<Long, User>();
-        this.users = new ArrayList<User>();
-        this.channels = new ArrayList<IRCChannel>();
+
     }
 
-    public long getUserId(String nick) {
-        Long longId = nickToId.get(nick);
-        if (longId == null) {
-            return -1;
-        }
-        return longId.longValue();
+    public User getUser(long id) {
+        return this.idToUser.get(id);
     }
 
-    public List<Long> getUserIds(List<String> nicks) {
-        List<Long> ids = new ArrayList<Long>();
-        for (String nick : nicks) {
-            ids.add(getUserId(nick));
-        }
-        return ids;
-    }
-
-    public String getUserNick(long id) {
-        return idToUser.get(id).getNick();
-    }
-    public String getUserName(long id) { return idToUser.get(id).getUserName(); }
-    public String getUserFullName(long id) {
-        return idToUser.get(id).getUserFullName();
+    public User getUser(String nick) {
+        return this.idToUser.get(nickToId.get(nick));
     }
 
     public boolean containsNick(String nick) {
@@ -55,13 +36,7 @@ public class UserHandler {
     public boolean containsId(long id) {
         return idToUser.containsKey(id);
     }
-    public boolean containsId(long id, String channelName) {
-        IRCChannel channel = nameToChannel.get(channelName);
-        if (channel == null) {
-            return false;
-        }
-        return channel.containsUser(idToUser.get(id));
-    }
+
 
     public boolean isRegistered(long id) {
         User user = idToUser.get(id);
@@ -74,13 +49,15 @@ public class UserHandler {
         return true;
     }
 
+
     public StatusCode addUser(long id) {
         if (containsId(id)) {
             return StatusCode.ID_DUPLICATE;
         }
-        User user = new User(id);
-        this.users.add(user);
+        User user = new User(id, null, null, null);
+        userList.add(user);
         idToUser.put(id, user);
+        userToChannels.put(user, new HashSet<IRCChannel>());
         return StatusCode.SUCCESS;
     }
 
@@ -89,14 +66,16 @@ public class UserHandler {
         if (user == null) {
             return StatusCode.ID_NOT_EXIST;
         }
-        users.remove(user);
-        idToUser.remove(id);
+        this.userList.remove(user);
+        this.idToUser.remove(id);
         if (user.getNick() != null) {
             nickToId.remove(user.getNick());
         }
-        for (IRCChannel channel : channels) {
+        Set<IRCChannel> joinedChannels = this.userToChannels.get(user);
+        for (IRCChannel channel : joinedChannels) {
             channel.removeUser(user);
         }
+        this.userToChannels.remove(user);
         return StatusCode.SUCCESS;
     }
 
@@ -107,67 +86,148 @@ public class UserHandler {
             return StatusCode.ID_NOT_EXIST;
         }
 
+        Set<IRCChannel> joinedChannels = this.userToChannels.get(user);
+
+        this.userList.remove(user);
+        this.idToUser.remove(user.getId());
+        this.userToChannels.remove(user);
+
         switch (parameter) {
             case "nick":
                 if (containsNick(newValue)) {
                     return StatusCode.NICK_DUPLICATE;
                 }
-                user.setNick(newValue);
+                nickToId.remove(user.getNick());
+                user = new User(user.getId(), newValue, user.getUserName(), user.getUserFullName());
+                nickToId.put(user.getNick(), user.getId());
                 break;
             case "userName":
-                user.setUserName(newValue);
+                user = new User(user.getId(), user.getNick(), newValue, user.getUserFullName());
                 break;
             case "userFullName":
-                user.setUserFullName(newValue);
+                user = new User(user.getId(), user.getNick(), user.getUserName(), newValue);
                 break;
             default:
                 return StatusCode.UNKNOWN_OPERATION;
 
         }
+        userList.add(user);
+        idToUser.put(user.getId(), user);
+        userToChannels.put(user, joinedChannels);
         return StatusCode.SUCCESS;
     }
 
-    public void createChannel(String name) {
-        createChannel(name, "");
+    public void createChannel(String name, long adminId) {
+        createChannel(name, adminId, "");
     }
 
-    public void createChannel(String name, String topic) {
-        IRCChannel channel = new IRCChannel(name, topic);
+    public IRCChannel createChannel(String name, long adminId, String topic) {
+        User admin = idToUser.get(adminId);
+        IRCChannel channel = new IRCChannel(name, admin, topic);
         this.channels.add(channel);
         this.nameToChannel.put(name, channel);
+        this.userToChannels.get(admin).add(channel);
+        return channel;
+    }
+
+    public String getChannelTopic(String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return null;
+        }
+        return channel.getTopic();
+    }
+
+    public void setChannelTopic(String channelName, String newTopic) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return;
+        }
+        channel.setTopic(newTopic);
     }
 
     public boolean containsChannel(String name) {
         return this.nameToChannel.containsKey(name);
     }
 
-    public IRCChannel getChannel(String name) {
-        return this.nameToChannel.get(name);
+    public boolean isOnChannel(long id, String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return false;
+        }
+        return channel.isMember(idToUser.get(id));
+    }
+
+    public boolean isChannelOperator(long id, String channelName) {
+        User user = idToUser.get(id);
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return false;
+        }
+        return channel.isOperator(user);
+    }
+
+    public Set<String> getJoinedChannelNames(long id) {
+        Set<String> channelNames = new HashSet<>();
+        Set<IRCChannel> joinedChannels = this.userToChannels.get(idToUser.get(id));
+        for (IRCChannel channel : joinedChannels) {
+            channelNames.add(channel.getName());
+        }
+        return channelNames;
     }
 
     public void addUserToChannel(long id, String channelName) {
         IRCChannel channel = nameToChannel.get(channelName);
-        if (channel == null) {
+        User user = idToUser.get(id);
+        if (channel == null || user == null) {
             return;
         }
         channel.addUser(idToUser.get(id));
+        userToChannels.get(user).add(channel);
+    }
+
+    public void removeUserFromChannel(long id, String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        User user = idToUser.get(id);
+        if (channel == null || user == null) {
+            return;
+        }
+        channel.removeUser(idToUser.get(id));
+        userToChannels.get(user).remove(channel);
+        if (channel.isEmpty()) {
+            channels.remove(channel);
+            nameToChannel.remove(channelName);
+        }
 
     }
 
-    public List<String> getChannelMemberNicks(String channelName) {
-        IRCChannel channel = nameToChannel.get(channelName);
-        if (channel == null) {
-            return null;
+    public void removeUserFromAllChannels(long id) {
+        User user = idToUser.get(id);
+        Set<IRCChannel> joinedChannels = userToChannels.get(user);
+        if (user == null || joinedChannels == null || joinedChannels.isEmpty()) {
+            return;
         }
-        return channel.getAllNicks();
+        for (IRCChannel channel : joinedChannels) {
+            removeUserFromChannel(id, channel.getName());
+        }
     }
 
-    public List<Long> getChannelMemberIds(String channelName) {
+    public Map<User, String> getChannelMembers(String channelName) {
         IRCChannel channel = nameToChannel.get(channelName);
+        Map<User, String> users = new HashMap<>();
         if (channel == null) {
-            return null;
+            return users;
         }
-        return channel.getAllIds();
+        for (User user : channel.getAllMembers()) {
+            if (channel.isAdmin(user)) {
+                users.put(user, "@");
+            } else if (channel.isModerator(user)) {
+                users.put(user, "+");
+            } else {
+                users.put(user, "");
+            }
+        }
+        return users;
     }
 
 

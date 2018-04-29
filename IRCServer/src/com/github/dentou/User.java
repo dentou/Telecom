@@ -4,14 +4,18 @@ import jdk.nashorn.internal.ir.annotations.Immutable;
 
 import java.util.Objects;
 
+@Immutable
 public class User {
     private final long id;
-    private String nick = null;
-    private String userName = null;
-    private String userFullName = null;
+    private final String nick;
+    private final String userName;
+    private final String userFullName;
 
-    public User(long id) {
+    public User(long id, String nick, String userName, String userFullName) {
         this.id = id;
+        this.nick = nick;
+        this.userName = userName;
+        this.userFullName = userFullName;
     }
 
     public long getId() {
@@ -31,18 +35,6 @@ public class User {
     }
 
 
-    public void setNick(String nick) {
-        this.nick = nick;
-    }
-
-    public void setUserName(String userName) {
-        this.userName = userName;
-    }
-
-    public void setUserFullName(String userFullName) {
-        this.userFullName = userFullName;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -55,5 +47,15 @@ public class User {
     public int hashCode() {
 
         return Objects.hash(id);
+    }
+
+    @Override
+    public String toString() {
+        return "User{" +
+                "id=" + id +
+                ", nick='" + nick + '\'' +
+                ", userName='" + userName + '\'' +
+                ", userFullName='" + userFullName + '\'' +
+                '}';
     }
 }

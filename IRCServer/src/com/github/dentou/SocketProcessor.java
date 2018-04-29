@@ -6,7 +6,7 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
 
-import static com.github.dentou.IRCConstants.*;
+import static com.github.dentou.IRCConstants.Response;
 import static com.github.dentou.IRCUtils.*;
 import static com.github.dentou.UserHandler.StatusCode;
 
@@ -15,7 +15,7 @@ import static com.github.dentou.UserHandler.StatusCode;
  *
  */
 public class SocketProcessor implements Runnable {
-    private String serverName = "localhost";
+    private String serverName = getServerAddress();
     private Queue<IRCSocket> socketQueue;
     private Map<Long, IRCSocket> socketMap = new HashMap<Long, IRCSocket>();
     private long nextSocketId = 1024; // Id frm 0 to 1023 is reserved for servers
@@ -24,7 +24,7 @@ public class SocketProcessor implements Runnable {
     private Selector writeSelector;
 
 
-    private Queue<IRCMessage> requestQueue = new LinkedList<>();
+    private Queue<IRCMessage> requestQueue = new LinkedList<>(); // Contains already parsed requests (no \r\n)
     private Queue<IRCMessage> sendQueue = new LinkedList<>();
 
     private UserHandler userHandler;
@@ -43,7 +43,6 @@ public class SocketProcessor implements Runnable {
 
     @Override
     public void run() {
-        userHandler.createChannel("#All", "Everything is discussed");
         while (true) {
             try {
                 registerNewSockets();
@@ -169,8 +168,17 @@ public class SocketProcessor implements Runnable {
             case "JOIN":
                 handleJoinCommand(request, requestParts);//todo implements channel
                 break;
+            case "PART":
+                handlePartCommand(request, requestParts);
+                break;
+            case "TOPIC":
+                handleTopicCommand(request, requestParts);
+                break;
+            case "KICK":
+                handleKickCommand(request, requestParts);
+                break;
             default:
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
+                sendQueue.add(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
                 break;
         }
 
@@ -179,97 +187,126 @@ public class SocketProcessor implements Runnable {
     private void handleNickCommand(IRCMessage request, List<String> requestParts) {
         // Not enough params
         if (requestParts.size() < 2) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
+            return;
+        }
+        // Check if nickname is valid
+        if (!isValidNick(requestParts.get(1))) {
+            sendQueue.add(createResponse(Response.ERR_ERRONEOUSNICKNAME, request, requestParts, userHandler));
+            return;
+        }
+        // Check if another user has same nick
+        if (userHandler.containsNick(requestParts.get(1))) {
+            sendQueue.add(createResponse(Response.ERR_NICKNAMEINUSE, request, requestParts, userHandler));
             return;
         }
         // Check if user was registered before this command
         boolean isRegisteredBefore = userHandler.isRegistered(request.getFromId());
         // Set user's nick
-        StatusCode statusCode = userHandler.changeUserInfo(request.getFromId(), "nick", requestParts.get(1));
-        if (statusCode == StatusCode.NICK_DUPLICATE) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NICKNAMEINUSE, request, requestParts, userHandler));
-            return;
-        }
+        userHandler.changeUserInfo(request.getFromId(), "nick", requestParts.get(1));
         // Check if user is registered after this command
         boolean isRegisteredAfter = userHandler.isRegistered(request.getFromId());
         // User was not registered before and is registered after -> New user -> Send welcome
         if (!isRegisteredBefore && isRegisteredAfter) {
-            System.out.println("Welcome sent");
-            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
+            sendWelcome(request, requestParts);
         }
     }
 
     private void handleUSerCommand(IRCMessage request, List<String> requestParts) {
         // Not enough params
         if (requestParts.size() < 5) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Check if user was registered before this command
         boolean isRegisteredBefore = userHandler.isRegistered(request.getFromId());
         // Set user's name and full name
-        StatusCode statusCode = userHandler.changeUserInfo(request.getFromId(), "userName", requestParts.get(1));
+        userHandler.changeUserInfo(request.getFromId(), "userName", requestParts.get(1));
         userHandler.changeUserInfo(request.getFromId(), "userFullName", requestParts.get(4));
         // Check if user is registered after this command
         boolean isRegisteredAfter = userHandler.isRegistered(request.getFromId());
         // User was not registered before and is registered after -> New user -> Send welcome
         if (!isRegisteredBefore && isRegisteredAfter) {
-            System.out.println("Welcome sent");
-            sendQueue.add(createCommandResponse(CommandResponse.RPL_WELCOME, request, requestParts, userHandler));
+            sendWelcome(request, requestParts);
         }
-
 
     }
 
+    private void sendWelcome(IRCMessage request, List<String> requestParts) {
+        System.out.println("Welcome sent");
+        sendQueue.add(createResponse(Response.RPL_WELCOME, request, requestParts, userHandler));
+    }
+
     private void handleQuitCommand(IRCMessage request, List<String> requestParts) throws IOException {
-        StatusCode statusCode = userHandler.removeUser(request.getFromId());
-        IRCSocket ircSocket = socketMap.get(request.getFromId());
-        closeSocket(ircSocket);
+        // Send PART messages
+        if (userHandler.isRegistered(request.getFromId())) {
+            Set<String> channelNames = userHandler.getJoinedChannelNames(request.getFromId());
+            if (channelNames.isEmpty()) {
+                userHandler.removeUser(request.getFromId());
+                IRCSocket ircSocket = socketMap.get(request.getFromId());
+                closeSocket(ircSocket);
+                return;
+            } else {
+                for (String channelName : channelNames) {
+                    requestQueue.add(new IRCMessage("PART " + channelName, request.getFromId(), 0));
+                }
+                requestQueue.add(request);
+            }
+        } else {
+            userHandler.removeUser(request.getFromId());
+            IRCSocket ircSocket = socketMap.get(request.getFromId());
+            closeSocket(ircSocket);
+        }
+
     }
 
     private void handlePrivmsgCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
-        if (!userHandler.isRegistered(request.getFromId())){
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTREGISTERED, request, requestParts, userHandler));
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Not enough params
         if (requestParts.size() <= 1) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Not enough params
         if (requestParts.size() < 3) { // Only PRIVMSG and a parameter given
             if (request.getMessage().contains(":")) { // If only text is given, no nickname
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
+                sendQueue.add(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
             } else { // Only nickname is given, no text to send
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTEXTTOSEND, request, requestParts, userHandler));
+                sendQueue.add(createResponse(Response.ERR_NOTEXTTOSEND, request, requestParts, userHandler));
             }
             return;
         }
         // Check if receiver is a channel
         if (isValidChannelName(requestParts.get(1))) {
-            IRCChannel channel = userHandler.getChannel(requestParts.get(1));
-            if (channel ==  null) { // No channel has that name
-                sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            String channelName = requestParts.get(1);
+            if (!userHandler.containsChannel(channelName)) { // No channel has that name
+                sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
                 return;
-            } else { // There's a channel with the same name
-                if (userHandler.containsId(request.getFromId(), channel.getName())) { // User is a member of channel
-                    sendToChannel(channel.getName(), requestParts.get(2));
-                    return;
-                } else { // User is not a member
-                    // todo ERR_CANNOTSENDTOCHAN
-                }
             }
+            // There's a channel with the same name
+            // Check if user is a member
+            if (userHandler.isOnChannel(request.getFromId(), channelName)) { // User is a member of channel
+                sendToChannel(channelName, request);
+                return;
+            } else { // User is not a member
+                // todo ERR_CANNOTSENDTOCHAN
+                sendQueue.add(createResponse(Response.ERR_CANNOTSENDTOCHAN, request, requestParts, userHandler));
+                return;
+            }
+
         }
-        // Try to get receiver's id
-        long toId = userHandler.getUserId(requestParts.get(1));
-        if (toId == -1) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts, userHandler));
+        // Try to get receiver
+        User user = userHandler.getUser(requestParts.get(1));
+        if (user == null) {
+            sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
         // Relay message to receiver
-        sendQueue.add(createRelayMessage(request, userHandler, toId));
+        sendQueue.add(createRelayMessage(request, userHandler, user.getId()));
     }
 
     private void handlePingCommand(IRCMessage request, List<String> requestParts) {
@@ -279,7 +316,7 @@ public class SocketProcessor implements Runnable {
     private void handleWhoisCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // If no param, ignore
@@ -289,60 +326,180 @@ public class SocketProcessor implements Runnable {
         }
         // If nick user asks for does not exist
         if (!userHandler.containsNick(requestParts.get(1))) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
         //Send info back to requester
-        sendQueue.add(createCommandResponse(CommandResponse.RPL_WHOISUSER, request, requestParts, userHandler));
+        sendQueue.add(createResponse(Response.RPL_WHOISUSER, request, requestParts, userHandler));
 
     }
 
     private void handleJoinCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Not enough parameters
         if (requestParts.size() < 2) {
-            sendQueue.add(createErrorReplies(ErrorReplies.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
-        // Attempt to get channel
-        IRCChannel channel = userHandler.getChannel(requestParts.get(1));
-        if (channel == null) {
-            // todo check if channel name has correct form and create new channel
+        // Check if JOIN 0 (PART all channels)
+        if (requestParts.get(1).equals("0")) { // todo send to all members
+            Set<String> channelNames = userHandler.getJoinedChannelNames(request.getFromId());
+            for (String channelName : channelNames) {
+                requestQueue.add(new IRCMessage("PART " + channelName, request.getFromId(), 0));
+            }
             return;
         }
-        // If all test passed, add user to channel
-        userHandler.addUserToChannel(request.getFromId(), channel.getName());
-        // Create join messages
-        String requesterNick = userHandler.getUserNick(request.getFromId());
-        String requesterUserName = userHandler.getUserName(request.getFromId());
-        StringBuilder sb = new StringBuilder();
-        sb.append(":");
-        sb.append(createUserHeader(serverName, requesterNick, requesterUserName));
-        sb.append(" ");
-        sb.append(request.getMessage());
-        sb.append("\r\n");
+        //Check valid channel name
+        String channelName = requestParts.get(1);
+        if (!isValidChannelName(channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // If there exists no channel with the same name, create new one
+        if (!userHandler.containsChannel(channelName)) {
+            userHandler.createChannel(channelName, request.getFromId()); // Create channel and make user admin
+        } else {
+            // Add user to channel
+            userHandler.addUserToChannel(request.getFromId(), channelName);
+        }
+        String channelTopic = userHandler.getChannelTopic(channelName);
         //Send to all channel members
-        sendToChannel(channel.getName(), sb.toString());
+        sendToChannel(channelName, request);
         //Send channel topic to requester
-        if (channel.getTopic() != null || !channel.getTopic().isEmpty()) {
-            sendQueue.add(createCommandResponse(CommandResponse.RPL_TOPIC, request, requestParts, userHandler));
+        if (channelTopic != null && !channelTopic.isEmpty()) {
+            sendQueue.add(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
         }
         //Send channel name list
-        sendQueue.add(createCommandResponse(CommandResponse.RPL_NAMEREPLY, request, requestParts, userHandler));
-        sendQueue.add(createCommandResponse(CommandResponse.RPL_ENDOFNAMES, request, requestParts, userHandler));
+        sendQueue.add(createResponse(Response.RPL_NAMEREPLY, request, requestParts, userHandler));
+        sendQueue.add(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
         return;
     }
 
-    private void sendToChannel(String channelName, String message) {
-        List<Long> memberIds = userHandler.getChannelMemberIds(channelName);
-        for (long id : memberIds) {
-            sendQueue.add(new IRCMessage(message, 0, id));
+    private void handlePartCommand(IRCMessage request, List<String> requestParts) {
+        // If user has not yet registered
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            return;
+        }
+        // Check enough params
+        if (requestParts.size() < 2) {
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            return;
+        }
+        // Check if channel exists
+        String channelName = requestParts.get(1);
+        if (!userHandler.containsChannel(channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // Check if user is on channel
+        if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+        }
+        // Send message to all channel members
+        sendToChannel(channelName, request);
+        // Remove user from channel
+        userHandler.removeUserFromChannel(request.getFromId(), channelName);
+    }
+
+    private void handleTopicCommand(IRCMessage request, List<String> requestParts) {
+        // If user has not yet registered
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            return;
+        }
+        // Check parameters
+        if (requestParts.size() < 2) {
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            return;
+        }
+        //Check valid channel name
+        String channelName = requestParts.get(1);
+        if (!isValidChannelName(channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // Check if requester is member of channel
+        if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // If only channelName is given, return topic
+        if (requestParts.size() < 3) {
+            String channelTopic = userHandler.getChannelTopic(channelName);
+            // If no topic is set for channel
+            if (channelTopic == null || channelTopic.isEmpty()) {
+                sendQueue.add(createResponse(Response.RPL_NOTOPIC, request, requestParts, userHandler));
+                return;
+            }
+
+            sendQueue.add(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
+            return;
+        }
+
+        // If channelName and newTopic is given
+        // Check if requester is moderator or admin (channel operator)
+        if (!userHandler.isChannelOperator(request.getFromId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
+            return;
+        }
+
+        String newTopic = requestParts.get(2);
+        userHandler.setChannelTopic(channelName, newTopic);
+        sendToChannel(channelName, request);
+    }
+
+    private void handleKickCommand(IRCMessage request, List<String> requestParts) {
+        // If user has not yet registered
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            return;
+        }
+        // Check parameters
+        if (requestParts.size() < 3) {
+            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            return;
+        }
+        //Check valid channel name
+        String channelName = requestParts.get(1);
+        if (!isValidChannelName(channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // Check if requester is member of channel
+        if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // Check if requester is moderator or admin (channel operator)
+        if (!userHandler.isChannelOperator(request.getFromId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
+            return;
+        }
+        // Check if user being kicked is on channel
+        User kicked = userHandler.getUser(requestParts.get(2));
+        if (!userHandler.isOnChannel(kicked.getId(), channelName)) {
+            sendQueue.add(createResponse(Response.ERR_USERNOTINCHANNEL, request, requestParts, userHandler));
+            return;
+        }
+        // Send kick message
+        sendToChannel(channelName, request);
+        // Remove user from channel
+        userHandler.removeUserFromChannel(kicked.getId(), channelName);
+
+    }
+
+    private void sendToChannel(String channelName, IRCMessage request) {
+        Set<User> members = userHandler.getChannelMembers(channelName).keySet();
+        for (User member : members) {
+            sendQueue.add(createRelayMessage(request, userHandler, member.getId()));
         }
     }
+
 
     private void writeResponses() throws IOException {
         pullAllRequest();

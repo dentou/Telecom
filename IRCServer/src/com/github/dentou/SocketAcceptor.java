@@ -1,6 +1,7 @@
 package com.github.dentou;
 
 import java.io.IOException;
+import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
@@ -24,7 +25,7 @@ public class SocketAcceptor implements Runnable{
         try {
             this.serverChannel = ServerSocketChannel.open();
             this.serverChannel.bind(new InetSocketAddress(tcpPort));
-            System.out.println("Server starts at " + serverChannel.socket().getLocalSocketAddress());
+            System.out.println("Server starts at " + InetAddress.getLocalHost().getHostAddress());
         } catch (IOException e) {
             e.printStackTrace();
             return;
