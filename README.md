@@ -1,5 +1,37 @@
 # Telecom (draft)
 
+## Table of Contents
+
+* [Protocol Description](#protocol-description)
+	* [Identifiers](#identifiers)
+		* [Users](#users)
+		* [Channels](#channels)
+    * [Message Format](#message-format)
+    	* [Requests](#requests)
+    	* [Relay messages](#relay-messages)
+    	* [Replies](#replies)
+    * [Message Details](#message-details)
+    	* [Connection registration](#connection-registration)
+    		* [NICK](#nick)
+    		* [USER](#user)
+    		* [QUIT](#quit)
+    	* [Channel operations](#channel-operations)
+    		* [JOIN](#join)
+    		* [PART](#part)
+    		* [TOPIC](#topic)
+ 			* [KICK](#kick)
+    	* [Sending message](#sending-message)
+    		* [PRIVMSG](#privmsg)
+    	* [User based queries](#user-based-queries)
+    	 	* [WHO](#who)
+    	 	* [WHOIS](#whois)
+    	* [Miscellaneous messages](#miscellaneous-messages)
+    		* [PING and PONG](#ping-and-pong)
+* [Example communication](#example-communication)
+	* [Connection registration](#connection-registration)
+
+
+
 ## Protocol Description
 ### Identifiers
 ##### Users:
@@ -242,8 +274,8 @@ server at the other end of the connection. Servers send a PING
 message at regular intervals if no other activity detected coming
 from a connection. If a connection fails to respond to a PING
 message within a set amount of time, that connection is closed. **IMPLEMENT LATER**
-### Example communication
-##### Connection registration
+## Example communication
+### Connection registration
 When an IRC client connects to an IRC server, it must first register its connection. This is done by sending two messages (in any order): `NICK` and `USER`. `NICK` specifies the user’s nick, and `USER` provides additional information about the user. More specifically, `USER` specifies the user’s username and the user’s full name. For example:
 ``` java
 NICK dentou
