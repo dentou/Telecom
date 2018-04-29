@@ -95,7 +95,7 @@ A reply is a message with the following components:
 The following are examples of valid IRC replies:
 
 ``` java
-:irc.example.com 001 dentou :Welcome to the Internet Relay Network dentou!huy@vgu.edu.vn
+:irc.example.com 001 dentou :Welcome to the Internet Relay Network dentou!huy@​vgu.edu.vn
 
 :irc.example.com 433 * dentou :Nickname is already in use.
 
@@ -286,14 +286,14 @@ In this example, user's nick is `dentou`. His/her username is `kuri` and full na
 
 Upon success, the server will send an `RPL_WELCOME` reply (which is assigned code `001`) to the client who made the request. For example:
 ``` java
-:irc.example.com 001 dentou :Welcome to the Internet Relay Network dentou!huy@vgu.edu.vn
+:irc.example.com 001 dentou :Welcome to the Internet Relay Network dentou!huy@​vgu.edu.vn
 ```
 In the example,
 
 * `:irc.example.com` The prefix indicating that this reply originates in server irc.example.com.
 * `001`: The numeric code for `RPL_WELCOME`.
 * `dentou`: The first parameter which, in reply messages, must always be the nick of the user this reply is intended for.
-* `:Welcome to the Internet Relay Network dentou!huy@vgu.edu.vn`: The second parameter. The content of this parameter is specified in [RFC2812 §5](https://tools.ietf.org/html/rfc2812#section-5). (Note that the specification in RFC2812 omits the first parameter, which is always the recipient of the reply and only lists the second and subsequent (if any) parameters.)
+* `:Welcome to the Internet Relay Network dentou!huy@​vgu.edu.vn`: The second parameter. The content of this parameter is specified in [RFC2812 §5](https://tools.ietf.org/html/rfc2812#section-5). (Note that the specification in RFC2812 omits the first parameter, which is always the recipient of the reply and only lists the second and subsequent (if any) parameters.)
 
 Other replies can be sent in case of errors.
 
