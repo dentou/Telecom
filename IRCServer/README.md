@@ -1,4 +1,4 @@
-# Telecom (draft)
+# Server Descriptions
 
 ## Table of Contents
 
