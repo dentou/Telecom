@@ -1,0 +1,54 @@
+.send-message-label {
+    -fx-background-color: rgb(102, 102, 255);
+    -fx-text-fill: white;
+    -fx-font-size: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 5px;
+}
+
+.receive-message-label {
+    -fx-background-color: rgb(217, 217, 217);
+    -fx-text-fill: black;
+    -fx-font-size: 14px;
+    -fx-background-radius: 14px;
+    -fx-padding: 5px;
+}
+
+.nick-label {
+    -fx-background-color: rgba(161, 255, 255, 0.5);
+}
+
+#send-button {
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 14px;
+    -fx-background-color: #0084ff;
+    -fx-background-radius: 30px;
+}
+
+#send-button:hover {
+    -fx-text-fill: #0084ff;
+    -fx-background-color: white;
+}
+
+#chat-box {
+    -fx-background-radius: 7px;
+    -fx-border-radius: 7px;
+}
+
+#chat-box:focused {
+    -fx-faint-focus-color: transparent;
+    -fx-focus-color: rgba(0, 132, 255, 0.8);
+}
+
+#chat-box .scroll-pane {
+    -fx-background-color: transparent;
+}
+
+#chat-box .scroll-pane .viewport {
+    -fx-background-color: transparent;
+}
+
+#chat-box .scroll-pane .content {
+    -fx-background-color: transparent;
+}

@@ -21,6 +21,11 @@ public class UserHandler {
 
     }
 
+    public List<User> getAllUsers() {
+        List<User> users = new ArrayList<>(this.userList);
+        return users;
+    }
+
     public User getUser(long id) {
         return this.idToUser.get(id);
     }
@@ -210,6 +215,22 @@ public class UserHandler {
         for (IRCChannel channel : joinedChannels) {
             removeUserFromChannel(id, channel.getName());
         }
+    }
+
+    public Map<String, String> getAllChannelNamesAndTopics() {
+        Map<String, String> namesAndTopics = new HashMap<>();
+        for (IRCChannel channel : this.channels) {
+            namesAndTopics.put(channel.getName(), channel.getTopic());
+        }
+        return namesAndTopics;
+    }
+
+    public long getChannelNumberOfMembers(String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            return 0;
+        }
+        return channel.getNumberOfMembers();
     }
 
     public Map<User, String> getChannelMembers(String channelName) {

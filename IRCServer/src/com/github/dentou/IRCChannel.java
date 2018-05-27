@@ -10,6 +10,7 @@ public class IRCChannel {
     private List<User> moderatorList = new ArrayList<>();
     private String name;
     private String topic;
+    private long memberCount = 1;
 
     private User admin;
 
@@ -66,6 +67,10 @@ public class IRCChannel {
         return topic;
     }
 
+    public long getNumberOfMembers() {
+        return this.memberCount;
+    }
+
     public void setTopic(String topic) {
         this.topic = topic;
     }
@@ -73,6 +78,7 @@ public class IRCChannel {
     public void addUser(User user) {
         if (!userList.contains(user)) {
             userList.add(user);
+            this.memberCount++;
         }
 
     }
@@ -81,6 +87,7 @@ public class IRCChannel {
         if (user != null) {
             userList.remove(user);
             moderatorList.remove(user);
+            this.memberCount--;
             if (admin != null && admin.equals(user)) {
                 if (!moderatorList.isEmpty()) {
                     admin = moderatorList.get(0);

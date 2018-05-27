@@ -1,5 +1,8 @@
 package com.github.dentou;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class IRCConstants {
     public static final int SERVER_PORT = 6667;
 
@@ -66,23 +69,16 @@ public class IRCConstants {
 
         ERR_INVITEONLYCHAN("473"),
         ERR_CHANOPRIVSNEEDED("482"),
-
-
-
-
-
-
-
-
-
-
-
-
-
         ;
 
-
         private String numericCode;
+        private static final Map<String, Response> lookupMap = new HashMap<String, Response>();
+
+        static {
+            //Create reverse lookup hash map
+            for(Response response : Response.values())
+                lookupMap.put(response.getNumericCode(), response);
+        }
 
         Response(String numericCode) {
             this.numericCode = numericCode;
@@ -90,6 +86,9 @@ public class IRCConstants {
 
         public String getNumericCode() {
             return this.numericCode;
+        }
+        public static Response getResponse(String numericCode) {
+            return lookupMap.get(numericCode);
         }
     }
 

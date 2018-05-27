@@ -2,10 +2,7 @@ package com.github.dentou;
 
 import java.io.IOException;
 import java.net.InetAddress;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -76,8 +73,12 @@ public class IRCUtils {
         return new IRCMessage(sb.toString(), request.getFromId(), toId);
     }
 
-    public static IRCMessage createResponse(IRCConstants.Response responseType, IRCMessage request,
-                                                List<String> requestParts , UserHandler userHandler) {
+    public static Queue<IRCMessage> createResponse(IRCConstants.Response responseType, IRCMessage request,
+                                                   List<String> requestParts , UserHandler userHandler) {
+
+        boolean autoQueue = true; // Flag to automatically put response into queue
+
+        Queue<IRCMessage> messageQueue = new LinkedList<>();
 
         String serverName = getServerAddress(); // todo change to real serverName
         long requesterId = request.getFromId();
@@ -102,15 +103,36 @@ public class IRCUtils {
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, ":Welcome to the Internet Relay Network", userHeader);
                 break;
-            case RPL_YOURHOST:
+            case RPL_WHOREPLY:
+                autoQueue = false;
+                for (User user : userHandler.getAllUsers()) {
+                    if (!userHandler.isRegistered(user.getId())) {
+                        continue;
+                    }
+
+                    sb = new StringBuilder();
+                    sb.append(":");
+
+                    responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                            requesterNick, user.getNick(), user.getUserName(), "*", "*", ":" + user.getUserFullName());
+
+                    sb.append(responseStringBuilder);
+                    sb.append("\r\n");
+                    messageQueue.add(new IRCMessage(sb.toString(), 0, requesterId));
+                }
+                break;
+            case RPL_ENDOFWHO:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, ":Your host is", userHeader);
+                        requesterNick, ":End of WHO list");
                 break;
             case RPL_WHOISUSER:
                 User user = userHandler.getUser(requestParts.get(1));
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, user.getNick(), user.getUserName(), serverName,
-                        "*", ":" + user.getUserFullName());
+                        requesterNick, user.getNick(), user.getUserName(), "*", "*", ":" + user.getUserFullName());
+                break;
+            case RPL_ENDOFWHOIS:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, ":End of WHOIS list");
                 break;
 
             case RPL_TOPIC:
@@ -140,6 +162,27 @@ public class IRCUtils {
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, "=", requestParts.get(1), ":End of NAMES list");
                 break;
+            case RPL_LIST:
+                autoQueue = false;
+                Map<String, String> namesAndTopics = userHandler.getAllChannelNamesAndTopics();
+                for (String name : namesAndTopics.keySet()) {
+                    sb = new StringBuilder();
+                    sb.append(":");
+
+                    topic = namesAndTopics.get(name);
+                    String memberNum = Long.toString(userHandler.getChannelNumberOfMembers(name));
+                    responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                            requesterNick, name, memberNum , ":" + topic);
+
+                    sb.append(responseStringBuilder);
+                    sb.append("\r\n");
+                    messageQueue.add(new IRCMessage(sb.toString(), 0, requesterId));
+                }
+                break;
+            case RPL_LISTEND:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, ":End of LIST");
+                break;
 
 
 
@@ -163,7 +206,7 @@ public class IRCUtils {
                 break;
             case ERR_NORECIPIENT:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                       requesterNick , requestParts.get(0), ":No recipient given");
+                       requesterNick , ":No recipient given");
                 break;
             case ERR_NOSUCHNICK:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
@@ -203,9 +246,13 @@ public class IRCUtils {
                 break;
 
         }
-        sb.append(responseStringBuilder.toString());
-        sb.append("\r\n"); // End of message
-        return new IRCMessage(sb.toString(), 0, requesterId);
+        if (autoQueue) {
+            sb.append(responseStringBuilder);
+            sb.append("\r\n"); // End of message
+            messageQueue.add(new IRCMessage(sb.toString(), 0, requesterId));
+        }
+
+        return messageQueue;
     }
 
 

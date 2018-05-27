@@ -81,6 +81,7 @@ public class SocketProcessor implements Runnable {
     private void closeSocket(IRCSocket socket) throws IOException {
         System.out.println("Socket closed: " + socket.getId());
         this.socketMap.remove(socket.getId());
+        this.userHandler.removeUser(socket.getId()); // todo check this new adds
         SelectionKey readKey = socket.getSelectionKey(readSelector);
         readKey.attach(null);
         readKey.cancel();
@@ -115,7 +116,13 @@ public class SocketProcessor implements Runnable {
             while (keyIterator.hasNext()) {
                 SelectionKey key = keyIterator.next();
 
-                readFromSocket(key);
+                try {
+                    readFromSocket(key);
+                } catch (IOException e) {
+                    e.printStackTrace();
+                    closeSocket((IRCSocket) key.attachment());
+                }
+
 
                 keyIterator.remove();
             }
@@ -177,8 +184,14 @@ public class SocketProcessor implements Runnable {
             case "KICK":
                 handleKickCommand(request, requestParts);
                 break;
+            case "LIST":
+                handleListCommand(request, requestParts);
+                break;
+            case "WHO":
+                handleWhoCommand(request, requestParts);
+                break;
             default:
-                sendQueue.add(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
                 break;
         }
 
@@ -187,17 +200,17 @@ public class SocketProcessor implements Runnable {
     private void handleNickCommand(IRCMessage request, List<String> requestParts) {
         // Not enough params
         if (requestParts.size() < 2) {
-            sendQueue.add(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
             return;
         }
         // Check if nickname is valid
         if (!isValidNick(requestParts.get(1))) {
-            sendQueue.add(createResponse(Response.ERR_ERRONEOUSNICKNAME, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_ERRONEOUSNICKNAME, request, requestParts, userHandler));
             return;
         }
         // Check if another user has same nick
         if (userHandler.containsNick(requestParts.get(1))) {
-            sendQueue.add(createResponse(Response.ERR_NICKNAMEINUSE, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NICKNAMEINUSE, request, requestParts, userHandler));
             return;
         }
         // Check if user was registered before this command
@@ -215,7 +228,7 @@ public class SocketProcessor implements Runnable {
     private void handleUSerCommand(IRCMessage request, List<String> requestParts) {
         // Not enough params
         if (requestParts.size() < 5) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Check if user was registered before this command
@@ -234,7 +247,7 @@ public class SocketProcessor implements Runnable {
 
     private void sendWelcome(IRCMessage request, List<String> requestParts) {
         System.out.println("Welcome sent");
-        sendQueue.add(createResponse(Response.RPL_WELCOME, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_WELCOME, request, requestParts, userHandler));
     }
 
     private void handleQuitCommand(IRCMessage request, List<String> requestParts) throws IOException {
@@ -263,20 +276,20 @@ public class SocketProcessor implements Runnable {
     private void handlePrivmsgCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Not enough params
         if (requestParts.size() <= 1) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Not enough params
         if (requestParts.size() < 3) { // Only PRIVMSG and a parameter given
             if (request.getMessage().contains(":")) { // If only text is given, no nickname
-                sendQueue.add(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.ERR_NONICKNAMEGIVEN, request, requestParts, userHandler));
             } else { // Only nickname is given, no text to send
-                sendQueue.add(createResponse(Response.ERR_NOTEXTTOSEND, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.ERR_NOTEXTTOSEND, request, requestParts, userHandler));
             }
             return;
         }
@@ -284,7 +297,7 @@ public class SocketProcessor implements Runnable {
         if (isValidChannelName(requestParts.get(1))) {
             String channelName = requestParts.get(1);
             if (!userHandler.containsChannel(channelName)) { // No channel has that name
-                sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
                 return;
             }
             // There's a channel with the same name
@@ -294,7 +307,7 @@ public class SocketProcessor implements Runnable {
                 return;
             } else { // User is not a member
                 // todo ERR_CANNOTSENDTOCHAN
-                sendQueue.add(createResponse(Response.ERR_CANNOTSENDTOCHAN, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.ERR_CANNOTSENDTOCHAN, request, requestParts, userHandler));
                 return;
             }
 
@@ -302,7 +315,7 @@ public class SocketProcessor implements Runnable {
         // Try to get receiver
         User user = userHandler.getUser(requestParts.get(1));
         if (user == null) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
         // Relay message to receiver
@@ -316,7 +329,7 @@ public class SocketProcessor implements Runnable {
     private void handleWhoisCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // If no param, ignore
@@ -326,23 +339,24 @@ public class SocketProcessor implements Runnable {
         }
         // If nick user asks for does not exist
         if (!userHandler.containsNick(requestParts.get(1))) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
         //Send info back to requester
-        sendQueue.add(createResponse(Response.RPL_WHOISUSER, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_WHOISUSER, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_ENDOFWHOIS, request, requestParts, userHandler));
 
     }
 
     private void handleJoinCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Not enough parameters
         if (requestParts.size() < 2) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Check if JOIN 0 (PART all channels)
@@ -356,7 +370,7 @@ public class SocketProcessor implements Runnable {
         //Check valid channel name
         String channelName = requestParts.get(1);
         if (!isValidChannelName(channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
             return;
         }
         // If there exists no channel with the same name, create new one
@@ -371,34 +385,34 @@ public class SocketProcessor implements Runnable {
         sendToChannel(channelName, request);
         //Send channel topic to requester
         if (channelTopic != null && !channelTopic.isEmpty()) {
-            sendQueue.add(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
         }
         //Send channel name list
-        sendQueue.add(createResponse(Response.RPL_NAMEREPLY, request, requestParts, userHandler));
-        sendQueue.add(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_NAMEREPLY, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
         return;
     }
 
     private void handlePartCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Check enough params
         if (requestParts.size() < 2) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         // Check if channel exists
         String channelName = requestParts.get(1);
         if (!userHandler.containsChannel(channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
             return;
         }
         // Check if user is on channel
         if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
         }
         // Send message to all channel members
         sendToChannel(channelName, request);
@@ -409,23 +423,23 @@ public class SocketProcessor implements Runnable {
     private void handleTopicCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Check parameters
         if (requestParts.size() < 2) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         //Check valid channel name
         String channelName = requestParts.get(1);
         if (!isValidChannelName(channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
             return;
         }
         // Check if requester is member of channel
         if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
             return;
         }
         // If only channelName is given, return topic
@@ -433,18 +447,18 @@ public class SocketProcessor implements Runnable {
             String channelTopic = userHandler.getChannelTopic(channelName);
             // If no topic is set for channel
             if (channelTopic == null || channelTopic.isEmpty()) {
-                sendQueue.add(createResponse(Response.RPL_NOTOPIC, request, requestParts, userHandler));
+                sendQueue.addAll(createResponse(Response.RPL_NOTOPIC, request, requestParts, userHandler));
                 return;
             }
 
-            sendQueue.add(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.RPL_TOPIC, request, requestParts, userHandler));
             return;
         }
 
         // If channelName and newTopic is given
         // Check if requester is moderator or admin (channel operator)
         if (!userHandler.isChannelOperator(request.getFromId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
             return;
         }
 
@@ -456,34 +470,34 @@ public class SocketProcessor implements Runnable {
     private void handleKickCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
-            sendQueue.add(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Check parameters
         if (requestParts.size() < 3) {
-            sendQueue.add(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
         //Check valid channel name
         String channelName = requestParts.get(1);
         if (!isValidChannelName(channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHCHANNEL, request, requestParts, userHandler));
             return;
         }
         // Check if requester is member of channel
         if (!userHandler.isOnChannel(request.getFromId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_NOTONCHANNEL, request, requestParts, userHandler));
             return;
         }
         // Check if requester is moderator or admin (channel operator)
         if (!userHandler.isChannelOperator(request.getFromId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_CHANOPRIVSNEEDED, request, requestParts, userHandler));
             return;
         }
         // Check if user being kicked is on channel
         User kicked = userHandler.getUser(requestParts.get(2));
         if (!userHandler.isOnChannel(kicked.getId(), channelName)) {
-            sendQueue.add(createResponse(Response.ERR_USERNOTINCHANNEL, request, requestParts, userHandler));
+            sendQueue.addAll(createResponse(Response.ERR_USERNOTINCHANNEL, request, requestParts, userHandler));
             return;
         }
         // Send kick message
@@ -491,6 +505,16 @@ public class SocketProcessor implements Runnable {
         // Remove user from channel
         userHandler.removeUserFromChannel(kicked.getId(), channelName);
 
+    }
+
+    private void handleListCommand(IRCMessage request, List<String> requestParts) {
+        sendQueue.addAll(createResponse(Response.RPL_LIST, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_LISTEND, request, requestParts, userHandler));
+    }
+
+    private void handleWhoCommand(IRCMessage request,  List<String> requestParts) {
+        sendQueue.addAll(createResponse(Response.RPL_WHOREPLY, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_ENDOFWHO, request, requestParts, userHandler));
     }
 
     private void sendToChannel(String channelName, IRCMessage request) {
@@ -502,7 +526,7 @@ public class SocketProcessor implements Runnable {
 
 
     private void writeResponses() throws IOException {
-        pullAllRequest();
+        pullAllRequests();
 
         cancelEmptySockets();
 
@@ -548,7 +572,7 @@ public class SocketProcessor implements Runnable {
         nonEmptyToEmptySockets.clear();
     }
 
-    private void pullAllRequest() {
+    private void pullAllRequests() {
         while (true) {
             IRCMessage outMessage = sendQueue.poll();
             if (outMessage == null) {
