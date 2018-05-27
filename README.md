@@ -1,6 +1,6 @@
 # Telecom
 
-Project for Fundamentals of Telecommunication course @ Vietnamese-German University\
+Project for Fundamentals of Telecommunication course @ Vietnamese-German University
 
 Server: [IRCServer](https://github.com/dentou/Telecom/tree/master/IRCServer)\
 CLI IRC Client: [IRCClient](https://github.com/dentou/Telecom/tree/master/IRCClient)\
