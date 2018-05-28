@@ -24,7 +24,7 @@ where `<INSTALL_LOCATION>` is where you clone this project, and `<MODULE>` might
 
 4. Build the project using
 ```
-mvn package 
+mvn clean package 
 ```
 5. Run class in JVM
 ```
