@@ -7,7 +7,7 @@ CLI IRC Client: [IRCClient](https://github.com/dentou/Telecom/tree/master/IRCCli
 GUI Client: [IRCClientGUI](https://github.com/dentou/Telecom/tree/master/IRCClientGUI)\
 Protocol Descriptions: [ProtocolDescriptions](https://github.com/dentou/Telecom/blob/master/IRCServer/README.md)
 
-# Installation instructions (@NguyenHuuMinhTri, @NguyenHuyThong)
+# Installation instructions
 1. Install [Maven](https://maven.apache.org/guides/).
 2. Clone this project.
 3. Open command prompt/terminal and change directory to the module you want to run (IRCServer, IRCClient or IRCClientGUI).
