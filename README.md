@@ -7,6 +7,8 @@ CLI IRC Client: [IRCClient](https://github.com/dentou/Telecom/tree/master/IRCCli
 GUI Client: [IRCClientGUI](https://github.com/dentou/Telecom/tree/master/IRCClientGUI)\
 Protocol Descriptions: [ProtocolDescriptions](https://github.com/dentou/Telecom/blob/master/IRCServer/README.md)
 
-# License
+# Installation instructions
+1. Install Maven
 
+# License
 This project is licensed under the [MIT license](https://github.com/dentou/Telecom/blob/master/LICENSE.md).
