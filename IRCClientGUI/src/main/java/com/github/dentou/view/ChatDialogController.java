@@ -12,27 +12,48 @@ import javafx.scene.control.TextArea;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.*;
+import javafx.stage.Stage;
 import sun.applet.Main;
 
 
 public class ChatDialogController extends Controller<PrivateMessage>{
     @FXML
-    ScrollPane scrollPane;
+    protected ScrollPane scrollPane;
     @FXML
-    VBox vBox;
+    protected VBox vBox;
     @FXML
-    TextArea chatBox;
+    protected TextArea chatBox;
     @FXML
-    Button sendButton;
+    protected Button sendButton;
 
     private String chatter;
+
+    private boolean blocked = false;
 
     public synchronized String getChatter() {
         return chatter;
     }
 
+    public synchronized boolean isBlocked() {
+        return blocked;
+    }
+
+    public synchronized void setBlocked(boolean blocked) {
+        this.blocked = blocked;
+        if (blocked) {
+            disableAll();
+        } else {
+            enableAll();
+        }
+    }
+
     public synchronized void setChatter(String chatter) {
         this.chatter = chatter;
+    }
+
+    public void close() {
+        Stage stage = (Stage) chatBox.getScene().getWindow();
+        stage.close();
     }
 
     @FXML
@@ -44,7 +65,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
             public void handle(KeyEvent event) {
                 if (event.getCode().equals(KeyCode.ENTER)) {
                     if (!chatBox.getText().trim().isEmpty()) {
-                        handleSend();
+                        onSend();
                         chatBox.clear();
                     }
                     event.consume();
@@ -52,7 +73,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
             }
         });
         scrollPane.vvalueProperty().bind(vBox.heightProperty());
-        disableAll();
+        sendButton.setDisable(true);
     }
 
 
@@ -67,7 +88,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
     }
 
     @FXML
-    private void handleSend() {
+    protected void onSend() {
         // todo send PRIVMSG to server
         getMainApp().getIrcClient().sendToServer("PRIVMSG", " ", chatter, " ", ":", chatBox.getText());
         if (chatter.charAt(0) != '#') { // Privmsg to another user is not relayed back to sender by server
@@ -77,36 +98,56 @@ public class ChatDialogController extends Controller<PrivateMessage>{
             this.displayMessage(getMainApp().getUser().getNick(), chatBox.getText());
         }
         chatBox.clear();
-        disableAll();
+        sendButton.setDisable(true);
     }
 
 
 
     @FXML
-    private void handleKeyReleased() {
-        String text = chatBox.getText().trim();
-        if (text.isEmpty()) {
-            disableAll();
-        } else {
-            enableAll();
-        }
+    protected void onKeyReleased() {
+        boolean disableSendButton = chatBox.getText().trim().isEmpty();
+        sendButton.setDisable(disableSendButton);
     }
 
     public void disableAll() {
-        FXUtils.setDisabled(true, sendButton);
+        FXUtils.setDisabled(true, sendButton, chatBox);
     }
 
     public void enableAll() {
-        FXUtils.setDisabled(false, sendButton);
+        if (blocked) {
+            return;
+        }
+        FXUtils.setDisabled(false, sendButton, chatBox);
     }
 
-    private void displayMessage(String sender, String content) {
+    protected void displayNotification(String message) {
+        Label messageLabel = new Label(message);
+        messageLabel.setWrapText(true);
+        messageLabel.setMaxWidth(200);
+        messageLabel.setMinHeight(Region.USE_PREF_SIZE);
+        messageLabel.getStyleClass().add("notification-label");
+
+        HBox hBox = new HBox();
+        hBox.setAlignment(Pos.BASELINE_CENTER);
+
+        hBox.getChildren().add(messageLabel);
+        vBox.getChildren().add(hBox);
+        vBox.getChildren().add(new Label());
+    }
+
+    protected void displayMessage(String sender, String content) {
+
+        if (sender == "server") {
+            displayNotification(content);
+            return;
+        }
+
         Label nickLabel = new Label(sender);
         nickLabel.getStyleClass().add("nick-label");
 
         Label messageLabel = new Label(content);
         messageLabel.setWrapText(true);
-        messageLabel.setMaxWidth(vBox.getPrefWidth() * 0.6);
+        messageLabel.setMaxWidth(200);
         messageLabel.setMinHeight(Region.USE_PREF_SIZE);
 
         HBox hBox = new HBox();
@@ -128,3 +169,4 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         vBox.getChildren().add(new Label());
     }
 }
+

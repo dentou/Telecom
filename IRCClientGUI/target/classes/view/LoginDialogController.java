@@ -53,7 +53,7 @@ public class LoginDialogController extends Controller<String>{
     }
 
     @FXML
-    private void handleLogin() throws IOException{ // todo send NICK and USER request to server
+    private void onLogin() throws IOException{ // todo send NICK and USER request to server
         if (!isInputValid()) {
             return;
         }
@@ -72,7 +72,7 @@ public class LoginDialogController extends Controller<String>{
     }
 
     @FXML
-    private void handleDisconnect() {
+    private void onDisconnect() {
         getMainApp().getIrcClient().sendToServer("QUIT");
         getMainApp().getIrcClient().stop();
         getMainApp().showConnectionDialog();
@@ -80,7 +80,7 @@ public class LoginDialogController extends Controller<String>{
     }
 
     @FXML
-    private void handleKeyReleased() {
+    private void onKeyReleased() {
         String nick = nickField.getText().trim();
         String userName = userNameField.getText().trim();
         String fullName = fullnameField.getText().trim();

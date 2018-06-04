@@ -22,6 +22,11 @@ public abstract class Controller<M> { // M is type of message
         // Do nothing by default
     }
 
+    public void refresh() {
+        // Do nothing by default
+    }
+
+
     public void update() {
         while (true) {
             M message = receiveQueue.poll();

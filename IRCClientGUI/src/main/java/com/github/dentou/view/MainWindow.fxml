@@ -2,11 +2,9 @@
 
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
 <?import javafx.scene.control.Menu?>
 <?import javafx.scene.control.MenuBar?>
 <?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.ScrollPane?>
 <?import javafx.scene.control.SplitPane?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
@@ -54,7 +52,7 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView fx:id="joinedChannelsTable" onMouseClicked="#handleJoinedChannelsClicked" prefHeight="304.0" prefWidth="414.0">
+                                          <TableView fx:id="joinedChannelsTable" onMouseClicked="#onJoinedChannelsClicked" prefHeight="304.0" prefWidth="414.0">
                                              <columns>
                                                 <TableColumn fx:id="joinedChannelNameColumn" prefWidth="75.0" text="Name" />
                                                 <TableColumn fx:id="joinedChannelTopicColumn" prefWidth="75.0" text="Topic" />
@@ -71,7 +69,7 @@
                               <content>
                                 <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                        <children>
-                                          <TableView fx:id="historyTable" onMouseClicked="#handleHistoryClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <TableView fx:id="historyTable" onMouseClicked="#onHistoryClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                               <TableColumn fx:id="chatterColumn" prefWidth="75.0" text="Chatter" />
                                               <TableColumn fx:id="lastMessageColumn" prefWidth="75.0" text="Last message" />
@@ -88,7 +86,7 @@
                                  <content>
                                     <AnchorPane>
                                        <children>
-                                          <TableView fx:id="channelsTable" onMouseClicked="#handleChannelsClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <TableView fx:id="channelsTable" onMouseClicked="#onChannelsClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                               <TableColumn fx:id="channelNameColumn" prefWidth="75.0" text="Name" />
                                               <TableColumn fx:id="channelTopicColumn" prefWidth="75.0" text="Topic" />
@@ -106,7 +104,7 @@
                                  <content>
                                     <AnchorPane>
                                        <children>
-                                          <TableView fx:id="usersTable" onMouseClicked="#handleUsersClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+                                          <TableView fx:id="usersTable" onMouseClicked="#onUsersClicked" prefHeight="304.0" prefWidth="414.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
                                             <columns>
                                               <TableColumn fx:id="nickColumn" prefWidth="75.0" text="Nick" />
                                               <TableColumn fx:id="userNamecColumn" prefWidth="75.0" text="User Name" />
@@ -126,9 +124,8 @@
                      <bottom>
                         <ToolBar prefHeight="40.0" prefWidth="200.0" BorderPane.alignment="CENTER">
                           <items>
-                            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#handleRefresh" text="Refresh" />
-                              <Button fx:id="joinButton" mnemonicParsing="false" text="Join" />
-                              <Button fx:id="sendMessageButton" mnemonicParsing="false" text="Send Message" />
+                            <Button fx:id="refreshButton" mnemonicParsing="false" onAction="#onRefresh" text="Refresh" />
+                              <Button fx:id="createChannelButton" mnemonicParsing="false" onAction="#onCreateChannel" text="Create Channel" />
                           </items>
                         </ToolBar>
                      </bottom>
@@ -140,7 +137,7 @@
                             <AnchorPane minHeight="162.0" minWidth="0.0" prefHeight="162.0" prefWidth="155.0">
                                  <children>
                                     <Label text="HOST" AnchorPane.leftAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                    <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#handleLogout" text="Logout" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
+                                    <Button fx:id="logoutButton" mnemonicParsing="false" onAction="#onLogout" text="Logout" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
                                     <GridPane AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="50.0">
                                       <columnConstraints>
                                         <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -162,15 +159,7 @@
                                     </GridPane>
                                  </children>
                               </AnchorPane>
-                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0">
-                                 <children>
-                                    <Label text="Channel Member List" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0" />
-                                    <ScrollPane prefHeight="200.0" prefWidth="200.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="30.0">
-                                       <content>
-                                          <ListView prefHeight="200.0" prefWidth="200.0" />
-                                       </content></ScrollPane>
-                                 </children>
-                              </AnchorPane>
+                            <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="100.0" prefWidth="160.0" />
                           </items>
                         </SplitPane>
                      </children>

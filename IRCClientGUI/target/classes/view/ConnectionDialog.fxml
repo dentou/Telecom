@@ -38,11 +38,11 @@
                                 <Font name="System Bold" size="20.0" />
                             </font>
                         </Label>
-                        <TextField fx:id="serverAddressField" alignment="CENTER" onKeyReleased="#handleKeyReleased" promptText="Server Address" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                        <TextField fx:id="serverAddressField" alignment="CENTER" onKeyReleased="#onKeyReleased" promptText="Server Address" GridPane.columnIndex="1" GridPane.rowIndex="2" />
                   <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowIndex="4">
                     <buttons>
-                      <Button fx:id="connectButton" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#handleConnect" text="Connect" />
-                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#handleReset" text="Reset" />
+                      <Button fx:id="connectButton" alignment="CENTER" defaultButton="true" mnemonicParsing="false" onAction="#onConnect" text="Connect" />
+                        <Button fx:id="resetButton" mnemonicParsing="false" onAction="#onReset" text="Reset" />
                     </buttons>
                   </ButtonBar>
                   <Label text="Server Address" GridPane.rowIndex="2" />

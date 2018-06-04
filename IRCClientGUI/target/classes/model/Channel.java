@@ -1,9 +1,12 @@
 package com.github.dentou.model;
 
+import com.github.dentou.utils.FXUtils;
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
+import javafx.collections.FXCollections;
+import javafx.collections.ObservableList;
 
 import java.util.Objects;
 
@@ -17,6 +20,7 @@ public class Channel {
         this.numberOfMembers = new SimpleIntegerProperty(numberOfMembers);
         this.topic = new SimpleStringProperty(topic);
     }
+
 
     public String getName() {
         return name.get();
@@ -54,6 +58,10 @@ public class Channel {
         this.topic.set(topic);
     }
 
+
+
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -67,4 +75,5 @@ public class Channel {
 
         return Objects.hash(name);
     }
+
 }

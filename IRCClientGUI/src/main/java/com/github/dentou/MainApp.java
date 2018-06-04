@@ -5,6 +5,7 @@ import com.github.dentou.model.User;
 import com.github.dentou.view.*;
 import com.sun.corba.se.spi.orbutil.threadpool.Work;
 import javafx.application.Application;
+import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Group;
 import javafx.scene.Parent;
@@ -13,6 +14,7 @@ import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 
+import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
@@ -25,6 +27,7 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -37,6 +40,9 @@ public class MainApp extends Application {
     private IRCClient ircClient;
 
     private String serverAddress;
+
+    private AtomicBoolean appClosed = new AtomicBoolean(false);
+
 
 
     public synchronized Stage getPrimaryStage() {
@@ -95,6 +101,8 @@ public class MainApp extends Application {
 
         this.primaryStage.show();
 
+        new Thread(new GUIRefresher(this)).start();
+
     }
 
     @Override
@@ -104,9 +112,13 @@ public class MainApp extends Application {
             ircClient.sendToServer("QUIT");
             ircClient.stop();
         }
+        appClosed.set(true);
 
     }
 
+    public boolean isAppClosed() {
+        return appClosed.get();
+    }
 
     public void showConnectionDialog() {
         showScene("/view/ConnectionDialog.fxml");
@@ -148,10 +160,20 @@ public class MainApp extends Application {
         dialog.setHeaderText(headerText);
         dialog.setContentText(contentText);
 
+        dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(true);
+
+        dialog.getEditor().setOnKeyReleased(new EventHandler<KeyEvent>() {
+            @Override
+            public void handle(KeyEvent event) {
+                boolean disableOKButton = dialog.getEditor().getText().trim().isEmpty();
+                dialog.getDialogPane().lookupButton(ButtonType.OK).setDisable(disableOKButton);
+
+            }
+        });
+
         // Traditional way to get the response value.
         Optional<String> result = dialog.showAndWait();
         if (result.isPresent()){
-            System.out.println("First Conversation");
             return result.get();
         }
         return null;

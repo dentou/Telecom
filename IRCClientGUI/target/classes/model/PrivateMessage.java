@@ -23,3 +23,4 @@ public class PrivateMessage {
         return content;
     }
 }
+

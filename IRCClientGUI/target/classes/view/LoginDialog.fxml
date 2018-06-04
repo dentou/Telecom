@@ -44,13 +44,13 @@
                   <Label text="Nick" GridPane.rowIndex="1" />
                   <Label text="User name" GridPane.rowIndex="2" />
                   <Label text="Full name" GridPane.rowIndex="3" />
-                  <TextField fx:id="nickField" onKeyReleased="#handleKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
-                  <TextField fx:id="userNameField" onKeyReleased="#handleKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
-                  <TextField fx:id="fullnameField" onKeyReleased="#handleKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
+                  <TextField fx:id="nickField" onKeyReleased="#onKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="1" />
+                  <TextField fx:id="userNameField" onKeyReleased="#onKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="2" />
+                  <TextField fx:id="fullnameField" onKeyReleased="#onKeyReleased" GridPane.columnIndex="1" GridPane.columnSpan="2" GridPane.rowIndex="3" />
                   <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="2" GridPane.halignment="RIGHT" GridPane.rowIndex="4">
                     <buttons>
-                      <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#handleLogin" text="Log In" />
-                        <Button fx:id="disconnectButton" mnemonicParsing="false" onAction="#handleDisconnect" text="Disconnect" />
+                      <Button fx:id="loginButton" defaultButton="true" mnemonicParsing="false" onAction="#onLogin" text="Log In" />
+                        <Button fx:id="disconnectButton" mnemonicParsing="false" onAction="#onDisconnect" text="Disconnect" />
                     </buttons>
                      <GridPane.margin>
                         <Insets top="10.0" />

@@ -57,12 +57,12 @@
                 <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
             </rowConstraints>
             <children>
-                <TextArea id="chat-box" fx:id="chatBox" onKeyReleased="#handleKeyReleased" prefHeight="22.0" prefWidth="150.0" promptText="Enter message" wrapText="true" GridPane.rowSpan="2">
+                <TextArea id="chat-box" fx:id="chatBox" onKeyReleased="#onKeyReleased" prefHeight="22.0" prefWidth="150.0" promptText="Enter message" wrapText="true" GridPane.rowSpan="2">
                     <GridPane.margin>
                         <Insets bottom="10.0" left="10.0" right="5.0" top="10.0" />
                     </GridPane.margin>
                 </TextArea>
-                <Button id="send-button" fx:id="sendButton" mnemonicParsing="false" onAction="#handleSend" text="Send" GridPane.columnIndex="1">
+                <Button id="send-button" fx:id="sendButton" mnemonicParsing="false" onAction="#onSend" text="Send" GridPane.columnIndex="1">
                     <GridPane.margin>
                         <Insets left="5.0" top="10.0" />
                     </GridPane.margin>

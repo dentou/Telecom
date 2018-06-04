@@ -46,14 +46,14 @@ public class ConnectionDialogController extends Controller<String>{
     }
 
     @FXML
-    private void handleReset() {
+    private void onReset() {
         serverAddressField.setText("");
         serverAddressField.requestFocus();
         connectButton.setDisable(true);
     }
 
     @FXML
-    private void handleConnect() {
+    private void onConnect() {
         String serverAddress = serverAddressField.getText().trim();
         if (!isValidIpAddress(serverAddress)) {
             super.getMainApp().showAlertDialog(AlertType.ERROR, "Invalid Fields", "Please correct invalid fields", "Invalid IP Address");
@@ -99,7 +99,7 @@ public class ConnectionDialogController extends Controller<String>{
     }
 
     @FXML
-    private void handleKeyReleased() {
+    private void onKeyReleased() {
         String serverAddress = serverAddressField.getText().trim();
         boolean disableConnectButton = serverAddress.isEmpty();
         connectButton.setDisable(disableConnectButton);
