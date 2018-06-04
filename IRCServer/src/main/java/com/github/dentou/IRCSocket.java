@@ -9,7 +9,7 @@ import java.nio.channels.SocketChannel;
 import java.util.List;
 
 public class IRCSocket {
-    private SocketChannel socketChannel;
+    private final SocketChannel socketChannel;
     private long id;
     private IRCMessageReader reader;
     private IRCMessageWriter writer;

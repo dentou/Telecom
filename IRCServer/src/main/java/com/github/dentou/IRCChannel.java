@@ -91,6 +91,8 @@ public class IRCChannel {
             if (admin != null && admin.equals(user)) {
                 if (!moderatorList.isEmpty()) {
                     admin = moderatorList.get(0);
+                } else if (!userList.isEmpty()){
+                    admin = userList.get(0);
                 } else {
                     admin = null;
                 }

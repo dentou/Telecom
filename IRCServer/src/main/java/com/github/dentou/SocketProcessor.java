@@ -190,6 +190,9 @@ public class SocketProcessor implements Runnable {
             case "WHO":
                 handleWhoCommand(request, requestParts);
                 break;
+            case "NAMES":
+                handleNamesCommmand(request, requestParts);
+                break;
             default:
                 sendQueue.addAll(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
                 break;
@@ -515,6 +518,19 @@ public class SocketProcessor implements Runnable {
     private void handleWhoCommand(IRCMessage request,  List<String> requestParts) {
         sendQueue.addAll(createResponse(Response.RPL_WHOREPLY, request, requestParts, userHandler));
         sendQueue.addAll(createResponse(Response.RPL_ENDOFWHO, request, requestParts, userHandler));
+    }
+
+    private void handleNamesCommmand(IRCMessage request, List<String> requestParts) {
+        if (requestParts.size() < 2) {
+            for (String channelName : userHandler.getJoinedChannelNames(request.getFromId())) {
+                requestQueue.add(new IRCMessage("NAMES " + channelName, request.getFromId(), request.getToId()));
+            }
+            return;
+        }
+        //Send channel name list
+        sendQueue.addAll(createResponse(Response.RPL_NAMEREPLY, request, requestParts, userHandler));
+        sendQueue.addAll(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
+        return;
     }
 
     private void sendToChannel(String channelName, IRCMessage request) {
