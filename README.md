@@ -2,10 +2,10 @@
 
 Project for Fundamentals of Telecommunication course @ Vietnamese-German University
 
-Server: [IRCServer](https://github.com/dentou/Telecom/tree/master/IRCServer)\
-CLI IRC Client: [IRCClient](https://github.com/dentou/Telecom/tree/master/IRCClient)\
-GUI Client: [IRCClientGUI](https://github.com/dentou/Telecom/tree/master/IRCClientGUI)\
-Protocol Descriptions: [ProtocolDescriptions](https://github.com/dentou/Telecom/blob/master/IRCServer/README.md)
+[IRCServer](https://github.com/dentou/Telecom/tree/master/IRCServer)\
+[IRCClient](https://github.com/dentou/Telecom/tree/master/IRCClient)\
+[IRCClientGUI](https://github.com/dentou/Telecom/tree/master/IRCClientGUI)\
+[Protocol Descriptions](https://github.com/dentou/Telecom/blob/master/IRCServer/README.md)
 
 # Installation instructions
 1. Install [Maven](https://maven.apache.org/guides/).
@@ -24,7 +24,7 @@ where `<INSTALL_LOCATION>` is where you clone this project, and `<MODULE>` might
 
 4. Build the project using
 ```
-mvn package 
+mvn clean package 
 ```
 5. Run class in JVM
 ```
