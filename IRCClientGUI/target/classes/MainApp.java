@@ -1,13 +1,13 @@
 package com.github.dentou;
 
+import com.github.dentou.view.Controller;
 import com.github.dentou.model.IRCClient;
 import com.github.dentou.model.User;
 import com.github.dentou.view.*;
-import com.sun.corba.se.spi.orbutil.threadpool.Work;
+import com.jfoenix.controls.JFXDialog;
 import javafx.application.Application;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
-import javafx.scene.Group;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
@@ -15,12 +15,11 @@ import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
 
 import javafx.scene.input.KeyEvent;
-import javafx.scene.layout.AnchorPane;
-import javafx.scene.layout.BorderPane;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
-import javafx.stage.Modality;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import org.controlsfx.control.Notifications;
 
 import java.io.PrintWriter;
 import java.io.StringWriter;
@@ -96,6 +95,8 @@ public class MainApp extends Application {
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("IRC Chat Client");
         this.primaryStage.setResizable(false);
+        primaryStage.initStyle(StageStyle.TRANSPARENT);
+
 
         showConnectionDialog();
 
@@ -121,21 +122,20 @@ public class MainApp extends Application {
     }
 
     public void showConnectionDialog() {
-        showScene("/view/ConnectionDialog.fxml");
+        showScene("/view/ConnectionDialog.fxml" , "");
     }
 
-
     public void showLoginDialog() {
-        showScene("/view/LoginDialog.fxml");
+        showScene("/view/LoginDialog.fxml", "");
     }
 
     public void showMainWindow() {
-        showScene("/view/MainWindow.fxml");
+        showScene("/view/MainWindow.fxml", "");
     }
 
 
 
-    private void showScene(String fxmlFileName) {
+    private void showScene(String fxmlFileName, String title) {
         try {
             FXMLLoader loader = new FXMLLoader();
             loader.setLocation(MainApp.class.getResource(fxmlFileName));
@@ -143,11 +143,13 @@ public class MainApp extends Application {
 
             Controller controller = loader.getController();
             controller.setMainApp(this);
+            controller.setTitle(title);
             this.controller = controller;
 
             controller.displayInfo();
 
             primaryStage.setScene(new Scene(page));
+
         } catch (Exception e) {
             //e.printStackTrace();
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
@@ -183,7 +185,7 @@ public class MainApp extends Application {
         Alert alert = new Alert(AlertType.CONFIRMATION);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
-        alert.setContentText(headerText);
+        alert.setContentText(contentText);
 
         Optional<ButtonType> result = alert.showAndWait();
         return result.get() == ButtonType.OK;
@@ -191,6 +193,7 @@ public class MainApp extends Application {
 
     public String showCustomActionDialog(String title, String headerText, String contentText, String... buttonNames) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
+        alert.initOwner(this.primaryStage);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
@@ -249,6 +252,14 @@ public class MainApp extends Application {
         alert.getDialogPane().setExpandableContent(expContent);
 
         alert.showAndWait();
+    }
+
+    public void showNotifications(String title, String text) {
+        Notifications noti = Notifications.create();
+        noti.title(title);
+        noti.text(text);
+        noti.show();
+
     }
 
 

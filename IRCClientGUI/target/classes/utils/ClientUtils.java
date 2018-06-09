@@ -1,5 +1,7 @@
 package com.github.dentou.utils;
 
+import com.github.dentou.model.Channel;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
@@ -21,5 +23,23 @@ public class ClientUtils {
             return "server";
         }
         return header.split("!")[0];
+    }
+
+    public static boolean predicate(String key, String... values) {
+        if (key == null || key.isEmpty()) {
+            return true;
+        }
+
+        // Compare first name and last name of every person with filter text.
+        String lowerCaseKey = key.toLowerCase();
+
+        for (String value : values) {
+            if (value.toLowerCase().contains(lowerCaseKey)) {
+                return true;
+            }
+        }
+
+        return false;
+
     }
 }

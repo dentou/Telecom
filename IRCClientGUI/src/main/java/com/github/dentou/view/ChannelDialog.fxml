@@ -1,145 +1,135 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
+<?import com.jfoenix.controls.JFXButton?>
+<?import com.jfoenix.controls.JFXListView?>
+<?import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView?>
+<?import java.lang.String?>
+<?import java.net.URL?>
 <?import javafx.geometry.Insets?>
-<?import javafx.scene.control.Button?>
-<?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
-<?import javafx.scene.control.ListView?>
-<?import javafx.scene.control.Menu?>
-<?import javafx.scene.control.MenuBar?>
-<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.ScrollPane?>
-<?import javafx.scene.control.SplitPane?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.ToolBar?>
-<?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.BorderPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
-<?import javafx.scene.layout.RowConstraints?>
 <?import javafx.scene.layout.VBox?>
+<?import org.controlsfx.control.textfield.CustomTextField?>
 
-<AnchorPane prefHeight="407.0" prefWidth="500.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ChannelDialogController">
+<VBox fx:id="root" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ChannelDialogController">
    <children>
-      <BorderPane layoutX="133.0" layoutY="14.0" prefHeight="350.0" prefWidth="500.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-         <top>
-            <MenuBar BorderPane.alignment="CENTER">
-              <menus>
-                <Menu mnemonicParsing="false" text="File">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Close" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Edit">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="Delete" />
-                  </items>
-                </Menu>
-                <Menu mnemonicParsing="false" text="Help">
-                  <items>
-                    <MenuItem mnemonicParsing="false" text="About" />
-                  </items>
-                </Menu>
-              </menus>
-            </MenuBar>
-         </top>
-         <center>
-            <SplitPane dividerPositions="0.35542168674698793" prefHeight="160.0" prefWidth="200.0" BorderPane.alignment="CENTER">
-              <items>
-                  <BorderPane>
-                     <bottom>
-                        <ToolBar prefHeight="40.0" prefWidth="200.0">
-                          <items>
-                              <Button fx:id="leaveButton" mnemonicParsing="false" onAction="#onLeave" text="Leave" />
-                          </items>
-                        </ToolBar>
-                     </bottom>
-                     <center>
-                        <VBox prefHeight="200.0" prefWidth="100.0" BorderPane.alignment="CENTER">
-                           <children>
-                              <HBox alignment="CENTER" prefHeight="39.0" prefWidth="174.0">
-                                 <children>
-                                    <Label text="Members" />
-                                 </children>
-                              </HBox>
-                              <ListView fx:id="channelListView" prefHeight="244.0" prefWidth="174.0" />
-                              <HBox alignment="CENTER" prefHeight="47.0" prefWidth="174.0">
-                                 <children>
-                                    <Label fx:id="blockedLabel" text="Label" textFill="#f50f0f" />
-                                 </children>
-                              </HBox>
-                           </children>
+      <HBox style="-fx-background-color: primary-dark-color;">
+         <children>
+            <HBox HBox.hgrow="ALWAYS">
+               <children>
+                  <Label fx:id="titleLabel" prefHeight="40.0" prefWidth="506.0" style="-fx-text-fill: white;" text="Title" />
+               </children>
+               <padding>
+                  <Insets left="10.0" />
+               </padding>
+            </HBox>
+            <HBox alignment="CENTER_RIGHT" prefHeight="38.0" prefWidth="800.0" HBox.hgrow="NEVER">
+               <children>
+                  <Label fx:id="minimizeLabel" alignment="CENTER" prefHeight="50.0" prefWidth="40.0">
+                     <graphic>
+                        <FontAwesomeIconView fx:id="minimizeIcon" fill="WHITE" glyphName="MINUS" />
+                     </graphic>
+                  </Label>
+                  <Label fx:id="closeLabel" alignment="CENTER" prefHeight="60.0" prefWidth="40.0">
+                     <graphic>
+                        <FontAwesomeIconView fx:id="closeIcon" fill="WHITE" glyphName="CLOSE" />
+                     </graphic>
+                  </Label>
+               </children>
+            </HBox>
+         </children>
+         <VBox.margin>
+            <Insets />
+         </VBox.margin>
+      </HBox>
+      <HBox prefHeight="407.0" prefWidth="500.0">
+         <children>
+            <VBox prefHeight="407.0" prefWidth="169.0" spacing="10.0">
+               <children>
+                  <HBox alignment="CENTER" prefHeight="36.0" prefWidth="174.0">
+                     <children>
+                        <Label text="Members" />
+                     </children>
+                  </HBox>
+                  <JFXListView fx:id="channelListView" prefHeight="306.0" prefWidth="154.0" VBox.vgrow="ALWAYS">
+                     <VBox.margin>
+                        <Insets left="15.0" />
+                     </VBox.margin>
+                  </JFXListView>
+                  <HBox alignment="CENTER" prefHeight="47.0" prefWidth="174.0">
+                     <children>
+                        <Label fx:id="blockedLabel" text="Label" textFill="#f50f0f" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER_LEFT">
+                     <children>
+                        <JFXButton fx:id="leaveButton" onAction="#onLeave" styleClass="orange-button" text="Leave" />
+                     </children>
+                     <padding>
+                        <Insets bottom="15.0" left="15.0" />
+                     </padding>
+                  </HBox>
+               </children>
+               <padding>
+                  <Insets top="10.0" />
+               </padding>
+            </VBox>
+            <Separator orientation="VERTICAL" prefHeight="200.0">
+               <HBox.margin>
+                  <Insets bottom="20.0" left="15.0" right="15.0" top="20.0" />
+               </HBox.margin>
+            </Separator>
+            <VBox HBox.hgrow="ALWAYS">
+               <children>
+                  <VBox spacing="10.0">
+                     <children>
+                        <Label fx:id="channelNameLabel" text="Name" />
+                        <Label fx:id="channelTopicLabel" text="Topic" />
+                     </children>
+                     <VBox.margin>
+                        <Insets bottom="10.0" top="10.0" />
+                     </VBox.margin>
+                  </VBox>
+                  <ScrollPane fx:id="scrollPane" fitToHeight="true" fitToWidth="true" hbarPolicy="NEVER">
+                     <content>
+                        <VBox fx:id="vBox" prefHeight="400.0" prefWidth="381.0">
+                           <padding>
+                              <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
+                           </padding>
                         </VBox>
-                     </center>
-                  </BorderPane>
-                  <BorderPane prefHeight="323.0" prefWidth="347.0" stylesheets="@ChatDialog.css">
-                     <center>
-                        <ScrollPane fx:id="scrollPane" fitToWidth="true" hbarPolicy="NEVER" prefHeight="200.0" prefWidth="200.0">
-                           <content>
-                              <VBox fx:id="vBox">
-                                 <padding>
-                                    <Insets bottom="15.0" left="15.0" right="15.0" top="15.0" />
-                                 </padding></VBox>
-                           </content>
-                           <BorderPane.margin>
-                              <Insets left="5.0" right="5.0" />
-                           </BorderPane.margin>
-                        </ScrollPane>
-                     </center>
-                     <bottom>
-                        <GridPane BorderPane.alignment="CENTER">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="285.0" minWidth="10.0" prefWidth="227.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="167.0" minWidth="10.0" prefWidth="91.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <TextArea id="chat-box" fx:id="chatBox" onKeyReleased="#onKeyReleased" prefHeight="40.0" prefWidth="215.0" promptText="Enter message" GridPane.rowSpan="2">
-                                 <GridPane.margin>
-                                    <Insets bottom="10.0" left="10.0" right="5.0" top="10.0" />
-                                 </GridPane.margin>
-                              </TextArea>
-                              <Button id="send-button" fx:id="sendButton" defaultButton="true" mnemonicParsing="false" onAction="#onSend" text="Send" GridPane.columnIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="5.0" top="10.0" />
-                                 </GridPane.margin>
-                              </Button>
-                           </children>
-                        </GridPane>
-                     </bottom>
-                     <top>
-                        <GridPane prefHeight="35.0" prefWidth="318.0" BorderPane.alignment="CENTER">
-                          <columnConstraints>
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="154.0" minWidth="10.0" prefWidth="146.0" />
-                            <ColumnConstraints hgrow="SOMETIMES" maxWidth="272.0" minWidth="10.0" prefWidth="172.0" />
-                          </columnConstraints>
-                          <rowConstraints>
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                            <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                          </rowConstraints>
-                           <children>
-                              <Label fx:id="channelNameLabel" text="Name">
-                                 <GridPane.margin>
-                                    <Insets left="10.0" />
-                                 </GridPane.margin>
-                              </Label>
-                              <ButtonBar prefHeight="40.0" prefWidth="200.0" GridPane.columnIndex="1" GridPane.rowSpan="2" />
-                              <Label fx:id="channelTopicLabel" text="Topic" GridPane.rowIndex="1">
-                                 <GridPane.margin>
-                                    <Insets left="10.0" />
-                                 </GridPane.margin>
-                              </Label>
-                           </children>
-                        </GridPane>
-                     </top>
-                  </BorderPane>
-              </items>
-            </SplitPane>
-         </center>
-      </BorderPane>
+                     </content>
+                     <VBox.margin>
+                        <Insets right="15.0" />
+                     </VBox.margin>
+                  </ScrollPane>
+                  <HBox alignment="CENTER" prefHeight="30.0" prefWidth="400.0" spacing="15.0">
+                     <children>
+                        <CustomTextField id="chat-box" fx:id="chatBox" onKeyReleased="#onKeyReleased" HBox.hgrow="ALWAYS">
+                           <HBox.margin>
+                              <Insets />
+                           </HBox.margin>
+                        </CustomTextField>
+                        <FontAwesomeIconView fx:id="sendButton" glyphName="PAPER_PLANE" layoutX="375.0" layoutY="43.0" onMouseClicked="#onSend" styleClass="iconic-button" />
+                        <FontAwesomeIconView id="file-button" fx:id="fileButton" glyphName="PAPERCLIP">
+                           <styleClass>
+                              <String fx:value="iconic-button" />
+                              <String fx:value="file-button" />
+                           </styleClass>
+                        </FontAwesomeIconView>
+                     </children>
+                     <padding>
+                        <Insets bottom="10.0" right="15.0" top="10.0" />
+                     </padding>
+                  </HBox>
+               </children>
+            </VBox>
+         </children>
+      </HBox>
    </children>
-</AnchorPane>
+   <stylesheets>
+      <URL value="@Application.css" />
+      <URL value="@ChatDialog.css" />
+   </stylesheets>
+</VBox>

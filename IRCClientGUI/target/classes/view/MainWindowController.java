@@ -8,9 +8,14 @@ import com.github.dentou.model.IRCConstants.*;
 import com.github.dentou.model.PrivateMessage;
 import com.github.dentou.model.User;
 import com.github.dentou.utils.FXUtils;
-import javafx.beans.property.StringProperty;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
+import javafx.application.Platform;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.transformation.FilteredList;
+import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -21,17 +26,27 @@ import javafx.scene.input.MouseEvent;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
+import org.controlsfx.control.Notifications;
 
 
 import java.io.IOException;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.function.Predicate;
 
 
 public class MainWindowController extends Controller<String> {
+
+
+    @FXML
+    private TextField searchField;
+    @FXML
+    private Label nickLabel;
+    @FXML
+    private FontAwesomeIconView nickIcon;
+
     @FXML
     private TabPane tabPane;
     @FXML
@@ -75,28 +90,22 @@ public class MainWindowController extends Controller<String> {
     @FXML
     private TableColumn<User, String> nickColumn;
     @FXML
-    private TableColumn<User, String> userNamecColumn;
+    private TableColumn<User, String> userNameColumn;
     @FXML
     private TableColumn<User, String> fullNameColumn;
+
+    @FXML
+    private ProgressBar progressBar;
 
     private ObservableList<Channel> joinedChannelsData = FXCollections.observableArrayList();
     private ObservableList<ChatHistoryItem> historyData = FXCollections.observableArrayList();
     private ObservableList<Channel> channelsData = FXCollections.observableArrayList();
     private ObservableList<User> usersData = FXCollections.observableArrayList();
 
-
-    @FXML
-    private Label hostNickLabel;
-    @FXML
-    private Label hostUserNameLabel;
-    @FXML
-    private Label hostFullNameLabel;
-    @FXML
-    private Button logoutButton;
     @FXML
     private Button refreshButton;
     @FXML
-    private Button createChannelButton;
+    private Button createButton;
 
     private Map<Tab, TableView> tabTableMap = new HashMap<>();
 
@@ -113,15 +122,33 @@ public class MainWindowController extends Controller<String> {
     private boolean waitingForWhoEnd = false;
     private boolean waitingForNamesEnd = false;
 
-
     @FXML
     @Override
     protected void initialize() {
-        hostNickLabel.setText("");
-        hostUserNameLabel.setText("");
-        hostFullNameLabel.setText("");
+        super.initialize();
+        initializeTables();
+        initializeSearchField();
+        initializeNickLabel();
+        // todo clear channel member list
+        // todo Listen for selection changes and show the channel member list when changed.
+    }
+
+    private void initializeNickLabel() {
+        // Set title bar buttons
+        nickLabel.setOnMouseEntered(event -> {
+            nickLabel.setStyle("-fx-cursor:hand; -fx-text-fill: secondary-color;");
+            nickIcon.setStyle("-fx-text-fill: secondary-color; -fx-fill: secondary-color;");
+        });
+
+        nickLabel.setOnMouseExited(event -> {
+            nickLabel.setStyle("-fx-cursor:normal; -fx-text-fill: white;");
+            nickIcon.setStyle("-fx-text-fill: white; -fx-fill: white");
+        });
+    }
 
 
+
+    private void initializeTables() {
         // Initialize joined channels table
         joinedChannelNameColumn.setCellValueFactory(cellData -> cellData.getValue().nameProperty());
         joinedChannelTopicColumn.setCellValueFactory(cellData -> cellData.getValue().topicProperty());
@@ -140,7 +167,7 @@ public class MainWindowController extends Controller<String> {
 
         // Initialize users table
         nickColumn.setCellValueFactory(cellData -> cellData.getValue().nickProperty());
-        userNamecColumn.setCellValueFactory(cellData -> cellData.getValue().userNameProperty());
+        userNameColumn.setCellValueFactory(cellData -> cellData.getValue().userNameProperty());
         fullNameColumn.setCellValueFactory(cellData -> cellData.getValue().fullNameProperty());
 
         // Add observable list data to the table
@@ -154,97 +181,96 @@ public class MainWindowController extends Controller<String> {
         tabTableMap.put(historyTab, historyTable);
         tabTableMap.put(channelsTab, channelsTable);
         tabTableMap.put(usersTab, usersTable);
+    }
 
+    private void initializeSearchField() {
+        // Wrap the ObservableList in a FilteredList (initially display all data).
+        FilteredList<Channel> filteredJoinedChannelsData = new FilteredList<>(joinedChannelsData, p -> true);
+        FilteredList<ChatHistoryItem> filteredHistoryData = new FilteredList<>(historyData, p -> true);
+        FilteredList<Channel> filteredChannelsData = new FilteredList<>(channelsData, p -> true);
+        FilteredList<User> filteredUsersData = new FilteredList<>(usersData, p -> true);
 
-        // todo clear channel member list
+        // Set the filter Predicate whenever the filter changes.
+        searchField.textProperty().addListener(new ChangeListener<String>() {
+            @Override
+            public void changed(ObservableValue<? extends String> observable, String oldValue, String newValue) {
+                filteredJoinedChannelsData.setPredicate(new Predicate<Channel>() {
+                    @Override
+                    public boolean test(Channel channel) {
+                        return false;
+                    }
+                });
+            }
+        });
+        searchField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredJoinedChannelsData.setPredicate(channel ->
+                        ClientUtils.predicate(newValue, channel.getName(), channel.getTopic())));
 
-        // todo Listen for selection changes and show the channel member list when changed.
+        searchField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredHistoryData.setPredicate(item ->
+                        ClientUtils.predicate(newValue, item.getChatter())));
+        searchField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredChannelsData.setPredicate(channel ->
+                        ClientUtils.predicate(newValue, channel.getName(), channel.getTopic())));
+        searchField.textProperty().addListener((observable, oldValue, newValue) ->
+                filteredUsersData.setPredicate(user ->
+                        ClientUtils.predicate(newValue, user.getNick(), user.getUserName(), user.getFullName())));
+
+        // Wrap the FilteredList in a SortedList.
+        SortedList<Channel> sortedJoinedChannelsData = new SortedList<>(filteredJoinedChannelsData);
+        SortedList<ChatHistoryItem> sortedHistoryData = new SortedList<>(filteredHistoryData);
+        SortedList<Channel> sortedChannelsData = new SortedList<>(filteredChannelsData);
+        SortedList<User> sortedUsersData = new SortedList<>(filteredUsersData);
+
+        // Bind the SortedList comparator to the TableView comparator.
+        sortedJoinedChannelsData.comparatorProperty().bind(joinedChannelsTable.comparatorProperty());
+        sortedHistoryData.comparatorProperty().bind(historyTable.comparatorProperty());
+        sortedChannelsData.comparatorProperty().bind(channelsTable.comparatorProperty());
+        sortedUsersData.comparatorProperty().bind(usersTable.comparatorProperty());
+
+        // Add sorted (and filtered) data to the table.
+        joinedChannelsTable.setItems(sortedJoinedChannelsData);
+        historyTable.setItems(sortedHistoryData);
+        channelsTable.setItems(sortedChannelsData);
+        usersTable.setItems(sortedUsersData);
 
     }
 
+    /**
+     * GUI methods
+     */
+
     @Override
     public void displayInfo() {
-        User user = super.getMainApp().getUser();
-        hostNickLabel.setText(user.getNick());
-        hostUserNameLabel.setText(user.getUserName());
-        hostFullNameLabel.setText(user.getFullName());
+        super.displayInfo();
 
+        User user = super.getMainApp().getUser();
+        setTitle("IRCClient: " + user.getNick());
+        nickLabel.setText(user.getNick());
+
+        progressBar.setProgress(0);
 
         onRefresh();
 
     }
 
     @Override
-    public void processMessage(String message) {
-        // todo implement this
-        List<String> messageParts = ClientUtils.parseMessage(message);
-        System.out.println(messageParts);
-        String sender = ClientUtils.parseSender(messageParts.get(0));
-        String content = messageParts.get(messageParts.size() - 1);
-        if (sender.equals("server")) { // Message is server's response
-            // todo check for all responses
-            String numericCode = messageParts.get(1);
-            switch (Response.getResponse(numericCode)) {
-                case RPL_LIST:
-                    processRPL_LIST(messageParts);
-                    break;
-                case RPL_LISTEND:
-                    if (!waitingForWhoEnd) {
-                        enableAll();
-                    }
-                    waitingForListEnd = false;
-                    break;
-                case RPL_WHOREPLY:
-                    processRPL_WHO(messageParts);
-                    break;
-                case RPL_ENDOFWHO:
-                    if (!waitingForListEnd) {
-                        enableAll();
-                    }
-                    waitingForWhoEnd = false;
-                    break;
-                case RPL_NAMEREPLY:
-                    processRPL_NAMEREPLY(messageParts);
-                    break;
-                case RPL_ENDOFNAMES:
-                    waitingForNamesEnd = false;
-                    break;
-
-            }
-
-        } else { // Relay message
-            switch (messageParts.get(1)) {
-                case "PRIVMSG":
-                    String receiver = messageParts.get(2);
-                    PrivateMessage privateMessage = new PrivateMessage(sender, receiver, content);
-                    processPRIVMSG(privateMessage);
-                    break;
-                case "JOIN":
-                    String channel = messageParts.get(2);
-                    processJOIN(sender, channel);
-                    break;
-                case "PART":
-                    channel = messageParts.get(2);
-                    processPART(sender, channel);
-                    break;
-
-            }
-        }
-
+    protected void onWindowClosed(MouseEvent event) {
+        onLogout();
     }
 
     @Override
     public void disableAll() {
         // todo implement this
-        FXUtils.setDisabled(true, refreshButton);
-        FXUtils.setDisabled(true, tabPane);
+        FXUtils.setDisabled(true, refreshButton, createButton, searchField);
+        //FXUtils.setDisabled(true, tabPane);
     }
 
     @Override
     public void enableAll() {
         // todo implement this
-        FXUtils.setDisabled(false, refreshButton);
-        FXUtils.setDisabled(false, tabPane);
+        FXUtils.setDisabled(false, refreshButton, createButton, searchField);
+        //FXUtils.setDisabled(false, tabPane);
     }
 
     @Override
@@ -261,13 +287,30 @@ public class MainWindowController extends Controller<String> {
         getMainApp().getIrcClient().sendToServer("LIST");
         getMainApp().getIrcClient().sendToServer("WHO");
         getMainApp().getIrcClient().sendToServer("NAMES");
+        // Show progress bar
+        showProgressBar(true);
+
+    }
+
+    private boolean isRefreshing() {
+        return waitingForListEnd || waitingForWhoEnd || waitingForNamesEnd;
     }
 
     @FXML
     private void onLogout() {
+        // Confirm
+        boolean yes = getMainApp().showConfirmationDialog("Logout Confirmation", "Are you sure want to log out?", null);
+        if (!yes) {
+            return;
+        }
+
+        for (ChatDialogController controller : activeChatDialog.values()) {
+            controller.close();
+        }
         // todo send quit to server
-        getMainApp().getIrcClient().sendToServer("QUIT");
-        getMainApp().getIrcClient().stop();
+        getMainApp().stop();
+//        getMainApp().getIrcClient().sendToServer("QUIT");
+//        getMainApp().getIrcClient().stop();
         super.getMainApp().showConnectionDialog();
     }
 
@@ -373,39 +416,79 @@ public class MainWindowController extends Controller<String> {
     }
 
 
-//    private void handleSendMessage() {
-//        Tab selectedTab = tabPane.getSelectionModel().getSelectedItem();
-//        TableView table = tabTableMap.get(selectedTab);
-//        Object selectedItem = table.getSelectionModel().getSelectedItem();
-//        if (selectedItem == null) {
-//            getMainApp().showAlertDialog(AlertType.ERROR, "Send message error", "No user/channel selected",
-//                    "Please select an user or channel");
-//            return;
-//
-//        }
-//        String chatter = null;
-//
-//        if (selectedItem instanceof User) {
-//            User user = (User) selectedItem;
-//            chatter = user.getNick();
-//        } else if (selectedItem instanceof Channel) {
-//            Channel channel = (Channel) selectedItem;
-//            chatter = channel.getName();
-//        } else if (selectedItem instanceof ChatHistoryItem) {
-//            ChatHistoryItem chatHistoryItem = (ChatHistoryItem) selectedItem;
-//            chatter = chatHistoryItem.getChatter();
-//        }
-//
-//        displayMessage(chatter, null);
-//
-//    }
+
 
 
     /**
      * Processing methods
      *
-     * @param messageParts
      */
+
+    @Override
+    public void processMessage(String message) {
+        // todo implement this
+        List<String> messageParts = ClientUtils.parseMessage(message);
+        System.out.println(messageParts);
+        String sender = ClientUtils.parseSender(messageParts.get(0));
+        String content = messageParts.get(messageParts.size() - 1);
+        if (sender.equals("server")) { // Message is server's response
+            // todo check for all responses
+            String numericCode = messageParts.get(1);
+            switch (Response.getResponse(numericCode)) {
+                case RPL_LIST:
+                    processRPL_LIST(messageParts);
+                    break;
+                case RPL_LISTEND:
+                    waitingForListEnd = false;
+                    if (!isRefreshing()) {
+                        showProgressBar(false);
+                        enableAll();
+                    }
+                    break;
+                case RPL_WHOREPLY:
+                    processRPL_WHO(messageParts);
+                    break;
+                case RPL_ENDOFWHO:
+                    waitingForWhoEnd = false;
+                    if (!isRefreshing()) {
+                        showProgressBar(false);
+                        enableAll();
+                    }
+                    break;
+                case RPL_NAMEREPLY:
+                    processRPL_NAMEREPLY(messageParts);
+                    break;
+                case RPL_ENDOFNAMES:
+                    waitingForNamesEnd = false;
+                    if (!isRefreshing()) {
+                        showProgressBar(false);
+                        enableAll();
+                    }
+                    break;
+
+            }
+
+        } else { // Relay message
+            switch (messageParts.get(1)) {
+                case "PRIVMSG":
+                    String receiver = messageParts.get(2);
+                    PrivateMessage privateMessage = new PrivateMessage(sender, receiver, content);
+                    processPRIVMSG(privateMessage);
+                    break;
+                case "JOIN":
+                    String channel = messageParts.get(2);
+                    processJOIN(sender, channel);
+                    break;
+                case "PART":
+                    channel = messageParts.get(2);
+                    processPART(sender, channel);
+                    break;
+
+            }
+        }
+
+    }
+
 
     private void processRPL_LIST(List<String> messageParts) {
         if (waitingForList) {
@@ -517,8 +600,6 @@ public class MainWindowController extends Controller<String> {
     /**
      * Display methods
      *
-     * @param chatter
-     * @param privateMessage
      */
 
     private void displayMessage(String chatter, PrivateMessage privateMessage) {
@@ -560,6 +641,9 @@ public class MainWindowController extends Controller<String> {
             }
 
         }
+        if (privateMessage != null) {
+            getMainApp().showNotifications("Notification for " + chatter, privateMessage.getContent());
+        }
         chatDialogController.update();
 
     }
@@ -596,7 +680,9 @@ public class MainWindowController extends Controller<String> {
             Stage dialogStage = new Stage();
             dialogStage.setTitle("Conversation with " + chatter);
             dialogStage.initModality(Modality.NONE);
-            dialogStage.initOwner(getMainApp().getPrimaryStage());
+            dialogStage.initStyle(StageStyle.TRANSPARENT);
+            //dialogStage.initOwner(getMainApp().getPrimaryStage());
+            dialogStage.setResizable(false);
             Scene scene = new Scene(page);
             dialogStage.setScene(scene);
 
@@ -631,6 +717,18 @@ public class MainWindowController extends Controller<String> {
             return null;
         }
     }
+
+    private void showProgressBar(boolean show) {
+        if (show) {
+            progressBar.setProgress(ProgressIndicator.INDETERMINATE_PROGRESS);
+        } else {
+            progressBar.setProgress(0);
+        }
+    }
+
+
+
+
 
 
 }

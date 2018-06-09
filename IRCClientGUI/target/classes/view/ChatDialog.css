@@ -1,3 +1,30 @@
+*{
+    primary-color: #344955;
+    primary-dark-color: #232F34;
+    primary-light-color: #4A6572;
+    primary-text-color: #FFFFFF;
+
+    secondary-color: #F9AA33;
+    secondary-dark-color: #c17b00;
+    secondary-light-color: #ffdc65;
+    secondary-text-color: #000000;
+
+    -white: #FEFEFE;
+    -torea-bay: #353B7D;
+    -mischka: #A3A5A9;
+    -waikawa-grey: #636791;
+    -heather: #B5C0C6;
+    -heather: #ACB6C0;
+
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Message Bubbles  								                       	   *
+ *                                                                             *
+ ******************************************************************************/
+
 .send-message-label {
     -fx-background-color: rgb(102, 102, 255);
     -fx-text-fill: white;
@@ -23,27 +50,22 @@
     -fx-background-color: rgba(161, 255, 255, 0.5);
 }
 
-#send-button {
-    -fx-text-fill: white;
-    -fx-font-weight: bold;
-    -fx-font-size: 14px;
-    -fx-background-color: #0084ff;
-    -fx-background-radius: 30px;
-}
 
-#send-button:hover {
-    -fx-text-fill: #0084ff;
-    -fx-background-color: white;
-}
+/*******************************************************************************
+ *                                                                             *
+ * Chat Box         								                       	   *
+ *                                                                             *
+ ******************************************************************************/
 
 #chat-box {
-    -fx-background-radius: 7px;
-    -fx-border-radius: 7px;
+    -fx-background-radius: 20px;
+    -fx-border-radius: 20px;
 }
 
 #chat-box:focused {
     -fx-faint-focus-color: transparent;
-    -fx-focus-color: rgba(0, 132, 255, 0.8);
+    /*-fx-focus-color: rgba(0, 132, 255, 0.8);*/
+    -fx-focus-color: secondary-dark-color;
 }
 
 #chat-box .scroll-pane {
@@ -56,4 +78,26 @@
 
 #chat-box .scroll-pane .content {
     -fx-background-color: transparent;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Scroll pane            								                       *
+ *                                                                             *
+ ******************************************************************************/
+.scroll-pane:focused {
+    -fx-focus-color: secondary-color;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * File button            								                       *
+ *                                                                             *
+ ******************************************************************************/
+
+.file-button {
+    -glyph-size: 25px;
+    -fx-font-size: 25px;
+    -fx-rotate: -90;
 }

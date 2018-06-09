@@ -2,18 +2,17 @@ package com.github.dentou.view;
 
 import com.github.dentou.model.PrivateMessage;
 import com.github.dentou.utils.FXUtils;
+import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.geometry.Pos;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
+import javafx.scene.control.*;
 import javafx.scene.input.KeyCode;
 import javafx.scene.input.KeyEvent;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.*;
 import javafx.stage.Stage;
-import sun.applet.Main;
+import javafx.stage.WindowEvent;
 
 
 public class ChatDialogController extends Controller<PrivateMessage>{
@@ -22,9 +21,11 @@ public class ChatDialogController extends Controller<PrivateMessage>{
     @FXML
     protected VBox vBox;
     @FXML
-    protected TextArea chatBox;
+    protected TextField chatBox;
     @FXML
-    protected Button sendButton;
+    protected FontAwesomeIconView sendButton;
+    @FXML
+    protected FontAwesomeIconView fileButton;
 
     private String chatter;
 
@@ -47,18 +48,25 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         }
     }
 
+    @Override
+    protected void onWindowClosed(MouseEvent event) {
+        close();
+    }
+
+
     public synchronized void setChatter(String chatter) {
         this.chatter = chatter;
     }
 
     public void close() {
         Stage stage = (Stage) chatBox.getScene().getWindow();
-        stage.close();
+        stage.fireEvent(new WindowEvent(stage, WindowEvent.WINDOW_CLOSE_REQUEST));
     }
 
     @FXML
     @Override
     protected void initialize() {
+        super.initialize();
         //chatBox.setWrapText(true);
         chatBox.addEventFilter(KeyEvent.KEY_PRESSED, new EventHandler<KeyEvent>() {
             @Override
@@ -72,6 +80,7 @@ public class ChatDialogController extends Controller<PrivateMessage>{
                 }
             }
         });
+        chatBox.requestFocus();
         scrollPane.vvalueProperty().bind(vBox.heightProperty());
         sendButton.setDisable(true);
     }
@@ -110,14 +119,14 @@ public class ChatDialogController extends Controller<PrivateMessage>{
     }
 
     public void disableAll() {
-        FXUtils.setDisabled(true, sendButton, chatBox);
+        FXUtils.setDisabled(true, sendButton, fileButton, chatBox);
     }
 
     public void enableAll() {
         if (blocked) {
             return;
         }
-        FXUtils.setDisabled(false, sendButton, chatBox);
+        FXUtils.setDisabled(false, sendButton, fileButton, chatBox);
     }
 
     protected void displayNotification(String message) {

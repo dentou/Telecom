@@ -21,9 +21,14 @@ public class GUIRefresher implements Runnable {
                 System.out.println("Refresher closed");
                 return;
             }
-            this.mainApp.getController().refresh();
+            Platform.runLater(new Runnable() {
+                @Override
+                public void run() {
+                    mainApp.getController().refresh();
+                }
+            });
             try {
-                Thread.sleep(15000);
+                Thread.sleep(10000);
             } catch (InterruptedException e) {
                 System.out.println("Interruption in refresher thread");
                 e.printStackTrace();

@@ -7,7 +7,6 @@ import com.github.dentou.model.IRCConstants.Response;
 import com.github.dentou.model.User;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
-import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.TextField;
 
@@ -33,6 +32,7 @@ public class LoginDialogController extends Controller<String>{
     @FXML
     @Override
     protected void initialize() {
+        super.initialize();
         loginButton.setDisable(true);
     }
 

@@ -27,7 +27,9 @@ public class ConnectionDialogController extends Controller<String>{
 
     @Override
     protected void initialize() {
+        super.initialize();
         connectButton.setDisable(true);
+        resetButton.setDisable(true);
     }
 
     @Override
@@ -50,6 +52,7 @@ public class ConnectionDialogController extends Controller<String>{
         serverAddressField.setText("");
         serverAddressField.requestFocus();
         connectButton.setDisable(true);
+        resetButton.setDisable(true);
     }
 
     @FXML
@@ -101,8 +104,9 @@ public class ConnectionDialogController extends Controller<String>{
     @FXML
     private void onKeyReleased() {
         String serverAddress = serverAddressField.getText().trim();
-        boolean disableConnectButton = serverAddress.isEmpty();
-        connectButton.setDisable(disableConnectButton);
+        boolean disableButtons = serverAddress.isEmpty();
+        connectButton.setDisable(disableButtons);
+        resetButton.setDisable(disableButtons);
     }
 
     private boolean isValidIpAddress(String ip) {

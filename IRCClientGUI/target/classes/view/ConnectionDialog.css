@@ -1,0 +1,107 @@
+*{
+    primary-color: #344955;
+    primary-dark-color: #232F34;
+    primary-light-color: #4A6572;
+    primary-text-color: #FFFFFF;
+
+    secondary-color: #F9AA33;
+    secondary-dark-color: #c17b00;
+    secondary-light-color: #ffdc65;
+    secondary-text-color: #000000;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Root					 				                       				   *
+ *                                                                             *
+ ******************************************************************************/
+.root {
+
+    /* Swatch Colors - Blue*/
+    -swatch-100: #BBDEFB;
+    -swatch-200: #90CAF9;
+    -swatch-300: #64BEF6;
+    -swatch-400: #42A5F5;
+    -swatch-500: #2196F3;
+    /*default font */
+    -fx-font-family: 'Roboto Medium';
+    -fx-font-size: 14.0px;
+    -fx-disabled-opacity: 0.6;
+    /*default colors */
+    -swatch-grey: rgb(200.0, 200.0, 200.0);
+    -swatch-dark-grey: rgb(150.0, 150.0, 150.0);
+    -swatch-light-grey: rgb(230.0, 230.0, 230.0);
+    -swatch-toolbar: rgb(245.0, 245.0, 245.0);
+    -swatch-toolbar-selected: rgb(215.0, 215.0, 215.0);
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Menu Bar					 				                       			   *
+ *                                                                             *
+ ******************************************************************************/
+
+.menu-bar {
+    -fx-background-color: primary-dark-color;
+}
+
+.menu .label {
+    -fx-text-fill: primary-text-color;
+}
+
+.menu-button {
+    -fx-background-color: primary-dark-color;
+}
+
+.menu-button .label {
+    -fx-text-fill: primary-text-color;
+}
+
+
+.context-menu {
+    -fx-background-color: primary-dark-color;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Button					 				                       		       *
+ *                                                                             *
+ ******************************************************************************/
+
+.connect-button {
+    -fx-background-color: secondary-color;
+    -fx-text-fill: secondary-text-color;
+}
+
+
+.reset-button {
+    -fx-background-color: -swatch-grey;
+    -fx-text-fill: secondary-text-color;
+}
+
+.jfx-button:hover {
+    -fx-cursor: hand;
+    -fx-background-color: secondary-light-color;
+    -fx-border-color: secondary-dark-color;
+    -fx-border-width: 1;
+    -fx-border-radius: 3;
+    -fx-text-fill: secondary-text-color;
+
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * FontAwesome Icons								                       	   *
+ *                                                                             *
+ ******************************************************************************/
+
+.glyph-icon{
+
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -glyph-size: 16px;
+    -fx-font-family: 'FontAwesome';
+    -fx-font-size: 16px;
+}

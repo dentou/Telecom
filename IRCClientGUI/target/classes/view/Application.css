@@ -1,0 +1,271 @@
+*{
+    primary-color: #344955;
+    primary-dark-color: #232F34;
+    primary-light-color: #4A6572;
+    primary-text-color: #FFFFFF;
+
+    secondary-color: #F9AA33;
+    secondary-dark-color: #c17b00;
+    secondary-light-color: #ffdc65;
+    secondary-text-color: #000000;
+
+    -white: #FEFEFE;
+    -torea-bay: #353B7D;
+    -mischka: #A3A5A9;
+    -waikawa-grey: #636791;
+    -heather: #B5C0C6;
+    -heather: #ACB6C0;
+
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Root					 				                       				   *
+ *                                                                             *
+ ******************************************************************************/
+.root {
+
+    /* Swatch Colors - Blue*/
+    -swatch-100: #BBDEFB;
+    -swatch-200: #90CAF9;
+    -swatch-300: #64BEF6;
+    -swatch-400: #42A5F5;
+    -swatch-500: #2196F3;
+    /*default text */
+    /*-fx-text-base-color: rgb(100.0, 100.0, 100.0);*/
+    /*-fx-text-button-normal: -swatch-500;*/
+    /*-fx-text-button-colored: rgb(255.0, 255.0, 255.0);*/
+    /*-fx-text-button-text: rgb(100.0, 100.0, 100.0);*/
+    /*-fx-text-title-color: rgb(45.0, 45.0, 45.0);*/
+    /*-fx-text-subtitle-color: rgb(65.0, 65.0, 65.0);*/
+    /*-fx-text-control-title-color: rgb(130.0, 130.0, 130.0);*/
+    /*-fx-text-fill: -fx-text-base-color;*/
+    -dark: rgb(47.0, 52.0, 57.0);
+    /*-fx-background-color: -dark;*/
+    /*default font */
+    -fx-font-family: 'Roboto Medium';
+    -fx-font-size: 14.0px;
+    -fx-disabled-opacity: 0.6;
+    /*default colors */
+    -swatch-grey: rgb(200.0, 200.0, 200.0);
+    -swatch-dark-grey: rgb(150.0, 150.0, 150.0);
+    -swatch-light-grey: rgb(230.0, 230.0, 230.0);
+    -swatch-toolbar: rgb(245.0, 245.0, 245.0);
+    -swatch-toolbar-selected: rgb(215.0, 215.0, 215.0);
+    /*
+     Modena colors
+     */
+    /*-fx-dark-text-color: white; !* Text color when selected*!*/
+    /*-fx-mid-text-color: -fx-text-base-color;*/
+    /*-fx-light-text-color: -swatch-light-grey;*/
+    /*-fx-body-color: white;*/
+    /*!* A bright blue for the focus indicator of objects. Typically used as the*/
+     /** first color in -fx-background-color for the "focused" pseudo-class. Also*/
+     /** typically used with insets of -1.4 to provide a glowing effect.*/
+     /**!*/
+    /*-fx-focus-color: -swatch-400;*/
+    /*-fx-faint-focus-color: -swatch-200;*/
+    /*!* A bright blue for highlighting/accenting objects.  For example: selected*/
+     /** text; selected items in menus, lists, trees, and tables; progress bars *!*/
+    /*-fx-accent: -swatch-400;*/
+    /*-fx-dark-text-color: white;*/
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * FontAwesome Icons								                       	   *
+ *                                                                             *
+ ******************************************************************************/
+
+.glyph-icon{
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -glyph-size: 16px;
+    -fx-font-family: 'FontAwesome';
+    -fx-font-size: 16px;
+}
+
+.glyph-icon:disabled{
+    -fx-opacity: 0.6;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Menu Bar					 				                       			   *
+ *                                                                             *
+ ******************************************************************************/
+
+.menu-bar {
+    -fx-background-color: primary-dark-color;
+}
+
+.menu .label {
+    -fx-text-fill: primary-text-color;
+}
+
+.menu-button {
+    -fx-background-color: primary-dark-color;
+}
+
+.menu-button .label {
+    -fx-text-fill: primary-text-color;
+}
+
+
+.context-menu {
+    -fx-background-color: primary-dark-color;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Tab Pane					 				                       			   *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-tab-pane *.tab-header-background {
+    -fx-background-color: primary-color;
+}
+
+.jfx-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: secondary-light-color;
+}
+
+.tab-label {
+    -fx-text-fill: primary-text-color;
+    -fx-font-weight: normal;
+}
+
+.tab-label:hover {
+    -fx-cursor: hand;
+}
+
+.jfx-tab-pane .tab-header-area .tab-down-button {
+    -fx-background-color: WHITE;
+    -fx-min-width: 0.8em;
+    -fx-max-width: 0.8em;
+    -fx-min-height: 1.3em;
+    -fx-max-height: 1.3em;
+}
+
+/*******************************************************************************
+ *                                                                             *
+ * Text Field					 				                       		   *
+ *                                                                             *
+ ******************************************************************************/
+.jfx-text-field {
+    -fx-prompt-text-fill: primary-color;
+    -fx-text-fill: primary-color;
+    -fx-font-size: 14px;
+}
+
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Button					 				                       		       *
+ *                                                                             *
+ ******************************************************************************/
+
+.jfx-button:hover {
+    -fx-cursor: hand;
+    -fx-background-radius: 30px;
+    -fx-background-color: secondary-light-color;
+    -fx-text-fill: secondary-text-color;
+
+}
+
+.orange-button {
+    -fx-background-radius: 30px;
+    -fx-background-color: secondary-color;
+    -fx-text-fill: secondary-text-color;
+}
+
+.silver-button {
+    -fx-background-radius: 30px;
+    -fx-background-color: -swatch-grey;
+    -fx-text-fill: secondary-text-color;
+
+}
+
+
+.iconic-button {
+    -fx-text-fill: primary-light-color;
+    -fx-fill: primary-light-color;
+    -glyph-size: 20px;
+    -fx-font-size: 20px;
+    -fx-font-family: 'FontAwesome';
+}
+
+.iconic-button:hover {
+    -fx-fill: secondary-color;
+    -fx-cursor: hand;
+}
+
+.iconic-button-alt {
+    -fx-text-fill: white;
+    -fx-fill: white;
+    -glyph-size: 20px;
+    -fx-font-size: 20px;
+    -fx-font-family: 'FontAwesome';
+}
+
+.iconic-button-alt:hover {
+    -fx-fill: secondary-color;
+    -fx-cursor: hand;
+}
+
+
+/*******************************************************************************
+ *                                                                             *
+ * Tables								                       				   *
+ *                                                                             *
+ ******************************************************************************/
+.table-view, .tree-table-view {
+    /* Constants used throughout the tableview. */
+    -fx-table-header-border-color: transparent;
+    -fx-table-cell-border-color: -fx-box-border; /* Horizontal Lines*/
+    -fx-background-color: transparent;
+}
+
+/* The column header row is made up of a number of column-header, one for each
+   TableColumn, and a 'filler' area that extends from the right-most column
+   to the edge of the tableview, or up to the 'column control' button. */
+.table-view .filler, .tree-table-view .filler, .table-view .column-header,
+.tree-table-view .column-header {
+    -fx-size: 50;
+    -fx-border-style: null;
+    -fx-border-color: -swatch-grey;
+    -fx-border-width: 0 0 2 0;
+    -fx-background-color: transparent;
+}
+
+.table-view .show-hide-columns-button, .tree-table-view .show-hide-columns-button
+{
+    -fx-background-color: transparent;
+}
+
+.table-view .column-header .label, .table-view .filler .label,
+.table-view .column-drag-header .label, .tree-table-view .column-header .label,
+.tree-table-view .filler .label, .tree-table-view .column-drag-header .label
+{
+    -fx-alignment: CENTER;
+}
+
+.table-view .column-header-background, .tree-table-view .column-header-background
+{
+    -fx-background-color: transparent;
+}
+
+.table-row-cell, .tree-table-row-cell {
+    -fx-cell-size: 40px;
+}
+
+.table-cell {
+    -fx-border-color: transparent; /* Vertical Lines*/
+    -fx-padding: 0 0 0 110;
+    -fx-text-fill: black;
+}
+
