@@ -521,8 +521,13 @@ public class SocketProcessor implements Runnable {
     }
 
     private void handleNamesCommmand(IRCMessage request, List<String> requestParts) {
-        if (requestParts.size() < 2) {
-            for (String channelName : userHandler.getJoinedChannelNames(request.getFromId())) {
+        if (requestParts.size() == 1) {
+            Set<String> joinedChannels = userHandler.getJoinedChannelNames(request.getFromId());
+            if (joinedChannels.size() == 0) {
+                sendQueue.addAll(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
+                return;
+            }
+            for (String channelName :  joinedChannels){
                 requestQueue.add(new IRCMessage("NAMES " + channelName, request.getFromId(), request.getToId()));
             }
             return;

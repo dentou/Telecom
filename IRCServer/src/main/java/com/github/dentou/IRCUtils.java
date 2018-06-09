@@ -150,7 +150,7 @@ public class IRCUtils {
                         requesterNick, "=", requestParts.get(1), ":");
                 int i = 0;
                 for (User member : members.keySet()) {
-                    responseStringBuilder.append(members.get(member));
+                    responseStringBuilder.append(members.get(member)); // Append admin or moderator sign (* or +)
                     responseStringBuilder.append(member.getNick());
                     if (i < members.size() - 1) {
                         responseStringBuilder.append(" ");
@@ -159,8 +159,9 @@ public class IRCUtils {
                 }
                 break;
             case RPL_ENDOFNAMES:
+                String channelName = requestParts.size() < 2 ? "*" : requestParts.get(1);
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, "=", requestParts.get(1), ":End of NAMES list");
+                        requesterNick, "=", channelName, ":End of NAMES list");
                 break;
             case RPL_LIST:
                 autoQueue = false;

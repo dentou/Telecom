@@ -19,17 +19,17 @@
       <file leaf-file-name="SocketAcceptor.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/SocketAcceptor.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="206">
-              <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+            <state relative-caret-position="464">
+              <caret line="34" column="17" lean-forward="true" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
             </state>
           </provider>
         </entry>
       </file>
-      <file leaf-file-name="SocketProcessor.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/SocketProcessor.java">
+      <file leaf-file-name="IRCUtils.java" pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCUtils.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="7607">
-              <caret line="553" column="74" lean-forward="true" selection-start-line="553" selection-start-column="74" selection-end-line="553" selection-end-column="74" />
+            <state relative-caret-position="181">
+              <caret line="152" column="113" selection-start-line="152" selection-start-column="113" selection-end-line="152" selection-end-column="113" />
             </state>
           </provider>
         </entry>
@@ -37,17 +37,8 @@
       <file leaf-file-name="IRCChannel.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCChannel.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="119">
+            <state relative-caret-position="1200">
               <caret line="94" column="42" selection-start-line="94" selection-start-column="42" selection-end-line="94" selection-end-column="42" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="IRCUtils.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCUtils.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1488">
-              <caret line="101" column="29" lean-forward="true" selection-start-line="101" selection-start-column="29" selection-end-line="101" selection-end-column="29" />
             </state>
           </provider>
         </entry>
@@ -149,6 +140,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/SocketAcceptor.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/IRCChannel.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/SocketProcessor.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/UserHandler.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/IRCUtils.java" />
       </list>
     </option>
   </component>
@@ -169,7 +162,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -213,6 +205,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
       <pane id="PackagesPane" />
     </panes>
   </component>
@@ -324,11 +317,19 @@
       <workItem from="1528078380491" duration="3755000" />
       <workItem from="1528085278798" duration="2337000" />
       <workItem from="1528107057074" duration="3090000" />
+      <workItem from="1528120803113" duration="9000" />
+      <workItem from="1528301539016" duration="1850000" />
+      <workItem from="1528366462984" duration="1447000" />
+      <workItem from="1528380773337" duration="599000" />
+      <workItem from="1528518900656" duration="637000" />
+      <workItem from="1528535369109" duration="701000" />
+      <workItem from="1528552796461" duration="3170000" />
+      <workItem from="1528561032930" duration="69000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="197042000" />
+    <option name="totallyTimeSpent" value="205524000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -341,29 +342,30 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32838285" />
-      <window_info anchor="bottom" id="Messages" order="7" weight="0.32838285" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
       <window_info anchor="bottom" id="Event Log" order="7" side_tool="true" />
       <window_info anchor="right" id="Maven Projects" order="3" />
       <window_info anchor="bottom" id="Version Control" order="7" show_stripe_button="false" />
       <window_info anchor="bottom" id="Run" order="2" weight="0.32838285" />
-      <window_info anchor="right" id="Coverage" side_tool="true" weight="0.32980332" />
       <window_info anchor="bottom" id="Terminal" order="7" weight="0.32838285" />
       <window_info id="Designer" order="2" />
-      <window_info content_ui="combo" id="Project" order="0" visible="true" weight="0.2700454" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.30559757" />
       <window_info id="Learn" order="2" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="Favorites" order="2" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
+      <window_info anchor="right" id="Coverage" order="4" side_tool="true" weight="0.32980332" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="right" id="Commander" order="0" weight="0.4" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32838285" />
+      <window_info anchor="bottom" id="Messages" order="7" weight="0.32838285" />
     </layout>
   </component>
   <component name="VcsContentAnnotationSettings">
@@ -629,13 +631,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCConstants.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="96">
-          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/pom.xml">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="128">
@@ -671,6 +666,13 @@
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCConstants.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-192">
+          <caret line="7" lean-forward="true" selection-start-line="7" selection-end-line="7" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCServer.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="96">
@@ -678,10 +680,17 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCUtils.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCChannel.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1488">
-          <caret line="101" column="29" lean-forward="true" selection-start-line="101" selection-start-column="29" selection-end-line="101" selection-end-column="29" />
+        <state relative-caret-position="1200">
+          <caret line="94" column="42" selection-start-line="94" selection-start-column="42" selection-end-line="94" selection-end-column="42" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/UserHandler.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="1184">
+          <caret line="82" column="38" selection-start-line="82" selection-start-column="38" selection-end-line="82" selection-end-column="38" />
         </state>
       </provider>
     </entry>
@@ -692,31 +701,24 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCChannel.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/SocketProcessor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="119">
-          <caret line="94" column="42" selection-start-line="94" selection-start-column="42" selection-end-line="94" selection-end-column="42" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/UserHandler.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-907">
-          <caret line="99" column="16" selection-start-line="99" selection-start-column="16" selection-end-line="99" selection-end-column="16" />
+        <state relative-caret-position="8304">
+          <caret line="527" column="23" selection-start-line="527" selection-start-column="23" selection-end-line="527" selection-end-column="23" />
         </state>
       </provider>
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/SocketAcceptor.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="206">
-          <caret line="22" column="13" selection-start-line="22" selection-start-column="13" selection-end-line="22" selection-end-column="13" />
+        <state relative-caret-position="464">
+          <caret line="34" column="17" lean-forward="true" selection-start-line="34" selection-start-column="17" selection-end-line="34" selection-end-column="17" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/SocketProcessor.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/IRCUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="7607">
-          <caret line="553" column="74" lean-forward="true" selection-start-line="553" selection-start-column="74" selection-end-line="553" selection-end-column="74" />
+        <state relative-caret-position="181">
+          <caret line="152" column="113" selection-start-line="152" selection-start-column="113" selection-end-line="152" selection-end-column="113" />
         </state>
       </provider>
     </entry>

@@ -76,10 +76,11 @@ public class UserHandler {
         if (user.getNick() != null) {
             nickToId.remove(user.getNick());
         }
-        Set<IRCChannel> joinedChannels = this.userToChannels.get(user);
-        for (IRCChannel channel : joinedChannels) {
-            channel.removeUser(user);
-        }
+//        Set<IRCChannel> joinedChannels = this.userToChannels.get(user);
+//        for (IRCChannel channel : joinedChannels) {
+//            channel.removeUser(user);
+//        }
+        removeUserFromAllChannels(id);
         this.userToChannels.remove(user);
         return StatusCode.SUCCESS;
     }
