@@ -108,9 +108,13 @@ The following are examples of valid IRC replies:
 ```
 
 **Remark:** Only messages (relay or response) from server can be preceeded with prefix.
+
 ### Message Details
+
 #### Connection registration
+
 ##### NICK
+
 ``` 
 NICK <nickname>
 ```
@@ -270,12 +274,10 @@ LIST
 ```
 The `LIST` command is used to request information about all channels on the server.
 
-Possible Replies:
+Replies (always):
 ``` 
-451 ERR_NOTREGISTERED
-461 ERR_NEEDMOREPARAMS
-403 ERR_NOSUCHCHANNEL
-442 ERR_NOTONCHANNEL
+322 RPL_LIST
+323 RPL_LISTEND
 ```
 
 #### Sending messages
@@ -283,11 +285,15 @@ Possible Replies:
 ``` 
 PRIVMSG <target> :<text to be sent>
 ```
-`PRIVMSG` is used to send private messages between users, as well as to send messages to channels. `<msgtarget>` is usually the nickname of the recipient of the message, or a channel name.\
+`PRIVMSG` is used to send private messages between users, as well as to send messages to channels. `<target>` is usually the nickname of the recipient of the message, or a channel name.\
 In case the recipient is a channel, the sender must be a member of that channel.
 
-
 Possible Replies:
+* Request accepted
+```
+Relay message (sent to recipient)
+```
+* Errors
 ``` 
 451 ERR_NOTREGISTERED
 461 ERR_NEEDMOREPARAMS
@@ -296,47 +302,68 @@ Possible Replies:
 401 ERR_NOSUCHNICK
 404 ERR_CANNOTSENDTOCHAN
 ```
+
 #### User based queries
+
 ##### WHO
+
 ``` 
 WHO
 ```
-The WHO command is used to query information about all current users in the server. 
+
+The WHO command is used to query information about all current users in the server.
 
 Replies:
+
 ``` 
 352 RPL_WHOREPLY
 :<servername> <numeric code> <nick of requester> <nick> <user name> :<fullname>
-
 315 RPL_ENDOFWHO
 :<servername> <numeric code> <nick of requester> :End of WHO list
 ```
+
 Example (`C` represents message from Client to Server, `S` represents message from Server to Client):
+
 ``` 
 C: WHO
 S: :irc.example.com 352 thong dentou huy :huy tran
 S: :irc.example.com 352 thong mintori tri :minh tri
 S: :irc.example.com 315 :End of WHO list
 ```
+
 ##### WHOIS
-``` 
+
+```
 WHOIS <nick>
 ```
+
 This command is used to query information about particular user. If there is not enough parameters, the request is ignored.
 
 Possible Replies:
-``` 
-451 ERR_NOTREGISTERED
-401 ERR_NOSUCHNICK
+
+* Request accepted
+
+```
 311 RPL_WHOISUSER
 318 RPL_ENDOFWHOIS
 ```
+
+* Errors
+
+```
+451 ERR_NOTREGISTERED
+401 ERR_NOSUCHNICK
+```
+
 #### Miscellaneous messages
+
 ##### PING and PONG
-``` 
+
+```
 PING
 PONG
 ```
+
 The PING command is used to test the presence of an active client or
 server at the other end of the connection. Servers send a PING
 message at regular intervals if no other activity detected coming
