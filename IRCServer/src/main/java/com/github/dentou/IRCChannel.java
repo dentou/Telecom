@@ -1,18 +1,22 @@
 package com.github.dentou;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import com.github.dentou.IRCConstants.ChannelMode;
 
 public class IRCChannel {
-    private List<User> userList = new ArrayList<User>();
-    private List<User> moderatorList = new ArrayList<>();
     private String name;
     private String topic;
     private long memberCount = 1;
 
     private User admin;
+    private List<User> moderatorList = new ArrayList<>();
+    private List<User> userList = new ArrayList<User>();
+
+
+    private EnumSet<ChannelMode> channelModes = EnumSet.noneOf(ChannelMode.class);
+    private String key = "";
+    private long memberLimit = 100;
+
 
     public IRCChannel(String name, User admin) {
         this(name, admin, "");
@@ -59,6 +63,10 @@ public class IRCChannel {
         return userList.isEmpty() && moderatorList.isEmpty() && admin == null;
     }
 
+    public boolean isFull() {
+        return memberCount >= memberLimit;
+    }
+
     public String getName() {
         return name;
     }
@@ -75,12 +83,16 @@ public class IRCChannel {
         this.topic = topic;
     }
 
-    public void addUser(User user) {
-        if (!userList.contains(user)) {
-            userList.add(user);
-            this.memberCount++;
+    public boolean addUser(User user) {
+        if (memberCount >= memberLimit) {
+            return false;
         }
-
+        if (userList.contains(user)) {
+            return false;
+        }
+        userList.add(user);
+        this.memberCount++;
+        return true;
     }
 
     public void removeUser(User user) {
@@ -123,5 +135,65 @@ public class IRCChannel {
         return members;
     }
 
+    public String getKey() {
+        return this.key;
+    }
 
+    public void setKey(String key) {
+        this.key = key;
+    }
+
+    public void promote(User user) {
+        if (user == null) {
+            return;
+        }
+        if (!userList.contains(user)) {
+            return;
+        }
+        userList.remove(user);
+        moderatorList.add(user);
+    }
+
+    public void demote(User user) {
+        if (user == null) {
+            return;
+        }
+        if (!moderatorList.contains(user)) {
+            return;
+        }
+        moderatorList.remove(user);
+        userList.add(user);
+    }
+
+    public boolean hasMode(ChannelMode mode) {
+        return this.channelModes.contains(mode);
+    }
+
+    public void setMode(ChannelMode mode, boolean enable) {
+        if (mode == null) {
+            return;
+        }
+        if (enable) {
+            this.channelModes.add(mode);
+        } else {
+            this.channelModes.remove(mode);
+        }
+    }
+
+    public String getModes() {
+        StringBuilder sb = new StringBuilder();
+        sb.append("+");
+        for (ChannelMode mode : channelModes) {
+            sb.append(mode.getFlag());
+        }
+        return sb.toString();
+    }
+
+    public long getMemberLimit() {
+        return memberLimit;
+    }
+
+    public void setMemberLimit(long memberLimit) {
+        this.memberLimit = memberLimit;
+    }
 }

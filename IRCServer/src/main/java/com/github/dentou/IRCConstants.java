@@ -42,6 +42,8 @@ public class IRCConstants {
         RPL_LUSERCHANNELS("254"),
         RPL_LUSERME("255"),
         RPL_TRYAGAIN("263"),
+        RPL_FILESEND("525"),
+
 
 
 
@@ -66,8 +68,11 @@ public class IRCConstants {
         ERR_NEEDMOREPARAMS("461"),
 
         ERR_PASSWDMISMATCH("464"),
+        ERR_CHANNELISFULL("471"),
+        ERR_UNKNOWNMODE("472"),
 
         ERR_INVITEONLYCHAN("473"),
+        ERR_BADCHANNELKEY("475"),
         ERR_CHANOPRIVSNEEDED("482"),
         ;
 
@@ -89,6 +94,34 @@ public class IRCConstants {
         }
         public static Response getResponse(String numericCode) {
             return lookupMap.get(numericCode);
+        }
+    }
+
+    public enum ChannelMode {
+        INVITE_ONLY('i'),
+        KEY('k'),
+        LIMITED('l'),
+        OPERATOR('o'),
+        ;
+
+        private char flag;
+        private static final Map<Character, ChannelMode> lookupMap = new HashMap<Character, ChannelMode>();
+
+        static {
+            //Create reverse lookup hash map
+            for(ChannelMode mode : ChannelMode.values())
+                lookupMap.put(mode.getFlag(), mode);
+        }
+
+        ChannelMode(char flag) {
+            this.flag = flag;
+        }
+
+        public char getFlag() {
+            return this.flag;
+        }
+        public static ChannelMode getMode(char flag) {
+            return lookupMap.get(flag);
         }
     }
 

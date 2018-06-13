@@ -73,6 +73,7 @@ public class IRCUtils {
         return new IRCMessage(sb.toString(), request.getFromId(), toId);
     }
 
+
     public static Queue<IRCMessage> createResponse(IRCConstants.Response responseType, IRCMessage request,
                                                    List<String> requestParts , UserHandler userHandler) {
 
@@ -184,6 +185,11 @@ public class IRCUtils {
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, ":End of LIST");
                 break;
+            case RPL_CHANNELMODEIS:
+                channelName = requestParts.get(1);
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, channelName, userHandler.getChannelModes(channelName));
+                break;
 
 
 
@@ -242,8 +248,29 @@ public class IRCUtils {
                         requesterNick, requestParts.get(1), ":You're not channel operator");
                 break;
             case ERR_USERNOTINCHANNEL:
+                if (requestParts.get(0).equals("MODE")) {
+                    responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                            requesterNick, requestParts.get(3), requestParts.get(1), ":They aren't on that channel");
+                } else {
+                    responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                            requesterNick, requestParts.get(2), requestParts.get(1), ":They aren't on that channel");
+                }
+                break;
+            case ERR_UNKNOWNMODE:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(2), requestParts.get(1), ":They aren't on that channel");
+                        requesterNick, requestParts.get(2), ":Is unknown mode char for me for channel " + requestParts.get(1));
+                break;
+            case ERR_INVITEONLYCHAN:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Cannot join channel (+i)");
+                break;
+            case ERR_CHANNELISFULL:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Cannot join channel (+l)");
+                break;
+            case ERR_BADCHANNELKEY:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Cannot join channel (+k)");
                 break;
 
         }

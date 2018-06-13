@@ -39,6 +39,9 @@ public class IRCMessageReader { // todo handle partial read (for file transfer)
                 break;
             }
             String content = new String(Arrays.copyOfRange(src, beginOfMessage, endOfMessage - 1)); // Ignore line break
+            if (content.length() > 510) {
+                content = content.substring(0, 510);
+            }
             IRCMessage message = new IRCMessage(content, ircSocket.getId(), 0); // 0 is server
             messages.add(message);
             beginOfMessage = endOfMessage + 1;

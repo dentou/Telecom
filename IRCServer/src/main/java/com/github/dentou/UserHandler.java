@@ -1,6 +1,8 @@
 package com.github.dentou;
 
 import java.util.*;
+import com.github.dentou.IRCConstants.ChannelMode;
+
 
 public class UserHandler {
     private Set<User> userList = new HashSet<>();
@@ -54,6 +56,14 @@ public class UserHandler {
         return true;
     }
 
+    public boolean isFull(String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+           throw new IllegalArgumentException("Channel does not exist");
+        }
+        return channel.isFull();
+    }
+
 
     public StatusCode addUser(long id) {
         if (containsId(id)) {
@@ -76,10 +86,7 @@ public class UserHandler {
         if (user.getNick() != null) {
             nickToId.remove(user.getNick());
         }
-//        Set<IRCChannel> joinedChannels = this.userToChannels.get(user);
-//        for (IRCChannel channel : joinedChannels) {
-//            channel.removeUser(user);
-//        }
+
         removeUserFromAllChannels(id);
         this.userToChannels.remove(user);
         return StatusCode.SUCCESS;
@@ -252,6 +259,57 @@ public class UserHandler {
         return users;
     }
 
+    public String getChannelModes(String channelName) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            throw new IllegalArgumentException("Channel not exist");
+        }
+        return channel.getModes();
+    }
 
+    public void setChannelMode(String channelName, char flag, String parameter, boolean enable) {
+        IRCChannel channel = nameToChannel.get(channelName);
+        if (channel == null) {
+            throw new IllegalArgumentException("Channel does not exist");
+        }
+        switch (flag) {
+            case 'i':
+                channel.setMode(ChannelMode.INVITE_ONLY, enable);
+                break;
+            case 'l':
+                channel.setMode(ChannelMode.LIMITED, enable);
+                channel.setMemberLimit(Long.parseLong(parameter));
+                break;
+            case 'k':
+                channel.setMode(ChannelMode.KEY, enable);
+                if (enable) {
+                    channel.setKey(parameter);
+                } else {
+                    channel.setKey("");
+                }
+                break;
+            case 'o':
+                User user = idToUser.get(nickToId.get(parameter));
+                if (user == null) {
+                    throw new IllegalArgumentException("User is not on channel to set +-o mode");
+                }
+                if (enable) {
+                    channel.promote(user);
+                } else {
+                    channel.demote(user);
+                }
+
+                break;
+
+        }
+    }
+     public String getChannelKey(String channelName) {
+         IRCChannel channel = nameToChannel.get(channelName);
+         if (channel == null) {
+             return "";
+         }
+         return channel.getKey();
+
+     }
 
 }

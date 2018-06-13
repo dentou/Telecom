@@ -15,6 +15,16 @@ public class IRCMessage {
 
     }
 
+    public IRCMessage(long fromId, long toId, String... messageParts) {
+        this.fromId = fromId;
+        this.toId = toId;
+        StringBuilder sb = new StringBuilder();
+        for (String part : messageParts) {
+            sb.append(part);
+        }
+        this.message = sb.toString();
+    }
+
     public String getMessage() {
         return message;
     }
