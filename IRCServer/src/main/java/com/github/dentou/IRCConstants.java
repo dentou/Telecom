@@ -42,7 +42,6 @@ public class IRCConstants {
         RPL_LUSERCHANNELS("254"),
         RPL_LUSERME("255"),
         RPL_TRYAGAIN("263"),
-        RPL_FILESEND("525"),
 
 
 

@@ -196,6 +196,11 @@ public class SocketProcessor implements Runnable {
             case "MODE":
                 handleModeCommand(request, requestParts);
                 break;
+            case "FILE_SEND":
+            case "FILE_RECEIVE":
+            case "FILE_DENY":
+                handleFileCommand(request, requestParts);
+                break;
             default:
                 sendQueue.addAll(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
                 break;
@@ -602,7 +607,7 @@ public class SocketProcessor implements Runnable {
             }
         }
 
-        // If user is not a member of the channel
+        // If affected user is not a member of the channel
         if (flag == 'o') {
             User affectedUser = userHandler.getUser(parameter); // todo check if nick is valid
             if (affectedUser == null || !userHandler.isOnChannel(affectedUser.getId(), channelName)) {
@@ -622,27 +627,31 @@ public class SocketProcessor implements Runnable {
 
 
 
-    private void handleFileSendCommand(IRCMessage request, List<String> requestParts) {
+    private void handleFileCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
             sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
             return;
         }
         // Check parameters
-        if (requestParts.size() < 5) {
+        if (requestParts.size() < 4) {
             sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
             return;
         }
 
-
-
         // If nick user asks for does not exist
-        if (!userHandler.containsNick(requestParts.get(1))) {
+        String nick = requestParts.get(1);
+        User recipient = userHandler.getUser(nick);
+        if (recipient == null) {
             sendQueue.addAll(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
             return;
         }
 
+        sendQueue.add(createRelayMessage(request, userHandler, recipient.getId()));
+
     }
+
+
 
 
     private void sendToChannel(String channelName, IRCMessage request) {

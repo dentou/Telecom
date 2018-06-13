@@ -194,30 +194,21 @@ public class IRCUtils {
 
 
             // Errors
-            case ERR_NICKNAMEINUSE:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":Nickname is already in use");
-                break;
-            case ERR_NONICKNAMEGIVEN:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, ":No nickname given");
-                break;
-            case ERR_ERRONEOUSNICKNAME:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":Erroneous nickname");
-                break;
-            case ERR_NEEDMOREPARAMS:
-
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(0), ":Not enough parameters");
-                break;
-            case ERR_NORECIPIENT:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                       requesterNick , ":No recipient given");
-                break;
             case ERR_NOSUCHNICK:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, requestParts.get(1), ":No such nick/channel");
+                break;
+            case ERR_NOSUCHCHANNEL:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":No such channel");
+                break;
+            case ERR_CANNOTSENDTOCHAN:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Cannot send to channel");
+                break;
+            case ERR_NORECIPIENT:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick , ":No recipient given");
                 break;
             case ERR_NOTEXTTOSEND:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
@@ -227,25 +218,17 @@ public class IRCUtils {
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, requestParts.get(0), ":Unknown command");
                 break;
-            case ERR_NOTREGISTERED:
+            case ERR_NONICKNAMEGIVEN:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, ":You have not registered");
+                        requesterNick, ":No nickname given");
                 break;
-            case ERR_CANNOTSENDTOCHAN:
+            case ERR_ERRONEOUSNICKNAME:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":Cannot send to channel");
+                        requesterNick, requestParts.get(1), ":Erroneous nickname");
                 break;
-            case ERR_NOSUCHCHANNEL:
+            case ERR_NICKNAMEINUSE:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":No such channel");
-                break;
-            case ERR_NOTONCHANNEL:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":You're not on that channel");
-                break;
-            case ERR_CHANOPRIVSNEEDED:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":You're not channel operator");
+                        requesterNick, requestParts.get(1), ":Nickname is already in use");
                 break;
             case ERR_USERNOTINCHANNEL:
                 if (requestParts.get(0).equals("MODE")) {
@@ -256,6 +239,23 @@ public class IRCUtils {
                             requesterNick, requestParts.get(2), requestParts.get(1), ":They aren't on that channel");
                 }
                 break;
+            case ERR_NOTONCHANNEL:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":You're not on that channel");
+                break;
+            case ERR_NOTREGISTERED:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, ":You have not registered");
+                break;
+            case ERR_NEEDMOREPARAMS:
+
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(0), ":Not enough parameters");
+                break;
+            case ERR_CHANNELISFULL:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":Cannot join channel (+l)");
+                break;
             case ERR_UNKNOWNMODE:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, requestParts.get(2), ":Is unknown mode char for me for channel " + requestParts.get(1));
@@ -264,13 +264,14 @@ public class IRCUtils {
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, requestParts.get(1), ":Cannot join channel (+i)");
                 break;
-            case ERR_CHANNELISFULL:
-                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
-                        requesterNick, requestParts.get(1), ":Cannot join channel (+l)");
-                break;
+
             case ERR_BADCHANNELKEY:
                 responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
                         requesterNick, requestParts.get(1), ":Cannot join channel (+k)");
+                break;
+            case ERR_CHANOPRIVSNEEDED:
+                responseStringBuilder = createResponseStringBuilder(serverHeader, responseType.getNumericCode(),
+                        requesterNick, requestParts.get(1), ":You're not channel operator");
                 break;
 
         }
