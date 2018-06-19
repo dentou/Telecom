@@ -1,8 +1,7 @@
-package com.github.dentou;
+package com.github.dentou.chat;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
-import java.nio.channels.SocketChannel;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

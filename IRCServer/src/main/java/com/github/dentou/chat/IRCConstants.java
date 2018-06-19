@@ -1,15 +1,20 @@
-package com.github.dentou;
+package com.github.dentou.chat;
 
 import java.util.HashMap;
 import java.util.Map;
 
 public class IRCConstants {
-    public static final int SERVER_PORT = 6667;
+    public static final int CHAT_SERVER_PORT = 6667;
+    public static final int FILE_SERVER_PORT = 6668;
 
     public static final int KB = 1024; // bytes
     public static final int MB = 1024 * KB;
 
     public static final int MESSAGE_BUFFER_SIZE = 10 * KB; // bytes
+
+    public static final int FILE_BUFFER_SIZE = 1 * MB;
+
+    public static final int SOCKET_BUFFER_SIZE = 1024;
 
 
     public enum Response {

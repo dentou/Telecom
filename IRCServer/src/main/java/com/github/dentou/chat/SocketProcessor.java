@@ -1,4 +1,4 @@
-package com.github.dentou;
+package com.github.dentou.chat;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
@@ -6,9 +6,8 @@ import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
 
-import static com.github.dentou.IRCConstants.Response;
-import static com.github.dentou.IRCUtils.*;
-import static com.github.dentou.UserHandler.StatusCode;
+import static com.github.dentou.chat.IRCConstants.Response;
+import static com.github.dentou.chat.IRCUtils.*;
 
 
 /**
@@ -200,6 +199,11 @@ public class SocketProcessor implements Runnable {
             case "FILE_RECEIVE":
             case "FILE_DENY":
                 handleFileCommand(request, requestParts);
+                break;
+            case "FILE_RESUME":
+            case "FILE_RESEND":
+            case "FILE_RESUME_DENY":
+                handleFileResumeCommand(request, requestParts);
                 break;
             default:
                 sendQueue.addAll(createResponse(Response.ERR_UNKNOWNCOMMAND, request, requestParts, userHandler));
@@ -649,6 +653,29 @@ public class SocketProcessor implements Runnable {
 
         sendQueue.add(createRelayMessage(request, userHandler, recipient.getId()));
 
+    }
+
+    private void handleFileResumeCommand(IRCMessage request, List<String> requestParts) {
+        // If user has not yet registered
+        if (!userHandler.isRegistered(request.getFromId())) {
+            sendQueue.addAll(createResponse(Response.ERR_NOTREGISTERED, request, requestParts, userHandler));
+            return;
+        }
+        // Check parameters
+        if (requestParts.size() < 5) {
+            sendQueue.addAll(createResponse(Response.ERR_NEEDMOREPARAMS, request, requestParts, userHandler));
+            return;
+        }
+
+        // If nick user asks for does not exist
+        String nick = requestParts.get(1);
+        User recipient = userHandler.getUser(nick);
+        if (recipient == null) {
+            sendQueue.addAll(createResponse(Response.ERR_NOSUCHNICK, request, requestParts, userHandler));
+            return;
+        }
+
+        sendQueue.add(createRelayMessage(request, userHandler, recipient.getId()));
     }
 
 

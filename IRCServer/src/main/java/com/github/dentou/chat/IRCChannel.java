@@ -1,7 +1,7 @@
-package com.github.dentou;
+package com.github.dentou.chat;
 
 import java.util.*;
-import com.github.dentou.IRCConstants.ChannelMode;
+import com.github.dentou.chat.IRCConstants.ChannelMode;
 
 public class IRCChannel {
     private String name;

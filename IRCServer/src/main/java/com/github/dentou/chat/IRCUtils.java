@@ -1,4 +1,4 @@
-package com.github.dentou;
+package com.github.dentou.chat;
 
 import java.io.IOException;
 import java.net.InetAddress;
