@@ -193,22 +193,21 @@
                               </JFXButton>
                            </children>
                                 </HBox>
-                                <GridPane>
+                                <GridPane prefHeight="60.0" prefWidth="174.0">
                                     <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" />
+                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="209.0" minWidth="10.0" prefWidth="131.0" />
+                              <ColumnConstraints hgrow="SOMETIMES" maxWidth="109.0" minWidth="7.0" prefWidth="43.0" />
                                     </columnConstraints>
                                     <rowConstraints>
                                         <RowConstraints minHeight="3.0" vgrow="SOMETIMES" />
                                     </rowConstraints>
                                     <children>
                                         <JFXProgressBar fx:id="progressBar" prefHeight="0.0" progress="0.0" />
+                              <Label fx:id="transferCountLabel" text="0" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
                                     </children>
                                     <HBox.margin>
                                         <Insets />
                                     </HBox.margin>
-                                    <padding>
-                                        <Insets right="15.0" />
-                                    </padding>
                                 </GridPane>
                             </children>
                         </HBox>

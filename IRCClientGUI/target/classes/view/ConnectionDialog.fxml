@@ -5,6 +5,8 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.ButtonBar?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuButton?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.BorderPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -14,7 +16,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<BorderPane fx:id="root" prefHeight="275.0" prefWidth="375.0" stylesheets="@ConnectionDialog.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ConnectionDialogController">
+<BorderPane fx:id="root" prefHeight="275.0" prefWidth="400.0" stylesheets="@ConnectionDialog.css" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ConnectionDialogController">
     <top>
         <HBox style="-fx-background-color: #232F34;">
             <children>
@@ -73,6 +75,17 @@
                         </ButtonBar>
                         <Label text="Server Address" GridPane.rowIndex="2" />
                         <CustomTextField fx:id="serverAddressField" alignment="CENTER" onKeyReleased="#onKeyReleased" promptText="Server Address" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                  <HBox alignment="CENTER_RIGHT" GridPane.columnIndex="1">
+                     <children>
+                        <MenuButton fx:id="serverMenuButton" alignment="CENTER" contentDisplay="CENTER" mnemonicParsing="false" prefHeight="30.0" prefWidth="125.0" text="Server" HBox.hgrow="ALWAYS">
+                          <items>
+                            <MenuItem mnemonicParsing="false" onAction="#onLocalHostChosen" text="Local Host" />
+                            <MenuItem mnemonicParsing="false" onAction="#onAWSServerChosen" text="AWS Server" />
+                              <MenuItem mnemonicParsing="false" onAction="#onOtherChosen" text="Other" />
+                          </items>
+                        </MenuButton>
+                     </children>
+                  </HBox>
                     </children>
                 </GridPane>
             </children>

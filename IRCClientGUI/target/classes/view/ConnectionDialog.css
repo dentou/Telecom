@@ -39,20 +39,13 @@
 
 /*******************************************************************************
  *                                                                             *
- * Menu Bar					 				                       			   *
+ * Menu Button					 				                       			   *
  *                                                                             *
  ******************************************************************************/
 
-.menu-bar {
-    -fx-background-color: primary-dark-color;
-}
-
-.menu .label {
-    -fx-text-fill: primary-text-color;
-}
 
 .menu-button {
-    -fx-background-color: primary-dark-color;
+    -fx-background-color: primary-color;
 }
 
 .menu-button .label {
@@ -61,7 +54,7 @@
 
 
 .context-menu {
-    -fx-background-color: primary-dark-color;
+    -fx-background-color: primary-light-color;
 }
 
 /*******************************************************************************
