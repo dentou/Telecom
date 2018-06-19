@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
+import org.controlsfx.control.MaskerPane;
 
 
 public class LoginDialogController extends Controller<String>{
@@ -29,6 +30,8 @@ public class LoginDialogController extends Controller<String>{
     @FXML
     private Button disconnectButton;
 
+    private MaskerPane maskerPane = new MaskerPane();
+
     @FXML
     @Override
     protected void initialize() {
@@ -43,6 +46,7 @@ public class LoginDialogController extends Controller<String>{
         String numericCode = messageParts.get(1);
         switch (Response.getResponse(numericCode)) {
             case RPL_WELCOME:
+                maskerPane.setVisible(false);
                 getMainApp().setUser(new User(nickField.getText(), userNameField.getText(), fullnameField.getText()));
                 getMainApp().showMainWindow();
                 break;
@@ -69,6 +73,7 @@ public class LoginDialogController extends Controller<String>{
         ircClient.sendToServer("USER", " ", userName, " ", "* *", " ", ":", fullName);
 
         disableAll();
+        maskerPane.setVisible(true);
     }
 
     @FXML

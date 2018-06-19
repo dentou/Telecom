@@ -5,6 +5,7 @@ import java.util.Map;
 
 public class IRCConstants {
     public static final int SERVER_PORT = 6667;
+    public static final String AWS_SERVER_IP ="18.216.182.124";
 
     public static final int KB = 1024; // bytes
     public static final int MB = 1024 * KB;

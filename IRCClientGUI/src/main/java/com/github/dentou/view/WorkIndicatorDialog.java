@@ -23,6 +23,8 @@ import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.function.ToIntFunction;
 
+import static javafx.scene.paint.Color.TRANSPARENT;
+
 
 /**
  * Public domain. Use as you like. No warranties.
@@ -34,11 +36,14 @@ public class WorkIndicatorDialog<P, R> {
     private Task animationWorker;
     private Task<R> taskWorker;
 
+    private final int width = 240;
+    private final int height = 180;
+
     private final ProgressIndicator progressIndicator = new ProgressIndicator(ProgressIndicator.INDETERMINATE_PROGRESS);
-    private final Stage dialog = new Stage(StageStyle.UNDECORATED);
+    private final Stage dialog = new Stage(StageStyle.TRANSPARENT);
     private final Label label = new Label();
     private final Group root = new Group();
-    private final Scene scene = new Scene(root, 330, 120, Color.WHITE);
+    private final Scene scene = new Scene(root, Color.TRANSPARENT);
     private final BorderPane mainPane = new BorderPane();
     private final VBox vbox = new VBox();
 
@@ -51,10 +56,18 @@ public class WorkIndicatorDialog<P, R> {
      *
      */
     public WorkIndicatorDialog(Window owner, String label) {
+        dialog.setWidth(width);
+        dialog.setHeight(height);
         dialog.initModality(Modality.WINDOW_MODAL);
         dialog.initOwner(owner);
         dialog.setResizable(false);
+
         this.label.setText(label);
+
+        this.label.setStyle("-fx-text-fill: white; -fx-font-size: 14px");
+        dialog.setX(owner.getX() + owner.getWidth()/2 - dialog.getWidth()/2);
+        dialog.setY(owner.getY() + owner.getHeight()/2 - dialog.getHeight()/2);
+
     }
 
     /**
@@ -80,10 +93,14 @@ public class WorkIndicatorDialog<P, R> {
      *
      */
     private void setupDialog() {
+
+        mainPane.setStyle("-fx-background-radius: 20px; -fx-background-color: rgb(0, 0, 0, 0.75);");
+
+        //progressIndicator.setStyle("-fx-progress-color: red;");
         root.getChildren().add(mainPane);
         vbox.setSpacing(5);
         vbox.setAlignment(Pos.CENTER);
-        vbox.setMinSize(330, 120);
+        vbox.setMinSize(width, height);
         vbox.getChildren().addAll(label,progressIndicator);
         mainPane.setTop(vbox);
         dialog.setScene(scene);

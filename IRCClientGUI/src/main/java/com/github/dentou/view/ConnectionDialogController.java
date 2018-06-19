@@ -7,6 +7,7 @@ import com.github.dentou.model.IRCSocket;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
+import javafx.scene.control.MenuButton;
 import javafx.scene.control.TextField;
 import javafx.scene.control.Alert.AlertType;
 
@@ -25,11 +26,17 @@ public class ConnectionDialogController extends Controller<String>{
     @FXML
     private Button resetButton;
 
+    @FXML
+    private MenuButton serverMenuButton;
+
     @Override
     protected void initialize() {
         super.initialize();
         connectButton.setDisable(true);
         resetButton.setDisable(true);
+
+        onLocalHostChosen();
+
     }
 
     @Override
@@ -65,7 +72,7 @@ public class ConnectionDialogController extends Controller<String>{
 
 
         InetSocketAddress inetAddress = new InetSocketAddress(serverAddress, IRCConstants.SERVER_PORT);
-        WorkIndicatorDialog wd = new WorkIndicatorDialog(super.getMainApp().getPrimaryStage(), "Connecting to server");
+        WorkIndicatorDialog<InetSocketAddress, SocketChannel> wd = new WorkIndicatorDialog<>(super.getMainApp().getPrimaryStage(), "Connecting to server");
         wd.addTaskEndNotification(result -> {
             enableAll();
             if (result == null) {
@@ -107,6 +114,34 @@ public class ConnectionDialogController extends Controller<String>{
         boolean disableButtons = serverAddress.isEmpty();
         connectButton.setDisable(disableButtons);
         resetButton.setDisable(disableButtons);
+    }
+
+    @FXML
+    private void onLocalHostChosen() {
+        serverMenuButton.setText("Local Host");
+        serverAddressField.setText("localhost");
+        connectButton.setDisable(false);
+        resetButton.setDisable(false);
+        serverAddressField.setDisable(true);
+    }
+
+    @FXML
+    private void onAWSServerChosen() {
+        serverMenuButton.setText("AWS Server");
+        serverAddressField.setText(IRCConstants.AWS_SERVER_IP);
+        connectButton.setDisable(false);
+        resetButton.setDisable(false);
+        serverAddressField.setDisable(true);
+    }
+
+    @FXML
+    private void onOtherChosen() {
+        serverMenuButton.setText("Other");
+        serverAddressField.setText("");
+        connectButton.setDisable(true);
+        resetButton.setDisable(true);
+        serverAddressField.setDisable(false);
+        serverAddressField.requestFocus();
     }
 
     private boolean isValidIpAddress(String ip) {

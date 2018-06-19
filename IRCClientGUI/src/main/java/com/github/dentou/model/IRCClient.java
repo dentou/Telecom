@@ -2,6 +2,7 @@ package com.github.dentou.model;
 
 import com.github.dentou.MainApp;
 import javafx.application.Platform;
+import javafx.scene.control.Alert;
 
 import java.io.IOException;
 import java.nio.channels.*;
@@ -83,6 +84,11 @@ public class IRCClient implements Runnable{
     }
 
     private void processMessages() {
+
+        if (stopped.get()) {
+            return;
+        }
+
         if (!receiveQueue.isEmpty()) {
             while (true) {
                 String message = receiveQueue.poll();
@@ -114,6 +120,11 @@ public class IRCClient implements Runnable{
                 } catch (IOException e) {
                     e.printStackTrace();
                     closeSocket((IRCSocket) key.attachment());
+                    stop(); // New
+                    Platform.runLater(() -> {
+                        mainApp.showConnectionDialog();
+                        mainApp.showAlertDialog(Alert.AlertType.ERROR, "Connection lost", "Connection to server lost", null);
+                    });
                 }
 
 
@@ -144,6 +155,11 @@ public class IRCClient implements Runnable{
 
 
     private void writeMessages() throws IOException {
+
+        if (stopped.get()) {
+            return;
+        }
+
         pullAllMessages();
 
         cancelEmptySockets();

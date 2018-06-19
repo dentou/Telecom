@@ -19,16 +19,21 @@ import javafx.collections.transformation.SortedList;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
+import javafx.geometry.Insets;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
+import javafx.scene.layout.HBox;
+import javafx.scene.layout.VBox;
 import javafx.stage.Modality;
 import javafx.stage.Stage;
 import javafx.scene.control.Alert.AlertType;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import org.controlsfx.control.Notifications;
+import org.controlsfx.control.PopOver;
+import org.controlsfx.control.TaskProgressView;
 
 
 import java.io.IOException;
@@ -43,9 +48,23 @@ public class MainWindowController extends Controller<String> {
     @FXML
     private TextField searchField;
     @FXML
-    private Label nickLabel;
-    @FXML
     private FontAwesomeIconView nickIcon;
+    @FXML
+    private Label nickLabel;
+
+
+
+    @FXML
+    private Button refreshButton;
+    @FXML
+    private Button createButton;
+
+    @FXML
+    private ProgressBar progressBar;
+    @FXML
+    private Label transferCountLabel;
+
+    private TaskProgressView fileTransferView = new TaskProgressView(); // todo implement task
 
     @FXML
     private TabPane tabPane;
@@ -94,18 +113,14 @@ public class MainWindowController extends Controller<String> {
     @FXML
     private TableColumn<User, String> fullNameColumn;
 
-    @FXML
-    private ProgressBar progressBar;
+
 
     private ObservableList<Channel> joinedChannelsData = FXCollections.observableArrayList();
     private ObservableList<ChatHistoryItem> historyData = FXCollections.observableArrayList();
     private ObservableList<Channel> channelsData = FXCollections.observableArrayList();
     private ObservableList<User> usersData = FXCollections.observableArrayList();
 
-    @FXML
-    private Button refreshButton;
-    @FXML
-    private Button createButton;
+
 
     private Map<Tab, TableView> tabTableMap = new HashMap<>();
 
@@ -129,12 +144,13 @@ public class MainWindowController extends Controller<String> {
         initializeTables();
         initializeSearchField();
         initializeNickLabel();
+        initializeTransferCountLabel();
         // todo clear channel member list
         // todo Listen for selection changes and show the channel member list when changed.
     }
 
     private void initializeNickLabel() {
-        // Set title bar buttons
+        // Set nick
         nickLabel.setOnMouseEntered(event -> {
             nickLabel.setStyle("-fx-cursor:hand; -fx-text-fill: secondary-color;");
             nickIcon.setStyle("-fx-text-fill: secondary-color; -fx-fill: secondary-color;");
@@ -144,6 +160,72 @@ public class MainWindowController extends Controller<String> {
             nickLabel.setStyle("-fx-cursor:normal; -fx-text-fill: white;");
             nickIcon.setStyle("-fx-text-fill: white; -fx-fill: white");
         });
+
+        nickLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+                VBox vBox =  new VBox();
+                vBox.setSpacing(15);
+                vBox.setPadding(new Insets(15));
+
+                HBox userNameHBox = new HBox();
+                userNameHBox.setSpacing(10);
+                userNameHBox.getChildren().add(new Label("User Name:"));
+                userNameHBox.getChildren().add(new Label(getMainApp().getUser().getUserName()));
+
+                HBox fullNameHBox = new HBox();
+                fullNameHBox.setSpacing(10);
+                fullNameHBox.getChildren().add(new Label("Full Name:"));
+                fullNameHBox.getChildren().add(new Label(getMainApp().getUser().getFullName()));
+
+                vBox.getChildren().addAll(userNameHBox, fullNameHBox);
+
+                PopOver popOver = new PopOver(vBox);
+                popOver.setCloseButtonEnabled(true);
+                popOver.setDetachable(false);
+
+                popOver.setHeaderAlwaysVisible(true);
+                popOver.setArrowLocation(PopOver.ArrowLocation.TOP_CENTER);
+                popOver.setTitle("User Info");
+                popOver.show(nickLabel);
+
+
+            }
+        });
+    }
+
+    private void initializeTransferCountLabel() {
+
+
+        transferCountLabel.setOnMouseEntered(event -> {
+            transferCountLabel.setStyle("-fx-cursor:hand; -fx-text-fill: secondary-color; ");
+        });
+
+        transferCountLabel.setOnMouseExited(event -> {
+            transferCountLabel.setStyle("-fx-cursor:normal; -fx-text-fill: white; ");
+        });
+
+        transferCountLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
+            @Override
+            public void handle(MouseEvent event) {
+
+                fileTransferView.setPrefHeight(200);
+                fileTransferView.setPrefWidth(200);
+
+                VBox vBox = new VBox(fileTransferView);
+
+                PopOver popOver = new PopOver(vBox);
+                popOver.setCloseButtonEnabled(true);
+                popOver.setDetachable(false);
+
+                popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+                popOver.setHeaderAlwaysVisible(true);
+                popOver.setTitle("File Transfer");
+                popOver.show(transferCountLabel);
+            }
+        });
+
     }
 
 
@@ -241,7 +323,7 @@ public class MainWindowController extends Controller<String> {
      */
 
     @Override
-    public void displayInfo() {
+    public void displayInfo() { // WARNING: Never call this inside initialize method, cause exception
         super.displayInfo();
 
         User user = super.getMainApp().getUser();
@@ -415,6 +497,10 @@ public class MainWindowController extends Controller<String> {
         }
     }
 
+    @FXML
+    private void onProgressBarClicked(MouseEvent event) {
+        PopOver popOver = new PopOver();
+    }
 
 
 
