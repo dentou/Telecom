@@ -1,12 +1,10 @@
 package com.github.dentou.view;
 
-import com.github.dentou.model.Channel;
+import com.github.dentou.model.chat.Channel;
 import com.github.dentou.utils.FXUtils;
-import javafx.application.Platform;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
-import javafx.scene.input.MouseEvent;
 
 public class ChannelDialogController extends ChatDialogController {
 

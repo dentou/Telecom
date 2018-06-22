@@ -13,7 +13,6 @@ public class FileTransferProcessor implements Runnable {
 
     private Queue<IRCSocket> socketQueue;
     private Map<Long, IRCSocket> socketMap = new HashMap<Long, IRCSocket>();
-    private long nextSocketId = 1024; // Id frm 0 to 1023 is reserved for servers
 
     private Selector readSelector;
     private Selector writeSelector;
@@ -73,7 +72,6 @@ public class FileTransferProcessor implements Runnable {
                 return;
             }
 
-            newSocket.setId(nextSocketId++);
             this.socketMap.put(newSocket.getId(), newSocket);
             SelectionKey key = newSocket.register(this.readSelector, SelectionKey.OP_READ);
             key.attach(newSocket);

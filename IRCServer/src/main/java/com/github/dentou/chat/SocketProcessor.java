@@ -5,6 +5,7 @@ import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
 
 import static com.github.dentou.chat.IRCConstants.Response;
 import static com.github.dentou.chat.IRCUtils.*;
@@ -17,7 +18,6 @@ public class SocketProcessor implements Runnable {
     private String serverName = getServerAddress();
     private Queue<IRCSocket> socketQueue;
     private Map<Long, IRCSocket> socketMap = new HashMap<Long, IRCSocket>();
-    private long nextSocketId = 1024; // Id frm 0 to 1023 is reserved for servers
 
     private Selector readSelector;
     private Selector writeSelector;
@@ -69,7 +69,7 @@ public class SocketProcessor implements Runnable {
                 return;
             }
 
-            newSocket.setId(nextSocketId++);
+            //newSocket.setId(nextSocketId.getAndIncrement());
             this.socketMap.put(newSocket.getId(), newSocket);
             this.userHandler.addUser(newSocket.getId());
             SelectionKey key = newSocket.register(this.readSelector, SelectionKey.OP_READ);
@@ -78,6 +78,9 @@ public class SocketProcessor implements Runnable {
     }
 
     private void closeSocket(IRCSocket socket) throws IOException {
+        if (socket == null) {
+            return;
+        }
         System.out.println("Socket closed: " + socket.getId());
         this.socketMap.remove(socket.getId());
         this.userHandler.removeUser(socket.getId()); // todo check this new adds

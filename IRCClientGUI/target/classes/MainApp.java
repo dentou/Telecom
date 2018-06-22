@@ -1,11 +1,11 @@
 package com.github.dentou;
 
+import com.github.dentou.model.chat.IRCClient;
+import com.github.dentou.model.chat.User;
+import com.github.dentou.model.file.FileTransferClient;
 import com.github.dentou.view.Controller;
-import com.github.dentou.model.IRCClient;
-import com.github.dentou.model.User;
-import com.github.dentou.view.*;
-import com.jfoenix.controls.JFXDialog;
 import javafx.application.Application;
+import javafx.application.Platform;
 import javafx.event.EventHandler;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,7 +13,6 @@ import javafx.scene.Scene;
 import javafx.scene.control.*;
 import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.ButtonBar.ButtonData;
-
 import javafx.scene.input.KeyEvent;
 import javafx.scene.layout.GridPane;
 import javafx.scene.layout.Priority;
@@ -26,7 +25,9 @@ import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.concurrent.atomic.AtomicBoolean;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -36,11 +37,15 @@ public class MainApp extends Application {
     private Stage primaryStage;
     private Controller controller;
     private User user = null;
+
     private IRCClient ircClient;
+
+    private FileTransferClient fileTransferClient;
 
     private String serverAddress;
 
-    private AtomicBoolean appClosed = new AtomicBoolean(false);
+
+    private ScheduledExecutorService refresherExecutor;
 
 
 
@@ -56,12 +61,16 @@ public class MainApp extends Application {
         this.user = user;
     }
 
-    public String getServerAddress() {
+    public synchronized String getServerAddress() {
         return serverAddress;
     }
 
-    public void setServerAddress(String serverAddress) {
+    public synchronized void setServerAddress(String serverAddress) {
         this.serverAddress = serverAddress;
+    }
+
+    public FileTransferClient getFileTransferClient() {
+        return fileTransferClient;
     }
 
     public synchronized IRCClient getIrcClient() {
@@ -90,19 +99,19 @@ public class MainApp extends Application {
 
 
     @Override
-    public void start(Stage primaryStage) throws Exception {
+    public void start(Stage primaryStage) {
 
         this.primaryStage = primaryStage;
         this.primaryStage.setTitle("IRC Chat Client");
         this.primaryStage.setResizable(false);
         primaryStage.initStyle(StageStyle.TRANSPARENT);
 
+        initializeFileTransferClient();
 
         showConnectionDialog();
 
         this.primaryStage.show();
-
-        new Thread(new GUIRefresher(this)).start();
+        initializeRefresher();
 
     }
 
@@ -113,13 +122,31 @@ public class MainApp extends Application {
             ircClient.sendToServer("QUIT");
             ircClient.stop();
         }
-        appClosed.set(true);
-
+        refresherExecutor.shutdown();
+        System.out.println("Refresher closed");
+        fileTransferClient.forcedClose();
+        System.out.println("File transfer client closed");
     }
 
-    public boolean isAppClosed() {
-        return appClosed.get();
+    public void initializeRefresher() {
+        //new Thread(new GUIRefresher(this)).start();
+        refresherExecutor = Executors.newSingleThreadScheduledExecutor();
+        refresherExecutor.scheduleAtFixedRate(new Runnable() {
+            @Override
+            public void run() {
+                // todo uncomment the following line when done debugging
+                //Platform.runLater(() -> getController().refresh());
+            }
+        },
+        1,
+        5,
+        TimeUnit.SECONDS);
     }
+
+    public void initializeFileTransferClient() {
+        this.fileTransferClient = new FileTransferClient(this);
+    }
+
 
     public void showConnectionDialog() {
         showScene("/view/ConnectionDialog.fxml" , "");
@@ -152,7 +179,11 @@ public class MainApp extends Application {
 
         } catch (Exception e) {
             //e.printStackTrace();
+            showExceptionDialog("Loading error", "Failed to load next screen",
+                    "The application will exit", e);
             Logger.getLogger(getClass().getName()).log(Level.SEVERE, null, e);
+
+            Platform.exit();
         }
     }
 

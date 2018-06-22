@@ -1,6 +1,7 @@
 package com.github.dentou;
 
-import com.github.dentou.file.FileMetaData;
+import com.github.dentou.chat.IRCConstants;
+import com.github.dentou.file.FileMetadata;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -28,7 +29,7 @@ public class Main {
 //        System.out.println(path.getParent());
 //        String path = "C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf";
 //        FileReceiver receiver;
-//        FileMetaData fileMetaData = new FileMetaData(Paths.get(path), 101, 0l);
+//        FileMetadata fileMetaData = new FileMetadata(Paths.get(path), 101, 0l);
 //        System.out.println("File already exists. Creating new dir: ");
 //        Path newDir = Paths.get(fileMetaData.getFilePath().getParent().toString(), "new-duplicated", fileMetaData.getFilePath().getFileName().toString());
 //        System.out.println(newDir);
@@ -38,70 +39,91 @@ public class Main {
 //        Files.createDirectory(newDir);
 //        System.out.println(newDir.toAbsolutePath());
 
+        createUserDataFile("dentou");
         emptyUserData("dentou");
-        List<FileMetaData> fileMetaDataList = loadUserData("dentou");
-        fileMetaDataList.add(new FileMetaData(Paths.get("C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf"),
+        List<FileMetadata> fileMetadataList = loadUserData("dentou");
+        fileMetadataList.add(new FileMetadata(Paths.get("C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf"),
                 125, 23));
-        saveUserData("dentou", fileMetaDataList);
+        saveUserData("dentou", fileMetadataList);
 
     }
 
-    public static List<FileMetaData> loadUserData(String nick) throws IOException {
+    public static boolean createUserDataFile(String nick) throws IOException {
 
-        List<FileMetaData> fileMetaDataList = new ArrayList<>();
+        boolean newFileCreated = false;
 
-        Path userDataDir = Paths.get("./users-data");
+        Path userDataDir = Paths.get(IRCConstants.usersDataPath);
         if (!Files.isDirectory(userDataDir)) {
-            Files.createDirectory(userDataDir);
+            Files.createDirectories(userDataDir);
         }
         Path filePath = Paths.get(userDataDir.toString(), nick + ".json");
         if (Files.notExists(filePath)) {
             Files.createFile(filePath);
-            return fileMetaDataList;
+            newFileCreated = true;
         }
+
+        return newFileCreated;
+    }
+
+    public static List<FileMetadata> loadUserData(String nick) throws IOException {
+
+        List<FileMetadata> fileMetadataList = new ArrayList<>();
+        boolean newFile = createUserDataFile(nick);
+        if (newFile) {
+            return fileMetadataList;
+        }
+        Path userDataDir = Paths.get(IRCConstants.usersDataPath);
+        Path filePath = Paths.get(userDataDir.toString(), nick + ".json");
+
 
         // File already exists, load it
         System.out.println("Loading user data");
-        JsonDeserializer<FileMetaData> fileMetaDataJsonDeserializer = new JsonDeserializer<FileMetaData>() {
+        JsonDeserializer<FileMetadata> fileMetaDataJsonDeserializer = new JsonDeserializer<FileMetadata>() {
             @Override
-            public FileMetaData deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            public FileMetadata deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
 
                 Path path = Paths.get(jsonObject.get("path").getAsString());
-                return new FileMetaData(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong());
+                return new FileMetadata(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong());
             }
         };
 
         JsonReader reader = new JsonReader(new InputStreamReader(new FileInputStream(filePath.toString()), "UTF-8"));
         GsonBuilder gsonBuilder = new GsonBuilder();
-        gsonBuilder.registerTypeAdapter(FileMetaData.class, fileMetaDataJsonDeserializer);
+        gsonBuilder.registerTypeAdapter(FileMetadata.class, fileMetaDataJsonDeserializer);
         Gson gson = gsonBuilder.create();
         // Read file in stream mode
-        Type fileMetaDataListType = new TypeToken<ArrayList<FileMetaData>>(){}.getType();
+        Type fileMetaDataListType = new TypeToken<ArrayList<FileMetadata>>(){}.getType();
         BufferedReader bufferedReader = new BufferedReader(new FileReader(new File(filePath.toString())));
-        List<FileMetaData> list = gson.fromJson(reader, fileMetaDataListType);
+        List<FileMetadata> list = gson.fromJson(reader, fileMetaDataListType);
         if (list != null) {
-            fileMetaDataList.addAll(list);
+            fileMetadataList.addAll(list);
         }
         System.out.println("Loaded file metadata");
-        System.out.println(fileMetaDataList);
+        System.out.println(fileMetadataList);
         bufferedReader.close();
-        return fileMetaDataList;
+        return fileMetadataList;
     }
 
     public static void emptyUserData(String nick) throws IOException {
-        Path filePath = Paths.get("./users-data", nick + ".json");
+        boolean newFile = createUserDataFile(nick);
+        if (newFile) {
+            return;
+        }
+        Path filePath = Paths.get(".", "data", "users-data", nick + ".json");
         try (FileWriter file = new FileWriter(filePath.toString(), false)) {
             file.write("");
             System.out.println("Successfully Empty User Data");
         }
     }
 
-    public static void saveUserData(String nick, List<FileMetaData> fileMetaDataList) throws IOException {
+    public static void saveUserData(String nick, List<FileMetadata> fileMetadataList) throws IOException {
 
-        JsonSerializer<FileMetaData> fileMetaDataJsonSerializer = new JsonSerializer<FileMetaData>() {
+        createUserDataFile(nick);
+
+        JsonSerializer<FileMetadata> fileMetaDataJsonSerializer = new JsonSerializer<FileMetadata>() {
             @Override
-            public JsonElement serialize(FileMetaData fileMetaData, Type type, JsonSerializationContext jsonSerializationContext) {
+            public JsonElement serialize(FileMetadata fileMetaData, Type type, JsonSerializationContext jsonSerializationContext) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("path", fileMetaData.getFilePath().toString());
                 jsonObject.addProperty("size", fileMetaData.getSize());
@@ -112,10 +134,10 @@ public class Main {
 
         GsonBuilder gsonBuilder = new GsonBuilder();
         gsonBuilder.setPrettyPrinting();
-        gsonBuilder.registerTypeAdapter(FileMetaData.class, fileMetaDataJsonSerializer);
+        gsonBuilder.registerTypeAdapter(FileMetadata.class, fileMetaDataJsonSerializer);
         Gson gson = gsonBuilder.create();
-        String jsonString = gson.toJson(fileMetaDataList);
-        Path filePath = Paths.get("./users-data", nick + ".json");
+        String jsonString = gson.toJson(fileMetadataList);
+        Path filePath = Paths.get(".", "data", "users-data", nick + ".json");
         try (FileWriter file = new FileWriter(filePath.toString(), false)) {
             file.write(jsonString);
             System.out.println("Successfully Copied JSON Object to File...");
@@ -127,15 +149,15 @@ public class Main {
     public static void playWithJson() throws IOException {
         Dummy dummy = new Dummy("Norman", "norman@futurestud.io", 26, true);
         Path path = Paths.get("C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf");
-        FileMetaData fileMetaData = new FileMetaData(path, 123, 12323l);
+        FileMetadata fileMetadata = new FileMetadata(path, 123, 12323l);
 
         Gson gson = new Gson();
 
         GsonBuilder gsonBuilder = new GsonBuilder();
 
-        JsonSerializer<FileMetaData> fileMetaDataJsonSerializer = new JsonSerializer<FileMetaData>() {
+        JsonSerializer<FileMetadata> fileMetaDataJsonSerializer = new JsonSerializer<FileMetadata>() {
             @Override
-            public JsonElement serialize(FileMetaData fileMetaData, Type type, JsonSerializationContext jsonSerializationContext) {
+            public JsonElement serialize(FileMetadata fileMetaData, Type type, JsonSerializationContext jsonSerializationContext) {
                 JsonObject jsonObject = new JsonObject();
                 jsonObject.addProperty("path", fileMetaData.getFilePath().toString());
                 jsonObject.addProperty("size", fileMetaData.getSize());
@@ -144,25 +166,25 @@ public class Main {
             }
         };
 
-        JsonDeserializer<FileMetaData> fileMetaDataJsonDeserializer = new JsonDeserializer<FileMetaData>() {
+        JsonDeserializer<FileMetadata> fileMetaDataJsonDeserializer = new JsonDeserializer<FileMetadata>() {
             @Override
-            public FileMetaData deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
+            public FileMetadata deserialize(JsonElement jsonElement, Type type, JsonDeserializationContext jsonDeserializationContext) throws JsonParseException {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
 
                 Path path = Paths.get(jsonObject.get("path").getAsString());
-                return new FileMetaData(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong());
+                return new FileMetadata(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong());
             }
         };
 
 
-        gsonBuilder.registerTypeAdapter(FileMetaData.class, fileMetaDataJsonSerializer);
-        gsonBuilder.registerTypeAdapter(FileMetaData.class, fileMetaDataJsonDeserializer);
+        gsonBuilder.registerTypeAdapter(FileMetadata.class, fileMetaDataJsonSerializer);
+        gsonBuilder.registerTypeAdapter(FileMetadata.class, fileMetaDataJsonDeserializer);
         Gson customGson = gsonBuilder.create();
 
 
-        String jsonString = customGson.toJson(fileMetaData);
+        String jsonString = customGson.toJson(fileMetadata);
         System.out.println(jsonString);
-//        FileMetaData custom = customGson.fromJson(json, FileMetaData.class);
+//        FileMetadata custom = customGson.fromJson(json, FileMetadata.class);
 //        System.out.println(custom);
 
         loadUserData("dentou");

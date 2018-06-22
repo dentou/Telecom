@@ -1,9 +1,9 @@
 package com.github.dentou.view;
 
 
-import com.github.dentou.model.IRCClient;
-import com.github.dentou.model.IRCConstants;
-import com.github.dentou.model.IRCSocket;
+import com.github.dentou.model.chat.IRCClient;
+import com.github.dentou.model.constants.IRCConstants;
+import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -65,13 +65,13 @@ public class ConnectionDialogController extends Controller<String>{
     @FXML
     private void onConnect() {
         String serverAddress = serverAddressField.getText().trim();
-        if (!isValidIpAddress(serverAddress)) {
+        if (!isValidIpAddress(serverAddress) && !serverAddress.equals("localhost")) {
             super.getMainApp().showAlertDialog(AlertType.ERROR, "Invalid Fields", "Please correct invalid fields", "Invalid IP Address");
             return;
         }
 
 
-        InetSocketAddress inetAddress = new InetSocketAddress(serverAddress, IRCConstants.SERVER_PORT);
+        InetSocketAddress inetAddress = new InetSocketAddress(serverAddress, IRCConstants.CHAT_SERVER_PORT);
         WorkIndicatorDialog<InetSocketAddress, SocketChannel> wd = new WorkIndicatorDialog<>(super.getMainApp().getPrimaryStage(), "Connecting to server");
         wd.addTaskEndNotification(result -> {
             enableAll();
@@ -79,6 +79,7 @@ public class ConnectionDialogController extends Controller<String>{
                 getMainApp().showAlertDialog(AlertType.ERROR,"Connection Error", "Connection Error", "Cannot connect to server. Please try again.");
                 return;
             }
+            getMainApp().setServerAddress(serverAddress);
             SocketChannel socketChannel = (SocketChannel) result;
             System.out.println("Server addr: " + socketChannel.socket().getInetAddress().toString());
             IRCSocket ircSocket = new IRCSocket(socketChannel);

@@ -2,7 +2,6 @@ package com.github.dentou.file;
 
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
@@ -16,7 +15,7 @@ public class FileSender {
     private final SocketChannel socketChannel;
     private final FileChannel fileChannel;
 
-    private final FileMetaData fileMetaData;
+    private final FileMetadata fileMetadata;
 
     private boolean blocking = true;
 
@@ -28,13 +27,13 @@ public class FileSender {
 
     public FileSender(SocketChannel socketChannel, String path, long initialPosition, boolean blocking) throws IOException {
         if (Objects.isNull(socketChannel) || StringUtils.isEmpty(path)) {
-            throw new IllegalArgumentException("socketChannel and fileMetaData required");
+            throw new IllegalArgumentException("socketChannel and fileMetadata required");
         }
 
         this.socketChannel = socketChannel;
         Path filePath = Paths.get(path);
         this.fileChannel = FileChannel.open(filePath, StandardOpenOption.READ);
-        this.fileMetaData = new FileMetaData(filePath, fileChannel.size(), initialPosition);
+        this.fileMetadata = new FileMetadata(filePath, fileChannel.size(), initialPosition);
         this.blocking = blocking;
     }
 
@@ -54,15 +53,15 @@ public class FileSender {
     }
 
     private long transfer() throws IOException {
-        long transferred = fileChannel.transferTo(fileMetaData.getPosition(), FileConstants.TRANSFER_MAX_SIZE, socketChannel);
+        long transferred = fileChannel.transferTo(fileMetadata.getPosition(), FileConstants.TRANSFER_MAX_SIZE, socketChannel);
         System.out.println("Bytes sent: " + transferred);
         bytesSent += transferred;
-        this.fileMetaData.addToPosition(transferred);
+        this.fileMetadata.addToPosition(transferred);
         return transferred;
     }
 
     public boolean done() {
-        return fileMetaData.done();
+        return fileMetadata.done();
     }
 
     public void close() throws IOException {

@@ -26,6 +26,10 @@ public class IRCSocket {
         this.writer = new IRCMessageWriter(this);
     }
 
+    public SocketChannel getSocketChannel() {
+        return this.socketChannel;
+    }
+
     public long getId() {
         return id;
     }

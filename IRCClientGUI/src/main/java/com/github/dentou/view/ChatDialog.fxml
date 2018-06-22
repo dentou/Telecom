@@ -59,7 +59,7 @@
                </HBox.margin>
             </CustomTextField>
             <FontAwesomeIconView fx:id="sendButton" glyphName="PAPER_PLANE" layoutX="375.0" layoutY="43.0" onMouseClicked="#onSend" styleClass="iconic-button" />
-            <FontAwesomeIconView id="file-button" fx:id="fileButton" glyphName="PAPERCLIP">
+            <FontAwesomeIconView id="file-button" fx:id="fileButton" glyphName="PAPERCLIP" onMouseClicked="#onFile">
                <styleClass>
                   <String fx:value="iconic-button" />
                   <String fx:value="file-button" />

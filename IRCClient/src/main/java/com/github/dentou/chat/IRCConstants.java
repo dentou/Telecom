@@ -1,7 +1,11 @@
 package com.github.dentou.chat;
 
+import java.io.File;
+
 public class IRCConstants {
     public static final int SERVER_PORT = 6667;
+
+    public static final String usersDataPath = "." + File.separator + "data" + File.separator + "users-data";
 
     public static final int KB = 1024; // bytes
     public static final int MB = 1024 * KB;

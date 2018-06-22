@@ -1,13 +1,10 @@
 package com.github.dentou.file;
 
-import com.github.dentou.chat.IRCConstants;
 import com.github.dentou.chat.IRCMessage;
 import com.github.dentou.chat.IRCSocket;
-import org.apache.commons.lang3.math.NumberUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
@@ -110,18 +107,18 @@ public class FileTransferClient {
         }
 
         FileReceiver receiver;
-        FileMetaData fileMetaData = new FileMetaData(Paths.get(path), bytes, position);
+        FileMetadata fileMetadata = new FileMetadata(Paths.get(path), bytes, position);
         try {
-            receiver = new FileReceiver(socket.getSocketChannel(), fileMetaData);
+            receiver = new FileReceiver(socket.getSocketChannel(), fileMetadata);
         } catch (FileAlreadyExistsException e) {
             System.out.println("File already exists. Creating new dir: ");
-            Path newDir = Paths.get(fileMetaData.getFilePath().getParent().toString(), "new-duplicated");
+            Path newDir = Paths.get(fileMetadata.getFilePath().getParent().toString(), "new-duplicated");
             if (!Files.isDirectory(newDir)) {
                 Files.createDirectory(newDir);
             }
-            Path newFilePath = Paths.get(newDir.toString(), fileMetaData.getFilePath().getFileName().toString());
-            fileMetaData = new FileMetaData(newFilePath, fileMetaData.getSize(), fileMetaData.getPosition());
-            receiver = new FileReceiver(socket.getSocketChannel(), fileMetaData);
+            Path newFilePath = Paths.get(newDir.toString(), fileMetadata.getFilePath().getFileName().toString());
+            fileMetadata = new FileMetadata(newFilePath, fileMetadata.getSize(), fileMetadata.getPosition());
+            receiver = new FileReceiver(socket.getSocketChannel(), fileMetadata);
             System.out.println(newFilePath);
         }
 

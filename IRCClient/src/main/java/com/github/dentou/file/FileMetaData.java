@@ -6,14 +6,14 @@ import java.nio.file.Path;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicLong;
 
-public class FileMetaData {
+public class FileMetadata {
     private final Path filePath;
     private final long size;
 
     private final AtomicLong position;
 
 
-    public FileMetaData(final Path filePath, final long size, final long position) {
+    public FileMetadata(final Path filePath, final long size, final long position) {
         if (Objects.isNull(filePath)) {
             throw new IllegalArgumentException("File path required");
         }
@@ -51,7 +51,7 @@ public class FileMetaData {
 
     @Override
     public String toString() {
-        return "FileMetaData{" +
+        return "FileMetadata{" +
                 "filePath=" + filePath +
                 ", size=" + size +
                 ", position=" + position +

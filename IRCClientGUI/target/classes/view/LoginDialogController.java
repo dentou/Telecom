@@ -2,9 +2,9 @@ package com.github.dentou.view;
 
 import com.github.dentou.MainApp;
 import com.github.dentou.utils.ClientUtils;
-import com.github.dentou.model.IRCClient;
-import com.github.dentou.model.IRCConstants.Response;
-import com.github.dentou.model.User;
+import com.github.dentou.model.chat.IRCClient;
+import com.github.dentou.model.constants.IRCConstants.Response;
+import com.github.dentou.model.chat.User;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
@@ -14,6 +14,7 @@ import java.io.IOException;
 import java.util.List;
 
 import javafx.scene.control.Alert.AlertType;
+import javafx.scene.input.MouseEvent;
 import org.controlsfx.control.MaskerPane;
 
 
@@ -37,6 +38,17 @@ public class LoginDialogController extends Controller<String>{
     protected void initialize() {
         super.initialize();
         loginButton.setDisable(true);
+    }
+
+    @Override
+    protected void onWindowClosed(MouseEvent event) {
+        boolean yes = getMainApp().showConfirmationDialog("Logout Confirmation", "Are you sure want to log out?", null);
+        if (!yes) {
+            return;
+        }
+        getMainApp().stop();
+        super.getMainApp().showConnectionDialog();
+
     }
 
     @Override

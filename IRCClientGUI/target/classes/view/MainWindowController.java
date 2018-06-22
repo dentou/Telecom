@@ -1,21 +1,24 @@
 package com.github.dentou.view;
 
 import com.github.dentou.MainApp;
-import com.github.dentou.model.Channel;
-import com.github.dentou.model.ChatHistoryItem;
+import com.github.dentou.model.chat.Channel;
+import com.github.dentou.model.chat.ChatHistoryItem;
+import com.github.dentou.model.file.FileMetadata;
 import com.github.dentou.utils.ClientUtils;
-import com.github.dentou.model.IRCConstants.*;
-import com.github.dentou.model.PrivateMessage;
-import com.github.dentou.model.User;
+import com.github.dentou.model.constants.IRCConstants.*;
+import com.github.dentou.model.chat.PrivateMessage;
+import com.github.dentou.model.chat.User;
 import com.github.dentou.utils.FXUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
-import javafx.application.Platform;
+import javafx.beans.property.IntegerProperty;
+import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
+import javafx.concurrent.Task;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -26,17 +29,17 @@ import javafx.scene.control.*;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
-import javafx.stage.Modality;
-import javafx.stage.Stage;
+import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
-import javafx.stage.StageStyle;
-import javafx.stage.WindowEvent;
-import org.controlsfx.control.Notifications;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
 
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.function.Predicate;
@@ -63,6 +66,8 @@ public class MainWindowController extends Controller<String> {
     private ProgressBar progressBar;
     @FXML
     private Label transferCountLabel;
+
+    private IntegerProperty transferCount = new SimpleIntegerProperty(0);
 
     private TaskProgressView fileTransferView = new TaskProgressView(); // todo implement task
 
@@ -119,6 +124,9 @@ public class MainWindowController extends Controller<String> {
     private ObservableList<ChatHistoryItem> historyData = FXCollections.observableArrayList();
     private ObservableList<Channel> channelsData = FXCollections.observableArrayList();
     private ObservableList<User> usersData = FXCollections.observableArrayList();
+
+    private Map<String, FileMetadata> fileSendMap = new HashMap<>();
+    private Map<String, FileMetadata> fileReceiveMap = new HashMap<>();
 
 
 
@@ -197,6 +205,7 @@ public class MainWindowController extends Controller<String> {
 
     private void initializeTransferCountLabel() {
 
+        transferCountLabel.textProperty().bind(transferCount.asString());
 
         transferCountLabel.setOnMouseEntered(event -> {
             transferCountLabel.setStyle("-fx-cursor:hand; -fx-text-fill: secondary-color; ");
@@ -209,23 +218,26 @@ public class MainWindowController extends Controller<String> {
         transferCountLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
-
-                fileTransferView.setPrefHeight(200);
-                fileTransferView.setPrefWidth(200);
-
-                VBox vBox = new VBox(fileTransferView);
-
-                PopOver popOver = new PopOver(vBox);
-                popOver.setCloseButtonEnabled(true);
-                popOver.setDetachable(false);
-
-                popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
-                popOver.setHeaderAlwaysVisible(true);
-                popOver.setTitle("File Transfer");
-                popOver.show(transferCountLabel);
+                onTransferCountLabelClicked();
             }
         });
 
+    }
+
+    private void onTransferCountLabelClicked() {
+        fileTransferView.setPrefHeight(200);
+        fileTransferView.setPrefWidth(200);
+
+        VBox vBox = new VBox(fileTransferView);
+
+        PopOver popOver = new PopOver(vBox);
+        popOver.setCloseButtonEnabled(true);
+        popOver.setDetachable(false);
+
+        popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
+        popOver.setHeaderAlwaysVisible(true);
+        popOver.setTitle("File Transfer");
+        popOver.show(transferCountLabel);
     }
 
 
@@ -318,23 +330,52 @@ public class MainWindowController extends Controller<String> {
 
     }
 
-    /**
-     * GUI methods
-     */
-
     @Override
     public void displayInfo() { // WARNING: Never call this inside initialize method, cause exception
         super.displayInfo();
 
+
         User user = super.getMainApp().getUser();
         setTitle("IRCClient: " + user.getNick());
         nickLabel.setText(user.getNick());
+
+        try {
+            List<FileMetadata> fileMetadataList = ClientUtils.loadUserData(user.getNick());
+            for (FileMetadata fileMetadata : fileMetadataList) {
+                this.fileReceiveMap.put(fileMetadata.getFilePath().getFileName().toString(), fileMetadata);
+            }
+        } catch (IOException e) {
+            getMainApp().showExceptionDialog("File Loading Error",
+                    "Cannot load user metadata (interrupted downloads cannot be resumed)", null, e);
+        }
+
 
         progressBar.setProgress(0);
 
         onRefresh();
 
     }
+
+
+    /**
+     * File transfer
+     */
+    public synchronized void addFileSend(FileMetadata fileMetadata) {
+        if (fileMetadata != null) {
+            this.fileSendMap.put(fileMetadata.getFilePath().getFileName().toString(), fileMetadata);
+        }
+    }
+
+    public synchronized FileMetadata getFileSend(String fileName) {
+        return this.fileSendMap.get(fileName);
+    }
+
+
+
+
+    /**
+     * GUI methods
+     */
 
     @Override
     protected void onWindowClosed(MouseEvent event) {
@@ -423,7 +464,7 @@ public class MainWindowController extends Controller<String> {
                 }
             }
             String errorString = error.toString();
-            if (errorString == null || errorString.isEmpty()) {
+            if (errorString.isEmpty()) {
                 break;
             }
             getMainApp().showAlertDialog(AlertType.ERROR, "Invalid input", "Please fix the errors and try again",
@@ -440,10 +481,10 @@ public class MainWindowController extends Controller<String> {
         if (event.getClickCount() == 2) {
             String result = getMainApp().showCustomActionDialog("Channel Options", "Please choose your action",
                     null, "Send message");
-            if (result == "Cancel") {
+            if ("Cancel".equals(result)) {
                 return;
             }
-            if (result == "Send message") {
+            if ("Send message".equals(result)) {
                 Channel channel = joinedChannelsTable.getSelectionModel().getSelectedItem();
                 displayMessage(channel.getName(), null);
             }
@@ -475,13 +516,13 @@ public class MainWindowController extends Controller<String> {
             }
             String result = getMainApp().showCustomActionDialog("Channel Options", "Please choose your action",
                     null, "Join", "Send message");
-            if (result == "Cancel") {
+            if ("Cancel".equals(result)) {
                 return;
             }
-            if (result == "Send message") {
+            if ("Send message".equals(result)) {
                 displayMessage(channel.getName(), null);
 
-            } else if (result == "Join") {
+            } else if ("Join".equals(result)) {
                 getMainApp().getIrcClient().sendToServer("JOIN", " ",
                         channelsTable.getSelectionModel().getSelectedItem().getName());
             }
@@ -496,13 +537,6 @@ public class MainWindowController extends Controller<String> {
             displayMessage(user.getNick(), null);
         }
     }
-
-    @FXML
-    private void onProgressBarClicked(MouseEvent event) {
-        PopOver popOver = new PopOver();
-    }
-
-
 
 
     /**
@@ -569,6 +603,26 @@ public class MainWindowController extends Controller<String> {
                     channel = messageParts.get(2);
                     processPART(sender, channel);
                     break;
+                case "FILE_SEND":
+                    processFILE_SEND(sender, messageParts);
+                    break;
+                case "FILE_RECEIVE":
+                    processFILE_RECEIVE(sender, messageParts);
+                    break;
+                case "FILE_DENY":
+                    processFILE_DENY(sender, messageParts);
+                    break;
+                case "FILE_RESUME":
+                    processFILE_RESUME(sender, messageParts);
+                    break;
+                case "FILE_RESEND":
+                    processFILE_RESEND(sender, messageParts);
+                    break;
+                case "FILE_RESUME_DENY":
+                    processFILE_RESUME_DENY(sender, messageParts);
+                    break;
+
+
 
             }
         }
@@ -680,8 +734,101 @@ public class MainWindowController extends Controller<String> {
                 sender + " has left the channel."), true);
         refresh();
 
+    }
+
+    private void processFILE_SEND(String sender, List<String> messageParts) {
+        String fileName = messageParts.get(4);
+
+        long fileSize = Long.parseLong(messageParts.get(3));
+
+
+        // todo
+        boolean yes = getMainApp().showConfirmationDialog("File Transfer Confirmation",
+                "User " + sender + " wants to send you a file. Would you like to receive?",
+                "File Name: " + fileName + "\n" +
+                "File size: " + fileSize + "bytes\n");
+
+        if (!yes) {
+            getMainApp().getIrcClient().sendToServer("FILE_DENY", " ", sender, " ", "" + fileSize, " ", ":" + fileName);
+            return;
+        }
+
+        DirectoryChooser directoryChooser = new DirectoryChooser();
+        File selectedDirectory = directoryChooser.showDialog(getMainApp().getPrimaryStage());
+
+        if (selectedDirectory == null) {
+            //No Directory selected
+            getMainApp().getIrcClient().sendToServer("FILE_DENY", " ", sender, " ", "" + fileSize, " ", ":" + fileName);
+            return;
+        }
+        Path dir = Paths.get(selectedDirectory.getAbsolutePath());
+        Path filePath = Paths.get(dir.toString(), fileName);
+
+        while (Files.exists(filePath) && !Files.isDirectory(filePath)) {
+            System.out.println("File already exists. Creating new dir.");
+            dir = Paths.get(dir.toString(), "new-duplicate");
+            filePath = Paths.get(dir.toString(), fileName);
+            getMainApp().showAlertDialog(AlertType.WARNING, "File duplicate", "There's another file with the same name",
+                    "The new file will be put in: " + dir);
+        }
+
+
+        // Send FILE_RECEIVE
+        getMainApp().getIrcClient().sendToServer("FILE_RECEIVE", " ", sender, " ", "" + fileSize, " ", ":" + fileName);
+
+        FileMetadata fileMetadata = new FileMetadata(filePath, fileSize, 0L);
+        this.fileReceiveMap.put(fileName, fileMetadata);
+
+        // Save file metadata
+        try {
+            List<FileMetadata> fileMetadataList = new ArrayList<>(this.fileReceiveMap.values());
+            ClientUtils.saveUserData(getMainApp().getUser().getNick(), fileMetadataList);
+        } catch (IOException e) {
+            getMainApp().showExceptionDialog("File Saving Error",
+                    "Cannot save user metadata (interrupted downloads won't be resumed)", null, e);
+        }
+
+        Task<Void> task = getMainApp().getFileTransferClient().receiveFile(fileMetadata, sender, getMainApp().getUser().getNick());
+        fileTransferView.getTasks().add(task);
+        transferCount.setValue(transferCount.getValue() + 1);
+        //onTransferCountLabelClicked();
 
     }
+
+    private void processFILE_RECEIVE(String recipient, List<String> messageParts) {
+        String fileName = messageParts.get(4);
+        FileMetadata fileMetadata = this.fileSendMap.get(fileName);
+        if (fileMetadata == null) {
+            System.out.println("File metadata not exist:" + messageParts);
+            return;
+        }
+        // todo
+        Task<Void> task = getMainApp().getFileTransferClient().sendFile(fileMetadata, getMainApp().getUser().getNick(), recipient);
+        fileTransferView.getTasks().add(task);
+        transferCount.setValue(transferCount.getValue() + 1);
+        //onTransferCountLabelClicked();
+    }
+
+    private void processFILE_DENY(String denier, List<String> messageParts) {
+        getMainApp().showAlertDialog(AlertType.ERROR, "File Transfer Error", "File Transfer Error",
+                "Your transfer request has been denied by " + denier);
+        this.fileSendMap.remove(messageParts.get(3));
+    }
+
+
+    private void processFILE_RESUME(String requester, List<String> messageParts) {
+        // todo
+    }
+
+    private void processFILE_RESEND(String recipient, List<String> messageParts) {
+        // todo
+    }
+
+    private void processFILE_RESUME_DENY(String recipient, List<String> messageParts) {
+        // todo
+    }
+
+
 
     /**
      * Display methods

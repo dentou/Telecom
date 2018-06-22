@@ -10,8 +10,12 @@ import java.nio.channels.SocketChannel;
 import java.util.Iterator;
 import java.util.Queue;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicLong;
 
 public class SocketAcceptor implements Runnable{
+
+    private long nextChatSocketId = 1024; // Id frm 0 to 1023 is reserved for servers
+    private long nextFileSocketId = 1024;
 
     private int chatPort;
     private Queue<IRCSocket> chatSocketQueue;
@@ -24,6 +28,8 @@ public class SocketAcceptor implements Runnable{
 
     private Selector chatSelector;
     private Selector fileSelector;
+
+
 
     public SocketAcceptor(int tcpPort, Queue<IRCSocket> chatSocketQueue, int filePort, Queue<IRCSocket> fileSocketQueue) {
         this.chatPort = tcpPort;
@@ -92,8 +98,11 @@ public class SocketAcceptor implements Runnable{
                 SelectionKey key = keyIterator.next();
 
                 SocketChannel chatSocketChannel = ((ServerSocketChannel) key.channel()).accept();
-                System.out.println("Chat Client connected: " + chatSocketChannel.socket().getLocalAddress());
-                this.chatSocketQueue.add(new IRCSocket(chatSocketChannel, false));
+                IRCSocket clientSocket = new IRCSocket(chatSocketChannel, false);
+                clientSocket.setId(nextChatSocketId++);
+                System.out.println("Chat Client connected: " + clientSocket.getSocketChannel().getRemoteAddress()
+                        + ", ID: " + clientSocket.getId());
+                this.chatSocketQueue.add(clientSocket);
 
                 keyIterator.remove();
             }
@@ -112,8 +121,11 @@ public class SocketAcceptor implements Runnable{
                 SelectionKey key = keyIterator.next();
 
                 SocketChannel fileSocketChannel = ((ServerSocketChannel) key.channel()).accept();
-                System.out.println("File Client connected: " + fileSocketChannel.socket().getLocalAddress());
-                this.fileSocketQueue.add(new IRCSocket(fileSocketChannel, false));
+                IRCSocket clientSocket = new IRCSocket(fileSocketChannel, false);
+                clientSocket.setId(nextFileSocketId++);
+                System.out.println("File Client connected: " + clientSocket.getSocketChannel().getRemoteAddress()
+                        + ", ID: " + clientSocket.getId());
+                this.fileSocketQueue.add(clientSocket);
 
                 keyIterator.remove();
             }
