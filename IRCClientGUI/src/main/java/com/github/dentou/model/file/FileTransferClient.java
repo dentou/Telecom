@@ -3,17 +3,14 @@ package com.github.dentou.model.file;
 import com.github.dentou.MainApp;
 import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.model.constants.IRCConstants;
-import javafx.application.Platform;
 import javafx.concurrent.Task;
-import javafx.scene.control.Alert;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.net.Socket;
+import java.nio.ByteBuffer;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SocketChannel;
-import java.util.List;
 import java.util.Objects;
 import java.util.Queue;
 import java.util.concurrent.ExecutorService;
@@ -63,7 +60,7 @@ public class FileTransferClient {
     /**
      * Transfer Tasks
      */
-    private class FileSendTask extends Task<Void> {
+    public class FileSendTask extends Task<Void> {
 
         private final FileMetadata fileMetadata;
         private final String sender;
@@ -72,67 +69,88 @@ public class FileTransferClient {
         private IRCSocket fileSocket = null;
         private FileSender fileSender = null;
 
+        private ByteBuffer checkBuffer = ByteBuffer.allocate(100);
+
         public FileSendTask(FileMetadata fileMetadata, String sender, String recipient) {
             this.fileMetadata = fileMetadata;
             this.sender = sender;
             this.recipient = recipient;
         }
 
+        private void closeSender() throws IOException {
+            if (fileSender == null) {
+                return;
+            }
+            fileSender.close();
+        }
+
         @Override
         protected void succeeded() {
             super.succeeded();
-            updateMessage("Done");
+            try {
+                closeSender();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
 
         @Override
         protected void cancelled() {
             super.cancelled();
-            updateMessage("Failed");
+            try {
+                closeSender();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
 
         @Override
         protected void failed() {
             super.failed();
-            updateMessage("Cancelled");
+            try {
+                closeSender();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
+
 
         @Override
-        protected Void call() {
-            try {
-                updateMessage("Initializing...");
+        protected Void call() throws IOException {
+            updateTitle(fileMetadata.getFilePath().getFileName().toString());
 
-                connectToFileServer();
+            updateMessage("Initializing...");
 
-                fileSender = new FileSender(fileSocket.getSocketChannel(), fileMetadata, false);
+            connectToFileServer();
 
-                negotiate();
+            fileSender = new FileSender(fileSocket.getSocketChannel(), fileMetadata, false);
 
-                while (!fileSender.done()) {
-                    long transferred = fileSender.send();
-                    updateMessage("Sent " + transferred + " bytes");
-                    updateProgress(transferred, fileMetadata.getSize());
+            negotiate();
+
+            while (!fileSender.done()) {
+                if (isCancelled()) {
+                    return null;
+                }
+                long transferred = fileSender.send();
+                double percent = (double) fileMetadata.getPosition() / fileMetadata.getSize() * 100;
+                String percentString = String.format("%3.2f", percent);
+                updateMessage("Sent " + percentString + "%");
+                updateProgress(percent, 100);
+
+                int bytes = fileSocket.getSocketChannel().read(checkBuffer);
+                if (bytes == -1) {
+                    updateMessage("Cancelled");
+                    cancel();
                 }
 
-
-                System.out.println("File successfully sent: " + fileMetadata.getFilePath());
-                fileSender.close();
-                System.out.println("Sender closed normally");
-
-            } catch (IOException e) {
-                if (fileSender != null) {
-                    try {
-                        fileSender.close();
-                        System.out.println("Sender closed by exception");
-                    } catch (IOException ex) {
-                        System.out.println("Unable to close file sender");
-                    }
-                }
-                Platform.runLater(() -> mainApp.showExceptionDialog("File Transfer Error", "There's an error sending file", null, e));
             }
 
+            System.out.println("File successfully sent: " + fileMetadata.getFilePath());
             return null;
         }
-
 
 
         private void connectToFileServer() throws IOException {
@@ -143,7 +161,7 @@ public class FileTransferClient {
 
         }
 
-        private boolean negotiate() throws IOException {
+        private void negotiate() throws IOException {
             String fileKey = fileMetadata.getFilePath().getFileName().toString() + sender + recipient;
             String message = "SEND " + fileKey + "\r\n";
 
@@ -153,6 +171,9 @@ public class FileTransferClient {
             boolean waiting = true;
 
             while (waiting) {
+                if (isCancelled()) {
+                    return;
+                }
                 Queue<String> responses = fileSocket.getMessages();
                 for (String response : responses) {
                     if (StringUtils.isNotEmpty(response)) {
@@ -160,9 +181,9 @@ public class FileTransferClient {
                             waiting = false;
                             break;
                         } else if (response.equals("FAILED")) {
-                            Platform.runLater(() -> mainApp.showAlertDialog(Alert.AlertType.ERROR, "File Transfer Error",
-                                    "Transfer denied by server", null));
-                            return false;
+//                            Platform.runLater(() -> mainApp.showAlertDialog(Alert.AlertType.ERROR, "File Transfer Error",
+//                                    "Transfer denied by server", null));
+                            throw new IOException("File transfer denied by server");
                         }
                     }
                 }
@@ -170,11 +191,10 @@ public class FileTransferClient {
                     throw new ClosedChannelException();
                 }
             }
-            return true;
         }
     }
 
-    private class FileReceiveTask extends Task<Void> {
+    public class FileReceiveTask extends Task<Void> {
 
         private final FileMetadata fileMetadata;
         private final String sender;
@@ -183,64 +203,85 @@ public class FileTransferClient {
         private IRCSocket fileSocket = null;
         private FileReceiver fileReceiver = null;
 
+        ByteBuffer checkBuffer = ByteBuffer.allocate(100);
+
         public FileReceiveTask(FileMetadata fileMetadata, String sender, String recipient) {
             this.fileMetadata = fileMetadata;
             this.sender = sender;
             this.recipient = recipient;
         }
 
+        private void closeReceiver() throws IOException {
+            if (fileReceiver == null) {
+                return;
+            }
+            fileReceiver.close();
+        }
+
         @Override
         protected void succeeded() {
             super.succeeded();
-            updateMessage("Done");
+            try {
+                closeReceiver();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
 
         @Override
         protected void cancelled() {
             super.cancelled();
-            updateMessage("Cancelled");
+            try {
+                closeReceiver();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
 
         @Override
         protected void failed() {
             super.failed();
-            updateMessage("Failed");
+            try {
+                closeReceiver();
+                System.out.println("Sender closed");
+            } catch (IOException ex) {
+                System.out.println("Unable to close file sender");
+            }
         }
 
+
         @Override
-        protected Void call() {
-            try {
-                updateMessage("Initializing...");
+        protected Void call() throws IOException {
+            updateTitle(fileMetadata.getFilePath().getFileName().toString());
 
-                connectToFileServer();
+            updateMessage("Initializing...");
 
-                fileReceiver = new FileReceiver(fileSocket.getSocketChannel(), fileMetadata, false);
+            connectToFileServer();
 
-                negotiate();
+            fileReceiver = new FileReceiver(fileSocket.getSocketChannel(), fileMetadata, false);
 
-                while (!fileReceiver.done()) {
-                    long transferred = fileReceiver.receive();
-                    updateMessage("Received " + transferred + " bytes");
-                    updateProgress(transferred, fileMetadata.getSize());
+            negotiate();
+
+            while (!fileReceiver.done()) {
+                if (isCancelled()) {
+                    return null;
+                }
+                long received = fileReceiver.receive();
+
+                if (fileReceiver.isEndOfStreamReached()) {
+                    failed();
                 }
 
-
-                System.out.println("File successfully received: " + fileMetadata.getFilePath());
-                fileReceiver.close();
-                System.out.println("Receiver closed normally");
-
-            } catch (IOException e) {
-                if (fileReceiver != null) {
-                    try {
-                        fileReceiver.close();
-                        System.out.println("Receiver closed by exception");
-                    } catch (IOException ex) {
-                        System.out.println("Unable to close file receiver");
-                    }
-                }
-                Platform.runLater(() -> mainApp.showExceptionDialog("File Transfer Error",
-                        "There's an error receiving file", null, e));
+                double percent = (double) fileMetadata.getPosition() / fileMetadata.getSize() * 100;
+                String percentString = String.format("%3.2f", percent);
+                updateMessage("Received " + percentString + "%");
+                updateProgress(fileMetadata.getPosition(), fileMetadata.getSize());
             }
+
+
+            System.out.println("File successfully received: " + fileMetadata.getFilePath());
 
             return null;
         }
@@ -254,7 +295,7 @@ public class FileTransferClient {
         }
 
 
-        private boolean negotiate() throws IOException {
+        private void negotiate() throws IOException {
             String fileKey = fileMetadata.getFilePath().getFileName().toString() + sender + recipient;
             String message = "RECEIVE " + fileKey + "\r\n";
 
@@ -264,6 +305,9 @@ public class FileTransferClient {
             boolean waiting = true;
 
             while (waiting) {
+                if (isCancelled()) {
+                    return;
+                }
                 Queue<String> responses = fileSocket.getMessages();
                 while (true) {
                     String response = responses.poll();
@@ -276,17 +320,13 @@ public class FileTransferClient {
                         fileSocket.sendMessages();
                         break;
                     } else if (response.equals("FAILED")) {
-                        Platform.runLater(() -> {mainApp.showAlertDialog(Alert.AlertType.ERROR, "File Transfer Error",
-                                "Transfer denied by server", null);});
-
-                        return false;
+                        throw new IOException("File transfer denied by server");
                     }
                 }
                 if (fileSocket.isEndOfStreamReached()) {
                     throw new ClosedChannelException();
                 }
             }
-            return true;
         }
 
     }

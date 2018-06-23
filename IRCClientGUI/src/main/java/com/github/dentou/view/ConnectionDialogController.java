@@ -75,6 +75,7 @@ public class ConnectionDialogController extends Controller<String>{
         WorkIndicatorDialog<InetSocketAddress, SocketChannel> wd = new WorkIndicatorDialog<>(super.getMainApp().getPrimaryStage(), "Connecting to server");
         wd.addTaskEndNotification(result -> {
             enableAll();
+            onLocalHostChosen();
             if (result == null) {
                 getMainApp().showAlertDialog(AlertType.ERROR,"Connection Error", "Connection Error", "Cannot connect to server. Please try again.");
                 return;

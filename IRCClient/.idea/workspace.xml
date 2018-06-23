@@ -19,8 +19,8 @@
       <file leaf-file-name="FileTransferClient.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/file/FileTransferClient.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="608">
-              <caret line="113" column="32" lean-forward="true" selection-start-line="113" selection-start-column="32" selection-end-line="113" selection-end-column="71" />
+            <state relative-caret-position="176">
+              <caret line="116" column="46" lean-forward="true" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="46" />
               <folding>
                 <element signature="imports" expanded="true" />
               </folding>
@@ -67,7 +67,7 @@
       <file leaf-file-name="Main.java" pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/Main.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1150">
+            <state relative-caret-position="1776">
               <caret line="128" column="42" lean-forward="true" selection-start-line="128" selection-start-column="42" selection-end-line="128" selection-end-column="42" />
               <folding>
                 <element signature="imports" expanded="true" />
@@ -140,8 +140,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
-      <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -203,6 +201,8 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
+      <pane id="PackagesPane" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -310,11 +310,12 @@
       <workItem from="1529662166750" duration="10000" />
       <workItem from="1529672522040" duration="1689000" />
       <workItem from="1529679182102" duration="1492000" />
+      <workItem from="1529752264634" duration="234000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="111467000" />
+    <option name="totallyTimeSpent" value="111701000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
@@ -328,7 +329,7 @@
       <window_info anchor="bottom" id="Run" order="2" weight="0.2739274" />
       <window_info anchor="bottom" id="Terminal" order="7" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.2579425" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" visible="true" weight="0.26172465" />
       <window_info id="Learn" order="4" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
@@ -673,7 +674,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/Main.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1150">
+        <state relative-caret-position="1776">
           <caret line="128" column="42" lean-forward="true" selection-start-line="128" selection-start-column="42" selection-end-line="128" selection-end-column="42" />
           <folding>
             <element signature="imports" expanded="true" />
@@ -690,8 +691,8 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/file/FileTransferClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="608">
-          <caret line="113" column="32" lean-forward="true" selection-start-line="113" selection-start-column="32" selection-end-line="113" selection-end-column="71" />
+        <state relative-caret-position="176">
+          <caret line="116" column="46" lean-forward="true" selection-start-line="116" selection-start-column="16" selection-end-line="116" selection-end-column="46" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>

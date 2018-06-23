@@ -53,6 +53,8 @@ public class ClientUtils {
                 jsonObject.addProperty("path", fileMetaData.getFilePath().toString());
                 jsonObject.addProperty("size", fileMetaData.getSize());
                 jsonObject.addProperty("position", fileMetaData.getPosition());
+                jsonObject.addProperty("sender", fileMetaData.getSender());
+                jsonObject.addProperty("receiver", fileMetaData.getReceiver());
                 return jsonObject;
             }
         };
@@ -92,7 +94,8 @@ public class ClientUtils {
                 JsonObject jsonObject = jsonElement.getAsJsonObject();
 
                 Path path = Paths.get(jsonObject.get("path").getAsString());
-                return new FileMetadata(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong());
+                return new FileMetadata(path, jsonObject.get("size").getAsLong(), jsonObject.get("position").getAsLong(),
+                        jsonObject.get("sender").getAsString(), jsonObject.get("receiver").getAsString());
             }
         };
 

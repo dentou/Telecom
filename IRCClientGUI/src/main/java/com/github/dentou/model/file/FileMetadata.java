@@ -13,9 +13,13 @@ public class FileMetadata {
     private final long size;
 
     private final AtomicLong position;
+    @Immutable
+    private final String sender;
+    @Immutable
+    private final String receiver;
 
 
-    public FileMetadata(final Path filePath, final long size, final long position) {
+    public FileMetadata(final Path filePath, final long size, final long position, final String sender, final String receiver) {
         if (Objects.isNull(filePath)) {
             throw new IllegalArgumentException("File path required");
         }
@@ -23,6 +27,9 @@ public class FileMetadata {
         this.filePath = filePath;
         this.size = size;
         this.position = new AtomicLong(position);
+
+        this.sender = sender;
+        this.receiver = receiver;
     }
 
 
@@ -45,6 +52,14 @@ public class FileMetadata {
 
     public void addToPosition(long bytes) {
         this.position.addAndGet(bytes);
+    }
+
+    public String getSender() {
+        return sender;
+    }
+
+    public String getReceiver() {
+        return receiver;
     }
 
     public boolean done() {

@@ -3,14 +3,18 @@ package com.github.dentou.model.file;
 import com.github.dentou.model.constants.IRCConstants;
 
 import java.io.IOException;
+import java.nio.ByteBuffer;
 import java.nio.channels.FileChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.file.FileAlreadyExistsException;
 import java.nio.file.Files;
 import java.nio.file.StandardOpenOption;
 import java.util.Objects;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileReceiver {
+
+    public static final int BUFFER_SIZE = 1 * IRCConstants.MB;
 
     private final SocketChannel socketChannel;
 
@@ -20,9 +24,17 @@ public class FileReceiver {
     private boolean blocking;
     private long bytesReceived = 0l;
 
+    private final ByteBuffer buffer = ByteBuffer.allocate(BUFFER_SIZE);
+
+    private AtomicBoolean endOfStreamReached = new AtomicBoolean(false);
+
 
     public FileReceiver(SocketChannel socketChannel, FileMetadata fileMetadata) throws IOException {
         this(socketChannel, fileMetadata, true);
+    }
+
+    public boolean isEndOfStreamReached() {
+        return this.endOfStreamReached.get();
     }
 
     public FileReceiver(SocketChannel socketChannel, FileMetadata fileMetadata, boolean blocking) throws IOException {
@@ -58,7 +70,6 @@ public class FileReceiver {
 
     public long receive() throws IOException {
 
-        System.out.println("Start receiving " + fileChannel.size() + " bytes");
         if (!blocking) {
             return transfer();
         }
@@ -72,11 +83,41 @@ public class FileReceiver {
     }
 
     private long transfer() throws IOException {
-        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE);
-        System.out.println("Bytes received: " + transferred);
-        bytesReceived += transferred;
-        this.fileMetadata.addToPosition(transferred);
-        return transferred;
+//        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE);
+//        bytesReceived += transferred;
+//        this.fileMetadata.addToPosition(transferred);
+//        return transferred;
+
+        long totalTransferred = 0;
+
+        buffer.clear();
+        while (buffer.hasRemaining()) {
+            long transferred = this.socketChannel.read(buffer);
+
+            if (transferred == -1) {
+                endOfStreamReached.set(true);
+
+                buffer.flip();
+                while (buffer.hasRemaining()) {
+                    fileChannel.write(buffer);
+                }
+
+                return 0;
+            }
+
+            bytesReceived += transferred;
+            totalTransferred += transferred;
+            this.fileMetadata.addToPosition(transferred);
+        }
+
+        buffer.flip();
+
+        while (buffer.hasRemaining()) {
+            fileChannel.write(buffer);
+        }
+
+        return totalTransferred;
+
     }
 
     public boolean done() {

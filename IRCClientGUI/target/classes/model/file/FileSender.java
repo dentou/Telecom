@@ -39,7 +39,6 @@ public class FileSender {
 
     public long send() throws IOException {
 
-        System.out.println("Start sending " + fileChannel.size() + " bytes");
         if (!blocking) {
             return transfer();
         }
@@ -54,7 +53,6 @@ public class FileSender {
 
     private long transfer() throws IOException {
         long transferred = fileChannel.transferTo(fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE, socketChannel);
-        System.out.println("Bytes sent: " + transferred);
         bytesSent += transferred;
         this.fileMetadata.addToPosition(transferred);
         return transferred;

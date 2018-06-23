@@ -1,0 +1,50 @@
+*{
+    primary-color: #344955;
+    primary-dark-color: #232F34;
+    primary-light-color: #4A6572;
+    primary-text-color: #FFFFFF;
+
+    secondary-color: #F9AA33;
+    secondary-dark-color: #c17b00;
+    secondary-light-color: #ffdc65;
+    secondary-text-color: #000000;
+
+    -white: #FEFEFE;
+    -torea-bay: #353B7D;
+    -mischka: #A3A5A9;
+    -waikawa-grey: #636791;
+    -heather: #B5C0C6;
+    -heather: #ACB6C0;
+
+}
+
+.jfx-tab-pane *.tab-header-background {
+    -fx-background-color: white;
+}
+
+.jfx-tab-pane .headers-region .tab-selected-line {
+    -fx-background-color: secondary-color;
+}
+
+
+.tab-label {
+    -fx-font-size: 14px;
+    -fx-text-fill: black;
+    -fx-font-weight: normal;
+}
+
+.tab-label:hover {
+    -fx-cursor: hand;
+}
+
+.scroll-bar:vertical {
+    -fx-pref-width: 10;
+}
+
+.context-menu {
+    -fx-background-color: primary-light-color;
+}
+
+.menu-item .label {
+    -fx-text-fill: -white;
+}

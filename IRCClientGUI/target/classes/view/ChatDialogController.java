@@ -145,7 +145,8 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         long fileSize = selectedFile.length();
 
         System.out.println("File selected for send: " + selectedFile.getAbsolutePath() + ", size in bytes: " + fileSize);
-        FileMetadata fileMetadata = new FileMetadata(Paths.get(selectedFile.getAbsolutePath()), fileSize, 0l);
+        FileMetadata fileMetadata = new FileMetadata(Paths.get(selectedFile.getAbsolutePath()), fileSize, 0l,
+                getMainApp().getUser().getNick(), chatter);
 
         MainWindowController mainWindowController = (MainWindowController) getMainApp().getController();
         mainWindowController.addFileSend(fileMetadata);

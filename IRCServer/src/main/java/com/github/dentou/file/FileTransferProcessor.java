@@ -80,12 +80,12 @@ public class FileTransferProcessor implements Runnable {
 
     private void closeSocket(IRCSocket socket) throws IOException {
         System.out.println("[FileTF] Socket closed: " + socket.getId());
+        socket.getSocketChannel().close();
         this.socketMap.remove(socket.getId());
         SelectionKey readKey = socket.getSelectionKey(readSelector);
         if (readKey != null) {
             readKey.attach(null);
             readKey.cancel();
-            readKey.channel().close();
         }
     }
 
@@ -189,6 +189,7 @@ public class FileTransferProcessor implements Runnable {
         System.out.println("Closing proxy " + proxy.toString());
         unsubscribe(proxy.getInSocket().getId(), fileSendSelector);
         fileTransferProxyMap.remove(proxy.getFileKey());
+        receiverMap.remove(proxy.getInSocket().getId());
         closeSocket(proxy.getInSocket());
         closeSocket(proxy.getOutSocket());
 

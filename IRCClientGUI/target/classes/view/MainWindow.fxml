@@ -203,7 +203,7 @@
                                     </rowConstraints>
                                     <children>
                                         <JFXProgressBar fx:id="progressBar" prefHeight="0.0" progress="0.0" />
-                              <Label fx:id="transferCountLabel" text="0" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" />
+                              <Label fx:id="transferCountLabel" alignment="CENTER" contentDisplay="CENTER" onMouseClicked="#onTransferCountLabelClicked" prefHeight="40.0" prefWidth="40.0" text="0" textFill="WHITE" GridPane.columnIndex="1" GridPane.halignment="CENTER" GridPane.valignment="CENTER" />
                                     </children>
                                     <HBox.margin>
                                         <Insets />
