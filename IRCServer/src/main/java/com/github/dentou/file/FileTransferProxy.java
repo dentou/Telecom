@@ -64,11 +64,14 @@ public class FileTransferProxy {
             transferEnded.set(true);
         }
         buffer.flip();
-        outSocket.write(buffer);
+        while (buffer.remaining() > IRCConstants.FILE_BUFFER_SIZE/2) {
+            outSocket.write(buffer);
+        }
         int check = outSocket.getSocketChannel().read(checkBuffer);
         if (check == -1) {
             transferEnded.set(true);
         }
+
 
 //        SocketChannel writeChannel = outSocket.getSocketChannel();
 //        while (buffer.hasRemaining()) {
