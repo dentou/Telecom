@@ -45,18 +45,11 @@ public class FileTransferProxy {
 
     public void transfer() throws IOException {
 
+
         if (transferEnded.get()) {
             return;
         }
 
-//        inSocket.read(buffer);
-//        buffer.flip();
-//        outSocket.write(buffer);
-//        buffer.compact();
-//        if (inSocket.isEndOfStreamReached()) {
-//            transferEnded = true;
-//        }
-//        return true;
 
 
         inSocket.read(buffer);
@@ -64,31 +57,24 @@ public class FileTransferProxy {
             transferEnded.set(true);
         }
         buffer.flip();
-        if (buffer.remaining() > IRCConstants.FILE_BUFFER_SIZE * 3 / 4)
+        if (buffer.remaining() > IRCConstants.FILE_BUFFER_SIZE * 3 / 4) {
             while (buffer.remaining() > IRCConstants.FILE_BUFFER_SIZE / 4) {
-                outSocket.write(buffer);
+                outSocket.getSocketChannel().write(buffer);
             }
+        }
+
         int check = outSocket.getSocketChannel().read(checkBuffer);
         if (check == -1) {
             transferEnded.set(true);
         }
 
 
-//        SocketChannel writeChannel = outSocket.getSocketChannel();
-//        while (buffer.hasRemaining()) {
-//            writeChannel.write(buffer);
-//        }
-//        int check = writeChannel.read(checkBuffer);
-//        if (check == -1) {
-//            transferEnded.set(true);
-//        }
         if (transferEnded.get()) {
             while (buffer.hasRemaining()) {
-                outSocket.write(buffer);
+                outSocket.getSocketChannel().write(buffer);
             }
         }
         buffer.compact();
-
     }
 
 

@@ -86,7 +86,7 @@
       <file leaf-file-name="Controller.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Controller.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="423">
+            <state relative-caret-position="96">
               <caret line="47" selection-start-line="47" selection-end-line="47" />
             </state>
           </provider>
@@ -611,12 +611,12 @@
       <workItem from="1529758570213" duration="1910000" />
       <workItem from="1529760637464" duration="9794000" />
       <workItem from="1529807595301" duration="2366000" />
-      <workItem from="1529812541884" duration="1299000" />
+      <workItem from="1529812541884" duration="2033000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="294250000" />
+    <option name="totallyTimeSpent" value="294984000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -1003,7 +1003,7 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Controller.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="423">
+        <state relative-caret-position="96">
           <caret line="47" selection-start-line="47" selection-end-line="47" />
         </state>
       </provider>
