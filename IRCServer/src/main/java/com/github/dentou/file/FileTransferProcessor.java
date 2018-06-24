@@ -160,7 +160,8 @@ public class FileTransferProcessor implements Runnable {
 
                 FileTransferProxy proxy = (FileTransferProxy) key.attachment();
                 try {
-                    if (!proxy.transfer()) {
+                    proxy.transfer();
+                    if (proxy.isTransferEnded()) {
                         closeProxy(proxy);
                     }
                 } catch (IOException e) {
