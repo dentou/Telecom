@@ -1,5 +1,7 @@
 package com.github.dentou.chat;
 
+import com.github.dentou.utils.ServerConstants;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.ArrayList;
@@ -7,7 +9,7 @@ import java.util.Arrays;
 import java.util.List;
 
 public class IRCMessageReader { // todo handle partial read (for file transfer)
-    private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);
+    private ByteBuffer buffer = ByteBuffer.allocate(ServerConstants.MESSAGE_BUFFER_SIZE);
     private IRCSocket ircSocket;
     private int bufferPosition = 0;
 

@@ -1,17 +1,19 @@
-package com.github.dentou.chat;
+package com.github.dentou.server;
 
 
 import java.io.IOException;
 import java.util.Queue;
 import java.util.concurrent.ArrayBlockingQueue;
 
-import com.github.dentou.chat.IRCConstants;
+import com.github.dentou.utils.ServerConstants;
+import com.github.dentou.chat.IRCSocket;
+import com.github.dentou.chat.ChatSocketProcessor;
 import com.github.dentou.file.FileTransferProcessor;
 
 public class IRCServer {
 
     private SocketAcceptor socketAcceptor;
-    private SocketProcessor socketProcessor;
+    private ChatSocketProcessor chatSocketProcessor;
     private FileTransferProcessor fileTransferProcessor;
 
     private final int chatPort;
@@ -23,15 +25,15 @@ public class IRCServer {
     }
 
     public void start() throws IOException {
-        Queue<IRCSocket> chatSocketQueue = new ArrayBlockingQueue<IRCSocket>(IRCConstants.SOCKET_BUFFER_SIZE);
-        Queue<IRCSocket> fileSocketQueue = new ArrayBlockingQueue<IRCSocket>(IRCConstants.SOCKET_BUFFER_SIZE);
+        Queue<IRCSocket> chatSocketQueue = new ArrayBlockingQueue<IRCSocket>(ServerConstants.SOCKET_BUFFER_SIZE);
+        Queue<IRCSocket> fileSocketQueue = new ArrayBlockingQueue<IRCSocket>(ServerConstants.SOCKET_BUFFER_SIZE);
 
         this.socketAcceptor = new SocketAcceptor(chatPort, chatSocketQueue, filePort, fileSocketQueue);
-        this.socketProcessor = new SocketProcessor(chatSocketQueue);
+        this.chatSocketProcessor = new ChatSocketProcessor(chatSocketQueue);
         this.fileTransferProcessor = new FileTransferProcessor(fileSocketQueue);
 
         Thread acceptorThread  = new Thread(this.socketAcceptor);
-        Thread chatProcessorThread = new Thread(this.socketProcessor);
+        Thread chatProcessorThread = new Thread(this.chatSocketProcessor);
         Thread fileProcessorThread = new Thread(this.fileTransferProcessor);
 
         acceptorThread.start();

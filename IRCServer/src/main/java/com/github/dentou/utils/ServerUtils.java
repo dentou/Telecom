@@ -1,4 +1,8 @@
-package com.github.dentou.chat;
+package com.github.dentou.utils;
+
+import com.github.dentou.chat.IRCMessage;
+import com.github.dentou.chat.User;
+import com.github.dentou.chat.UserHandler;
 
 import java.io.IOException;
 import java.net.InetAddress;
@@ -6,7 +10,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class IRCUtils {
+public class ServerUtils {
     public static String getServerAddress() {
         try {
             return InetAddress.getLocalHost().getHostAddress();
@@ -74,7 +78,7 @@ public class IRCUtils {
     }
 
 
-    public static Queue<IRCMessage> createResponse(IRCConstants.Response responseType, IRCMessage request,
+    public static Queue<IRCMessage> createResponse(ServerConstants.Response responseType, IRCMessage request,
                                                    List<String> requestParts , UserHandler userHandler) {
 
         boolean autoQueue = true; // Flag to automatically put response into queue

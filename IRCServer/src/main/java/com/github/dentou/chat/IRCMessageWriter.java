@@ -1,5 +1,7 @@
 package com.github.dentou.chat;
 
+import com.github.dentou.utils.ServerConstants;
+
 import java.io.IOException;
 import java.nio.ByteBuffer;
 import java.util.LinkedList;
@@ -9,7 +11,7 @@ import java.util.Queue;
 public class IRCMessageWriter { // todo handle partial write (for file transfer)
     private Queue<String> writeQueue = new LinkedList<String>();
     private String currentMessage = null;
-    private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);
+    private ByteBuffer buffer = ByteBuffer.allocate(ServerConstants.MESSAGE_BUFFER_SIZE);
     private IRCSocket ircSocket;
 
     public IRCMessageWriter(IRCSocket ircSocket) {

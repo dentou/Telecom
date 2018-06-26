@@ -1,7 +1,7 @@
 package com.github.dentou.chat;
 
 import java.util.*;
-import com.github.dentou.chat.IRCConstants.ChannelMode;
+import com.github.dentou.utils.ServerConstants.ChannelMode;
 
 
 public class UserHandler {

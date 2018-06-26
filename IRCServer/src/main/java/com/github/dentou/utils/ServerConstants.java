@@ -1,9 +1,9 @@
-package com.github.dentou.chat;
+package com.github.dentou.utils;
 
 import java.util.HashMap;
 import java.util.Map;
 
-public class IRCConstants {
+public class ServerConstants {
     public static final int CHAT_SERVER_PORT = 6667;
     public static final int FILE_SERVER_PORT = 6668;
 

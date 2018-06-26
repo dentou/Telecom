@@ -1,4 +1,6 @@
-package com.github.dentou.chat;
+package com.github.dentou.server;
+
+import com.github.dentou.chat.IRCSocket;
 
 import java.io.IOException;
 import java.net.InetAddress;

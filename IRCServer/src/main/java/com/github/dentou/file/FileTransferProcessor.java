@@ -2,103 +2,75 @@ package com.github.dentou.file;
 
 import com.github.dentou.chat.IRCMessage;
 import com.github.dentou.chat.IRCSocket;
+import com.github.dentou.server.SocketProcessor;
 
 import java.io.IOException;
 import java.nio.channels.ClosedChannelException;
 import java.nio.channels.SelectionKey;
 import java.nio.channels.Selector;
 import java.util.*;
+import java.util.concurrent.*;
 
-public class FileTransferProcessor implements Runnable {
+public class FileTransferProcessor extends SocketProcessor<IRCSocket, IRCMessage> {
 
-    private Queue<IRCSocket> socketQueue;
-    private Map<Long, IRCSocket> socketMap = new HashMap<Long, IRCSocket>();
+    private final ExecutorService fileTransferExecutor = Executors.newFixedThreadPool(5);
 
-    private Selector readSelector;
-    private Selector writeSelector;
-
-    private Selector fileSendSelector;
+    private final ConcurrentMap<String, Long> waitingToSendMap = new ConcurrentHashMap<>();
+    private final ConcurrentMap<String, Long> waitingToReceiveMap = new ConcurrentHashMap<>();
 
 
-    private Queue<IRCMessage> requestQueue = new LinkedList<>(); // Contains already parsed requests (no \r\n)
-    private Queue<IRCMessage> sendQueue = new LinkedList<>();
-
-    private Set<IRCSocket> emptyToNonEmptySockets = new HashSet<>();
-    private Set<IRCSocket> nonEmptyToEmptySockets = new HashSet<>();
-
-
-    private Map<String, Long> waitingToSendMap = new HashMap<>();
-    private Map<String, Long> waitingToReceiveMap = new HashMap<>();
-
-    private Map<String, FileTransferProxy> fileTransferProxyMap = new HashMap<>();
-
-    private Map<Long, String> receiverMap = new HashMap<>();
+    private final ConcurrentMap<Long, String> receiverMap = new ConcurrentHashMap<>();
 
     public FileTransferProcessor(Queue<IRCSocket> socketQueue) throws IOException {
-        this.socketQueue = socketQueue;
+        super(socketQueue);
 
-        this.readSelector = Selector.open();
-        this.writeSelector = Selector.open();
+    }
 
-        this.fileSendSelector = Selector.open();
 
+
+    @Override
+    protected void registerNewSocket(IRCSocket newSocket) throws ClosedChannelException{
+        getSocketMap().put(newSocket.getId(), newSocket);
+        subscribe(newSocket, getReadSelector(), SelectionKey.OP_READ);
     }
 
     @Override
-    public void run() {
-        while (true) {
-            try {
-                registerNewSockets();
-                readRequests();
-                processRequests(); // todo implement processRequests()
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+    protected void subscribe(IRCSocket socket, Selector selector, int keyOps) throws ClosedChannelException{
+        SelectionKey key = socket.register(selector, keyOps);
+        key.attach(socket);
+    }
 
-//            try {
-//                Thread.sleep(100);
-//            } catch (InterruptedException e) {
-//                e.printStackTrace();
-//            }
+    @Override
+    protected void unsubscribe(IRCSocket socket, Selector selector) {
+        SelectionKey key = socket.getSelectionKey(selector);
+        if (key != null) {
+            key.attach(null);
+            key.cancel();
         }
     }
 
-    private void registerNewSockets() throws ClosedChannelException {
 
-        while (true) {
-            IRCSocket newSocket = this.socketQueue.poll();
-
-            if (newSocket == null) {
-                return;
-            }
-
-            this.socketMap.put(newSocket.getId(), newSocket);
-            SelectionKey key = newSocket.register(this.readSelector, SelectionKey.OP_READ);
-            key.attach(newSocket);
+    @Override
+    protected void closeSocket(IRCSocket socket) throws IOException {
+        if (socket == null) {
+            System.out.println("Cannot close null socket");
+            return;
         }
-    }
-
-    private void closeSocket(IRCSocket socket) throws IOException {
         System.out.println("[FileTF] Socket closed: " + socket.getId());
+        getSocketMap().remove(socket.getId());
+        unsubscribe(socket, getReadSelector());
         socket.getSocketChannel().close();
-        this.socketMap.remove(socket.getId());
-        SelectionKey readKey = socket.getSelectionKey(readSelector);
-        if (readKey != null) {
-            readKey.attach(null);
-            readKey.cancel();
-        }
     }
 
-
-    private void readFromSocket(SelectionKey key) throws IOException {
-        IRCSocket socket = (IRCSocket) key.attachment();
+    @Override
+    protected void readFromSocket(IRCSocket socket) throws IOException {
         List<IRCMessage> requests = socket.getMessages();
-        System.out.println("[FileTF] (readFromSocket) Requests from socket: " + requests);
+        System.out.println("[FileTF] Requests from socket: " + requests);
 
         if (requests.size() > 0) {
             for (IRCMessage request : requests) {
                 if (request.getMessage() != null & !request.getMessage().trim().isEmpty()) {
-                    this.requestQueue.add(request);
+                    getRequestQueue().add(request);
                 }
             }
         }
@@ -108,88 +80,13 @@ public class FileTransferProcessor implements Runnable {
         }
     }
 
-    private void readRequests() throws IOException {
-        int readReady = this.readSelector.selectNow();
-
-        if (readReady > 0) {
-            Set<SelectionKey> selectedKeys = this.readSelector.selectedKeys();
-            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
-            while (keyIterator.hasNext()) {
-                SelectionKey key = keyIterator.next();
-
-                try {
-                    readFromSocket(key);
-                } catch (IOException e) {
-                    e.printStackTrace();
-                    closeSocket((IRCSocket) key.attachment());
-                }
 
 
-                keyIterator.remove();
-            }
-            selectedKeys.clear();
-        }
-    }
 
 
-    private void processRequests() throws IOException {
-        while (true) {
-            IRCMessage request = requestQueue.poll();
-            if (request == null) {
-                break;
-            }
-            processRequest(request);
-        }
-        // todo write to socket
-        writeResponses();
-        transferFiles();
-
-    }
-
-    private void transferFiles() throws IOException {
-
-        int fileReady = this.fileSendSelector.selectNow();
-
-        if (fileReady > 0) {
-            Set<SelectionKey> selectedKeys = this.fileSendSelector.selectedKeys();
-            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
-            while (keyIterator.hasNext()) {
-                SelectionKey key = keyIterator.next();
-
-                FileTransferProxy proxy = (FileTransferProxy) key.attachment();
-                try {
-                    proxy.transfer();
-                    if (proxy.isTransferEnded()) {
-                        closeProxy(proxy);
-                    }
-                } catch (IOException e) {
-                    closeProxy(proxy);
-                    e.printStackTrace();
-                }
-
-                keyIterator.remove();
-            }
-            selectedKeys.clear();
-        }
-
-//        for (FileTransferProxy proxy : fileTransferProxyMap.values()) {
-//            try {
-//                if (!proxy.transfer()) {
-//                    closeProxy(proxy);
-//                }
-//            } catch (IOException e) {
-//                closeProxy(proxy);
-//                e.printStackTrace();
-//            }
-//        }
-    }
 
     private void closeProxy(FileTransferProxy proxy) throws IOException {
         System.out.println("Closing proxy " + proxy.toString());
-        unsubscribe(proxy.getInSocket().getId(), fileSendSelector);
-        fileTransferProxyMap.remove(proxy.getFileKey());
         receiverMap.remove(proxy.getInSocket().getId());
         closeSocket(proxy.getInSocket());
         closeSocket(proxy.getOutSocket());
@@ -197,8 +94,8 @@ public class FileTransferProcessor implements Runnable {
     }
 
 
-    private void processRequest(IRCMessage request) throws IOException { // Process command and add response to send queue
-        if (request.getMessage() == null || request.getMessage().trim() == "") {
+    protected void processRequest(IRCMessage request) throws IOException { // Process command and add response to send queue
+        if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
             return;
         }
         List<String> requestParts = Arrays.asList(request.getMessage().split(" "));
@@ -225,40 +122,50 @@ public class FileTransferProcessor implements Runnable {
 
     }
 
-    private void interconnect(String fileKey) throws ClosedChannelException {
+    private void interconnect(String fileKey) {
         Long senderId = waitingToSendMap.get(fileKey);
         Long receiverId = waitingToReceiveMap.get(fileKey);
         if (senderId != null && receiverId != null) {
             System.out.println("Interconnecting " + senderId + " " + receiverId);
             // Glue two sockets together
-            IRCSocket senderSocket = socketMap.get(senderId);
-            IRCSocket receiverSocket = socketMap.get(receiverId);
+            IRCSocket senderSocket = getSocketMap().get(senderId);
+            IRCSocket receiverSocket = getSocketMap().get(receiverId);
             FileTransferProxy proxy = new FileTransferProxy(fileKey, senderSocket, receiverSocket);
-            fileTransferProxyMap.put(fileKey, proxy);
             // Remove waiting map entries
             removeKeyFromWaitingMaps(fileKey);
-//            // Announce connection
-//            sendQueue.add(new IRCMessage("READY\r\n", 0, senderId));
-//            sendQueue.add(new IRCMessage("READY\r\n", 0, receiverId));
             // Unsubscribe
-            unsubscribe(senderId, readSelector);
-            unsubscribe(receiverId, readSelector);
+            unsubscribe(senderSocket, getReadSelector());
+            unsubscribe(receiverSocket, getReadSelector());
+            // Put on executor
+            fileTransferExecutor.submit(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        while (true) {
+                            proxy.transfer();
+                            if (proxy.isTransferEnded()) {
+                                break;
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    } finally {
+                        try {
+                            closeProxy(proxy);
+                        } catch (IOException ex) {
+                            System.out.println("Cannot close proxy " + proxy);
+                            ex.printStackTrace();
+                        }
 
-            SelectionKey key = senderSocket.register(this.fileSendSelector, SelectionKey.OP_READ);
-            key.attach(proxy);
+                    }
+                }
+            });
+
         }
 
     }
 
-    private void unsubscribe(Long id, Selector selector) {
-        IRCSocket socket = socketMap.get(id);
-        SelectionKey selectionKey = socket.getSelectionKey(selector);
-        if (selectionKey != null) {
-            selectionKey.attach(null);
-            selectionKey.cancel();
-        }
 
-    }
 
     private void removeKeyFromWaitingMaps(String fileKey) {
         waitingToSendMap.remove(fileKey);
@@ -274,7 +181,7 @@ public class FileTransferProcessor implements Runnable {
         if (receiverId == null) {
             return;
         }
-        sendQueue.add(new IRCMessage("READY\r\n", 0, receiverId));
+        getSendQueue().add(new IRCMessage("READY\r\n", 0, receiverId));
     }
 
     private void handleReceiveCommand(IRCMessage request, List<String> requestParts) {
@@ -287,7 +194,7 @@ public class FileTransferProcessor implements Runnable {
         if (senderId == null) {
             return;
         }
-        sendQueue.add(new IRCMessage("READY\r\n", 0, receiverId));
+        getSendQueue().add(new IRCMessage("READY\r\n", 0, receiverId));
 
     }
 
@@ -295,7 +202,7 @@ public class FileTransferProcessor implements Runnable {
         Long id = request.getFromId();
         waitingToSendMap.remove(id);
         waitingToReceiveMap.remove(id);
-        IRCSocket ircSocket = socketMap.get(id);
+        IRCSocket ircSocket = getSocketMap().get(id);
         closeSocket(ircSocket);
     }
 
@@ -308,75 +215,32 @@ public class FileTransferProcessor implements Runnable {
         }
 
         interconnect(fileKey);
-        sendQueue.add(new IRCMessage("READY\r\n", 0, senderId));
+        getSendQueue().add(new IRCMessage("READY\r\n", 0, senderId));
     }
 
 
-    private void writeResponses() throws IOException {
-        pullAllRequests();
+    @Override
+    protected void sendMessages(IRCSocket socket) throws IOException{
+        socket.sendMessages();
 
-        cancelEmptySockets();
+        if (socket.isWriterEmpty()) {
+            this.nonEmptyToEmptySockets.add(socket);
+        }
+    }
 
-        registerNonEmptySockets();
 
-        int writeReady = writeSelector.selectNow();
+    @Override
+    protected void enqueueMessage(IRCMessage outMessage) {
+        IRCSocket ircSocket = getSocketMap().get(outMessage.getToId());
 
-        if (writeReady > 0) {
-            Set<SelectionKey> selectedKeys = writeSelector.selectedKeys();
-            Iterator<SelectionKey> keyIterator = selectedKeys.iterator();
-
-            while (keyIterator.hasNext()) {
-                SelectionKey key = keyIterator.next();
-
-                IRCSocket ircSocket = (IRCSocket) key.attachment();
-
-                ircSocket.sendMessages();
-
-                if (ircSocket.isWriterEmpty()) {
-                    this.nonEmptyToEmptySockets.add(ircSocket);
-                }
-
-                keyIterator.remove();
+        if (ircSocket != null) {
+            if (ircSocket.isWriterEmpty()) {
+                nonEmptyToEmptySockets.remove(ircSocket);
+                emptyToNonEmptySockets.add(ircSocket);
             }
+            ircSocket.enqueue(outMessage.getMessage());
 
-            selectedKeys.clear();
         }
-    }
-
-    private void registerNonEmptySockets() throws ClosedChannelException {
-        for (IRCSocket ircSocket : emptyToNonEmptySockets) {
-            SelectionKey key = ircSocket.register(this.writeSelector, SelectionKey.OP_WRITE);
-            key.attach(ircSocket);
-        }
-        emptyToNonEmptySockets.clear();
-    }
-
-    private void cancelEmptySockets() {
-        for (IRCSocket ircSocket : nonEmptyToEmptySockets) {
-            SelectionKey key = ircSocket.getSelectionKey(this.writeSelector);
-            key.cancel();
-        }
-        nonEmptyToEmptySockets.clear();
-    }
-
-    private void pullAllRequests() {
-        while (true) {
-            IRCMessage outMessage = sendQueue.poll();
-            if (outMessage == null) {
-                return;
-            }
-            IRCSocket ircSocket = socketMap.get(outMessage.getToId());
-
-            if (ircSocket != null) {
-                if (ircSocket.isWriterEmpty()) {
-                    nonEmptyToEmptySockets.remove(ircSocket);
-                    emptyToNonEmptySockets.add(ircSocket);
-                }
-                ircSocket.enqueue(outMessage.getMessage());
-
-            }
-        }
-
     }
 
 
