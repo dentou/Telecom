@@ -8,7 +8,7 @@ import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
 
-public class IRCMessageReader { // todo handle partial read (for file transfer)
+public class IRCMessageReader {
     private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);
     private IRCSocket ircSocket;
     private int bufferPosition = 0;
@@ -50,7 +50,7 @@ public class IRCMessageReader { // todo handle partial read (for file transfer)
 
     }
 
-    public int findNextLineBreak(byte[] src, int startIndex, int endIndex) {
+    public int findNextLineBreak(byte[] src, int startIndex, int endIndex) { // End index is non-exclusive
         for (int index = startIndex; index < endIndex; index++) {
             if (src[index] == '\n') {
                 if (src[index - 1] == '\r') {

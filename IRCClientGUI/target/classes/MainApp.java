@@ -129,7 +129,6 @@ public class MainApp extends Application {
     }
 
     public void initializeRefresher() {
-        //new Thread(new GUIRefresher(this)).start();
         refresherExecutor = Executors.newSingleThreadScheduledExecutor();
         refresherExecutor.scheduleAtFixedRate(new Runnable() {
             @Override
@@ -214,6 +213,8 @@ public class MainApp extends Application {
 
     public boolean showConfirmationDialog(String title, String headerText, String contentText) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
         alert.setContentText(contentText);
@@ -224,6 +225,8 @@ public class MainApp extends Application {
 
     public String showCustomActionDialog(String title, String headerText, String contentText, String... buttonNames) {
         Alert alert = new Alert(AlertType.CONFIRMATION);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
         alert.initOwner(this.primaryStage);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
@@ -242,6 +245,8 @@ public class MainApp extends Application {
 
     public void showAlertDialog(AlertType alertType, String title, String headerText, String contentText) {
         Alert alert = new Alert(alertType);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
         alert.initOwner(this.primaryStage);
         alert.setTitle(title);
         alert.setHeaderText(headerText);
@@ -252,6 +257,8 @@ public class MainApp extends Application {
 
     public void showExceptionDialog(String title, String headerText, String contentText, Exception ex) {
         Alert alert = new Alert(AlertType.ERROR);
+        Stage stage = (Stage) alert.getDialogPane().getScene().getWindow();
+        stage.setAlwaysOnTop(true);
         alert.initOwner(this.primaryStage);
         alert.setTitle(title);
         alert.setHeaderText(headerText);

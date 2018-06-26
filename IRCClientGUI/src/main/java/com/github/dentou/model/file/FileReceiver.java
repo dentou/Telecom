@@ -83,69 +83,34 @@ public class FileReceiver {
     }
 
     private long transfer() throws IOException {
-        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE);
-        bytesReceived += transferred;
-        this.fileMetadata.addToPosition(transferred);
-        return transferred;
+//        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE);
+//        bytesReceived += transferred;
+//        this.fileMetadata.addToPosition(transferred);
+//        return transferred;
 
-//        long totalBytesRead = 0;
-//
-//        while (true) {
-//            int bytesRead = this.socketChannel.read(buffer);
-//
-//            if (bytesRead == -1) {
-//                endOfStreamReached.set(true);
-//                break;
-//            } else if (bytesRead == 0) {
-//                break;
-//            }
-//
-//            bytesReceived += bytesRead;
-//            totalBytesRead += bytesRead;
-//            this.fileMetadata.addToPosition(bytesRead);
-//        }
-//
-//        buffer.flip();
-//        if (endOfStreamReached.get()) {
-//            while (buffer.hasRemaining()) {
-//                fileChannel.write(buffer);
-//            }
-//        } else {
-//            while (buffer.remaining() > BUFFER_SIZE / 2) {
-//                fileChannel.write(buffer);
-//            }
-//        }
-//        buffer.compact();
-//        return totalBytesRead;
+        long totalBytesRead = 0;
 
+        while (true) {
+            int bytesRead = this.socketChannel.read(buffer);
 
-//        buffer.clear();
-//        while (buffer.hasRemaining()) {
-//            long transferred = this.socketChannel.read(buffer);
-//
-//            if (transferred == -1) {
-//                endOfStreamReached.set(true);
-//
-//                buffer.flip();
-//                while (buffer.hasRemaining()) {
-//                    fileChannel.write(buffer);
-//                }
-//
-//                return 0;
-//            }
-//
-//            bytesReceived += transferred;
-//            totalTransferred += transferred;
-//            this.fileMetadata.addToPosition(transferred);
-//        }
-//
-//        buffer.flip();
-//
-//        while (buffer.hasRemaining()) {
-//            fileChannel.write(buffer);
-//        }
-//
-//        return totalTransferred;
+            if (bytesRead == -1) {
+                endOfStreamReached.set(true);
+                break;
+            } else if (bytesRead == 0) {
+                break;
+            }
+
+            bytesReceived += bytesRead;
+            totalBytesRead += bytesRead;
+            this.fileMetadata.addToPosition(bytesRead);
+        }
+
+        buffer.flip();
+        while (buffer.hasRemaining()) {
+            fileChannel.write(buffer);
+        }
+        buffer.clear();
+        return totalBytesRead;
 
     }
 

@@ -60,6 +60,13 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         close();
     }
 
+    @Override
+    public void update() {
+        Stage stage = (Stage) scrollPane.getScene().getWindow();
+        stage.toFront();
+        super.update();
+    }
+
 
     public synchronized void setChatter(String chatter) {
         this.chatter = chatter;
@@ -110,7 +117,6 @@ public class ChatDialogController extends Controller<PrivateMessage>{
             return;
         }
 
-        // todo send PRIVMSG to server
         getMainApp().getIrcClient().sendToServer("PRIVMSG", " ", chatter, " ", ":", chatBox.getText());
         if (chatter.charAt(0) != '#') { // Privmsg to another user is not relayed back to sender by server
             MainWindowController mainWindowController = (MainWindowController) getMainApp().getController();

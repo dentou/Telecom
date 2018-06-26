@@ -69,7 +69,7 @@ public class LoginDialogController extends Controller<String>{
     }
 
     @FXML
-    private void onLogin() throws IOException{ // todo send NICK and USER request to server
+    private void onLogin() throws IOException{
         if (!isInputValid()) {
             return;
         }

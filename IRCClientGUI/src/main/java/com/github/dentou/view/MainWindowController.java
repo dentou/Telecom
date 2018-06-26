@@ -81,7 +81,7 @@ public class MainWindowController extends Controller<String> {
 
     private AnchorPane fileTransferView = new AnchorPane();
 
-    private TaskProgressView fileProgressView = new TaskProgressView(); // todo implement task
+    private TaskProgressView fileProgressView = new TaskProgressView();
 
     private VBox fileFinishedVBox = new VBox();
 
@@ -223,19 +223,13 @@ public class MainWindowController extends Controller<String> {
         transferCountLabel.textProperty().bind(transferCount.asString());
 
         transferCountLabel.setOnMouseEntered(event -> {
-            transferCountLabel.setStyle("-fx-cursor:hand; -fx-background-color: secondary-color; -fx-font-size: 14; -fx-font-weight: bold");
+            transferCountLabel.setStyle("-fx-cursor:hand; -fx-background-color: #7793a1; -fx-font-size: 14; -fx-font-weight: bold");
         });
 
         transferCountLabel.setOnMouseExited(event -> {
             transferCountLabel.setStyle("-fx-cursor:normal; -fx-background-color: primary-light-color; -fx-font-size: 14; -fx-font-weight: bold");
         });
 
-//        transferCountLabel.setOnMouseClicked(new EventHandler<MouseEvent>() {
-//            @Override
-//            public void handle(MouseEvent event) {
-//                onTransferCountLabelClicked();
-//            }
-//        });
 
     }
 
@@ -416,14 +410,12 @@ public class MainWindowController extends Controller<String> {
 
     @Override
     public void disableAll() {
-        // todo implement this
         FXUtils.setDisabled(true, refreshButton, createButton, searchField);
         //FXUtils.setDisabled(true, tabPane);
     }
 
     @Override
     public void enableAll() {
-        // todo implement this
         FXUtils.setDisabled(false, refreshButton, createButton, searchField);
         //FXUtils.setDisabled(false, tabPane);
     }
@@ -462,10 +454,7 @@ public class MainWindowController extends Controller<String> {
         for (ChatDialogController controller : activeChatDialog.values()) {
             controller.close();
         }
-        // todo send quit to server
         getMainApp().stop();
-//        getMainApp().getIrcClient().sendToServer("QUIT");
-//        getMainApp().getIrcClient().stop();
         super.getMainApp().showConnectionDialog();
     }
 
@@ -582,17 +571,6 @@ public class MainWindowController extends Controller<String> {
         popOver.setTitle("File Transfer");
         popOver.show(transferCountLabel);
 
-
-//        VBox vBox = new VBox(fileProgressView);
-//
-//        PopOver popOver = new PopOver(vBox);
-//        popOver.setCloseButtonEnabled(true);
-//        popOver.setDetachable(false);
-//
-//        popOver.setArrowLocation(PopOver.ArrowLocation.BOTTOM_CENTER);
-//        popOver.setHeaderAlwaysVisible(true);
-//        popOver.setTitle("File Transfer");
-//        popOver.show(transferCountLabel);
     }
 
 
@@ -602,7 +580,6 @@ public class MainWindowController extends Controller<String> {
 
     @Override
     public void processMessage(String message) {
-        // todo implement this
         List<String> messageParts = ClientUtils.parseMessage(message);
         System.out.println(messageParts);
         String sender = ClientUtils.parseSender(messageParts.get(0));
@@ -719,7 +696,6 @@ public class MainWindowController extends Controller<String> {
             waitingForWho = false;
         }
 
-        // todo implement this
         String nick = messageParts.get(3);
         String userName = messageParts.get(4);
         String fullName = messageParts.get(7);
@@ -760,7 +736,6 @@ public class MainWindowController extends Controller<String> {
     }
 
     private void processJOIN(String sender, String channelName) {
-        // todo implement this
         if (getMainApp().getUser().getNick().equals(sender)) {
             channelMembersMap.put(channelName, FXCollections.observableArrayList());
             if (!allChannelsMap.containsKey(channelName)) {
@@ -965,7 +940,6 @@ public class MainWindowController extends Controller<String> {
     }
 
     private void displayMessage(String chatter, PrivateMessage privateMessage, boolean blocked) {
-        // todo implement this
         if (chatter == null) {
             System.out.println("Null chatter");
             return;
@@ -1049,6 +1023,7 @@ public class MainWindowController extends Controller<String> {
             ChatDialogController controller = (ChatDialogController) loader.getController();
             controller.setMainApp(getMainApp());
             controller.setChatter(chatter);
+            controller.setTitle("Conversation with " + chatter);
 
             if (chatter.charAt(0) == '#') { // If chatter is a channel
                 Channel channel = allChannelsMap.get(chatter);
@@ -1067,6 +1042,8 @@ public class MainWindowController extends Controller<String> {
 
             // Show the dialog
             dialogStage.show();
+            dialogStage.requestFocus();
+            dialogStage.toFront();
 
             return controller;
 

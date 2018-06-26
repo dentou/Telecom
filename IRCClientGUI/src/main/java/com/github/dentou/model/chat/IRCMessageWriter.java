@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 
-public class IRCMessageWriter { // todo handle partial write (for file transfer)
+public class IRCMessageWriter {
     private Queue<String> writeQueue = new LinkedList<String>();
     private String currentMessage = null;
     private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);

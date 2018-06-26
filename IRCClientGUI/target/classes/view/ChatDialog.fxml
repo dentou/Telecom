@@ -18,7 +18,7 @@
                <children>
                   <HBox HBox.hgrow="ALWAYS">
                      <children>
-                        <Label fx:id="titleLabel" prefHeight="40.0" prefWidth="506.0" style="-fx-text-fill: white;" text="Title" />
+                        <Label fx:id="titleLabel" prefHeight="40.0" prefWidth="1000.0" style="-fx-text-fill: white;" text="Conversation with dentou" HBox.hgrow="ALWAYS" />
                      </children>
                      <padding>
                         <Insets left="10.0" />

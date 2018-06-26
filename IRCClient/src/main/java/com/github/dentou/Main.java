@@ -1,5 +1,6 @@
 package com.github.dentou;
 
+import com.github.dentou.chat.IRCClient;
 import com.github.dentou.chat.IRCConstants;
 import com.github.dentou.file.FileMetadata;
 import com.google.gson.*;
@@ -19,7 +20,7 @@ public class Main {
     private static final String huyServer = "169.254.53.178";
 
     public static void main(String[] args) throws IOException {
-        //new IRCClient(huyServer, 6667).start();
+        new IRCClient("localhost", 6667).start();
         //new FileTransferClient().start();
 
 //        String pathString = "C:\\Users\\trant\\Desktop\\java-file-send\\todo.txt";
@@ -39,12 +40,12 @@ public class Main {
 //        Files.createDirectory(newDir);
 //        System.out.println(newDir.toAbsolutePath());
 
-        createUserDataFile("dentou");
-        emptyUserData("dentou");
-        List<FileMetadata> fileMetadataList = loadUserData("dentou");
-        fileMetadataList.add(new FileMetadata(Paths.get("C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf"),
-                125, 23));
-        saveUserData("dentou", fileMetadataList);
+//        createUserDataFile("dentou");
+//        emptyUserData("dentou");
+//        List<FileMetadata> fileMetadataList = loadUserData("dentou");
+//        fileMetadataList.add(new FileMetadata(Paths.get("C:\\Users\\trant\\Desktop\\java-file-receive\\Grammatik-aktuell.pdf"),
+//                125, 23));
+//        saveUserData("dentou", fileMetadataList);
 
     }
 
