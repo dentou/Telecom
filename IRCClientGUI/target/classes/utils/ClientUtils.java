@@ -31,7 +31,7 @@ public class ClientUtils {
 
         boolean newFileCreated = false;
 
-        Path userDataDir = Paths.get(IRCConstants.userDataPath);
+        Path userDataDir = Paths.get(ClientConstants.userDataPath);
         if (!Files.isDirectory(userDataDir)) {
             Files.createDirectories(userDataDir);
         }
@@ -73,7 +73,7 @@ public class ClientUtils {
         Gson gson = gsonBuilder.create();
         String jsonString = gson.toJson(fileMetadataList);
 
-        Path userDataDir = Paths.get(IRCConstants.userDataPath);
+        Path userDataDir = Paths.get(ClientConstants.userDataPath);
         Path filePath = Paths.get(userDataDir.toString(), nick + ".json");
 
         try (FileWriter file = new FileWriter(filePath.toString(), false)) {
@@ -91,7 +91,7 @@ public class ClientUtils {
             return fileMetadataList;
         }
 
-        Path userDataDir = Paths.get(IRCConstants.userDataPath);
+        Path userDataDir = Paths.get(ClientConstants.userDataPath);
         Path filePath = Paths.get(userDataDir.toString(), nick + ".json");
 
         // File already exists, load it
@@ -129,7 +129,7 @@ public class ClientUtils {
         if (newFile) {
             return;
         }
-        Path userDataDir = Paths.get(IRCConstants.userDataPath);
+        Path userDataDir = Paths.get(ClientConstants.userDataPath);
         Path filePath = Paths.get(userDataDir.toString(), nick + ".json");
         try (FileWriter file = new FileWriter(filePath.toString(), false)) {
             file.write("");

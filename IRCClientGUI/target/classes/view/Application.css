@@ -192,8 +192,8 @@
 
 
 .iconic-button {
-    -fx-text-fill: primary-light-color;
-    -fx-fill: primary-light-color;
+    -fx-text-fill: primary-color;
+    -fx-fill: primary-color;
     -glyph-size: 20px;
     -fx-font-size: 20px;
     -fx-font-family: 'FontAwesome';
@@ -203,6 +203,7 @@
     -fx-fill: secondary-color;
     -fx-cursor: hand;
 }
+
 
 .iconic-button-alt {
     -fx-text-fill: white;

@@ -2,7 +2,7 @@ package com.github.dentou.view;
 
 
 import com.github.dentou.model.chat.IRCClient;
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
 import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;
@@ -71,7 +71,7 @@ public class ConnectionDialogController extends Controller<String>{
         }
 
 
-        InetSocketAddress inetAddress = new InetSocketAddress(serverAddress, IRCConstants.CHAT_SERVER_PORT);
+        InetSocketAddress inetAddress = new InetSocketAddress(serverAddress, ClientConstants.CHAT_SERVER_PORT);
         WorkIndicatorDialog<InetSocketAddress, SocketChannel> wd = new WorkIndicatorDialog<>(super.getMainApp().getPrimaryStage(), "Connecting to server");
         wd.addTaskEndNotification(result -> {
             enableAll();
@@ -130,7 +130,7 @@ public class ConnectionDialogController extends Controller<String>{
     @FXML
     private void onAWSServerChosen() {
         serverMenuButton.setText("AWS Server");
-        serverAddressField.setText(IRCConstants.AWS_SERVER_IP);
+        serverAddressField.setText(ClientConstants.AWS_SERVER_IP);
         connectButton.setDisable(false);
         resetButton.setDisable(false);
         serverAddressField.setDisable(true);

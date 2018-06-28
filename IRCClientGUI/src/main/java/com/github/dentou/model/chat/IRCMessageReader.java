@@ -1,6 +1,6 @@
 package com.github.dentou.model.chat;
 
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -9,7 +9,7 @@ import java.util.LinkedList;
 import java.util.Queue;
 
 public class IRCMessageReader {
-    private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);
+    private ByteBuffer buffer = ByteBuffer.allocate(ClientConstants.MESSAGE_BUFFER_SIZE);
     private IRCSocket ircSocket;
     private int bufferPosition = 0;
 

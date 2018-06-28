@@ -1,6 +1,6 @@
 package com.github.dentou.model.file;
 
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
 
 import java.io.IOException;
 import java.nio.channels.FileChannel;
@@ -49,7 +49,7 @@ public class FileSender {
     }
 
     private long transfer() throws IOException {
-        long transferred = fileChannel.transferTo(fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE, socketChannel);
+        long transferred = fileChannel.transferTo(fileMetadata.getPosition(), ClientConstants.TRANSFER_MAX_SIZE, socketChannel);
         bytesSent += transferred;
         this.fileMetadata.addToPosition(transferred);
         return transferred;

@@ -6,6 +6,7 @@ import com.github.dentou.utils.FXUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
+import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -173,10 +174,12 @@ public class ChatDialogController extends Controller<PrivateMessage>{
         sendButton.setDisable(disableSendButton);
     }
 
+    @Override
     public void disableAll() {
         FXUtils.setDisabled(true, sendButton, fileButton, chatBox);
     }
 
+    @Override
     public void enableAll() {
         if (blocked) {
             return;

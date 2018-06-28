@@ -2,12 +2,11 @@ package com.github.dentou.model.file;
 
 import com.github.dentou.MainApp;
 import com.github.dentou.model.chat.IRCSocket;
-import com.github.dentou.utils.ClientUtils;
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
+import com.sun.security.ntlm.Client;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -71,7 +70,7 @@ public class FileTransferClient {
 
         private IRCSocket fileSocket = null;
 
-        private long lastTransferTime = 0;
+        private AtomicLong lastTransferTime = new AtomicLong(0);
 
         public FileTransferTask(FileMetadata fileMetadata) {
             this.fileMetadata = fileMetadata;
@@ -86,13 +85,13 @@ public class FileTransferClient {
         }
 
         protected long updateAndGetTransferDuration() { // In nanoseconds
-            if (lastTransferTime == 0) {
-                lastTransferTime = System.nanoTime();
+            if (lastTransferTime.get() == 0) {
+                lastTransferTime.set(System.nanoTime());
                 return 0;
             }
             long currentTime = System.nanoTime();
-            long duration = currentTime - lastTransferTime;
-            lastTransferTime = currentTime;
+            long duration = currentTime - lastTransferTime.get();
+            lastTransferTime.set(currentTime);
             return duration;
         }
 
@@ -106,14 +105,14 @@ public class FileTransferClient {
             if (duration == 0) {
                 return 0;
             }
-            return (long)((double)bytesTransferred /duration * 1000000000);
+            return bytesTransferred * ClientConstants.NANOS_PER_SECOND / duration;
         }
 
         protected abstract void closeTransfer();
 
         protected void connectToFileServer() throws IOException {
             SocketChannel socketChannel = SocketChannel.open(
-                    new InetSocketAddress(mainApp.getServerAddress(), IRCConstants.FILE_SERVER_PORT));
+                    new InetSocketAddress(mainApp.getServerAddress(), ClientConstants.FILE_SERVER_PORT));
             socketChannel.configureBlocking(false);
             this.fileSocket = new IRCSocket(socketChannel);
 
@@ -182,10 +181,8 @@ public class FileTransferClient {
                 long transferred = fileSender.send();
 //                double percent = (double) fileMetadata.getPosition() / fileMetadata.getSize() * 100;
 //                String percentString = String.format("%3.2f", percent);
-                long duration = updateAndGetTransferDuration();
-                long transferRate = computeTransferRate(transferred, duration);
                 updateMessage("Sent " + readableFileSize(getFileMetadata().getPosition()) + "/" +
-                        readableFileSize(getFileMetadata().getSize()) + " at " + readableFileSize(transferRate) + "/sec");
+                        readableFileSize(getFileMetadata().getSize()));
                 updateProgress(getFileMetadata().getPosition(), getFileMetadata().getSize());
 
                 int bytes = getFileSocket().getSocketChannel().read(checkBuffer);
@@ -283,12 +280,8 @@ public class FileTransferClient {
                     failed();
                 }
 
-//                double percent = (double) fileMetadata.getPosition() / fileMetadata.getSize() * 100;
-//                String percentString = String.format("%3.2f", percent);
-                long duration = updateAndGetTransferDuration();
-                long transferRate = computeTransferRate(received, duration);
                 updateMessage("Received " + readableFileSize(getFileMetadata().getPosition()) + "/" +
-                        readableFileSize(getFileMetadata().getSize()) + " at " + readableFileSize(transferRate) + "/sec");
+                        readableFileSize(getFileMetadata().getSize()));
                 updateProgress(getFileMetadata().getPosition(), getFileMetadata().getSize());
             }
 

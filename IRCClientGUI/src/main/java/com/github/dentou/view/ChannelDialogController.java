@@ -46,6 +46,7 @@ public class ChannelDialogController extends ChatDialogController {
     @Override
     public void enableAll() {
         super.enableAll();
+        FXUtils.setDisabled(true, fileButton); // File button is always disabled for channel
         FXUtils.setDisabled(false, leaveButton);
     }
 

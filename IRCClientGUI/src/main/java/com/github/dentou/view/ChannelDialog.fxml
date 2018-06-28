@@ -11,6 +11,7 @@
 <?import javafx.scene.control.Separator?>
 <?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
 <VBox fx:id="root" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ChannelDialogController">
@@ -83,10 +84,13 @@
             </Separator>
             <VBox HBox.hgrow="ALWAYS">
                <children>
-                  <VBox spacing="10.0">
+                  <VBox spacing="5.0">
                      <children>
-                        <Label fx:id="channelNameLabel" text="Name" />
-                        <Label fx:id="channelTopicLabel" text="Topic" />
+                        <Label fx:id="channelNameLabel" style="-fx-font-size: 16; -fx-font-weight: bold;" text="Name">
+                           <font>
+                              <Font name="System Bold" size="14.0" />
+                           </font></Label>
+                        <Label fx:id="channelTopicLabel" style="-fx-font-size: 14; -fx-font-style: italic; -fx-text-fill: #4A6572;" text="Topic" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" top="10.0" />

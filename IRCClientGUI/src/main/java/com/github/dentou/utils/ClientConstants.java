@@ -4,7 +4,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.Map;
 
-public class IRCConstants {
+public class ClientConstants {
     public static final int CHAT_SERVER_PORT = 6667;
     public static final int FILE_SERVER_PORT = 6668;
 
@@ -13,7 +13,9 @@ public class IRCConstants {
     public static final String userDataPath = "." + File.separator + "data" + File.separator + "users-data";
 
     public static final int KB = 1024; // bytes
-    public static final int MB = 1024 * KB;
+    public static final int MB = 1024 * KB; // = 1024 * 1024 bytes
+
+    public static final long NANOS_PER_SECOND = 1000000000;
 
     public static final int MESSAGE_BUFFER_SIZE = 10 * KB; // bytes
 

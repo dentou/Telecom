@@ -19,26 +19,23 @@ import static com.github.dentou.utils.ServerUtils.*;
  */
 public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> {
 
-    private UserHandler userHandler;
+    private final UserHandler userHandler = new UserHandler();
 
     public ChatSocketProcessor(Queue<IRCSocket> socketQueue) throws IOException {
 
         super(socketQueue);
-
-        this.userHandler = new UserHandler();
     }
 
 
-
     @Override
-    protected void registerNewSocket(IRCSocket newSocket) throws ClosedChannelException{
+    protected void registerNewSocket(IRCSocket newSocket) throws ClosedChannelException {
         getSocketMap().put(newSocket.getId(), newSocket);
         this.userHandler.addUser(newSocket.getId());
         subscribe(newSocket, getReadSelector(), SelectionKey.OP_READ);
     }
 
     @Override
-    protected void subscribe(IRCSocket socket, Selector selector, int keyOps) throws ClosedChannelException{
+    protected void subscribe(IRCSocket socket, Selector selector, int keyOps) throws ClosedChannelException {
         SelectionKey key = socket.register(selector, keyOps);
         key.attach(socket);
     }
@@ -51,7 +48,6 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
             key.cancel();
         }
     }
-
 
 
     @Override
@@ -80,17 +76,19 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
         }
 
         if (socket.isEndOfStreamReached()) {
-            closeSocket(socket);
+            // Create a pseudo QUIT request and add to queue it
+            IRCMessage quitRequest = new IRCMessage("QUIT", socket.getId(), 0);
+            getRequestQueue().add(quitRequest);
         }
     }
-    
+
 
     @Override
     protected void processRequest(IRCMessage request) throws IOException { // Process command and add response to send queue
         if (request.getMessage() == null || request.getMessage().trim().isEmpty()) {
             return;
         }
-        List<String> requestParts = ServerUtils.parseRequest(request.getMessage());
+        List<String> requestParts = parseRequest(request.getMessage());
         System.out.println("Request " + requestParts);
         String command = requestParts.get(0);
 
@@ -210,23 +208,15 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
     private void handleQuitCommand(IRCMessage request, List<String> requestParts) throws IOException {
         // Send PART messages
         if (userHandler.isRegistered(request.getFromId())) {
-            Set<String> channelNames = userHandler.getJoinedChannelNames(request.getFromId());
-            if (channelNames.isEmpty()) {
-                userHandler.removeUser(request.getFromId());
-                IRCSocket ircSocket = getSocketMap().get(request.getFromId());
-                closeSocket(ircSocket);
-                return;
-            } else {
-                for (String channelName : channelNames) {
-                    getRequestQueue().add(new IRCMessage("PART " + channelName, request.getFromId(), 0));
-                }
-                getRequestQueue().add(request);
-            }
-        } else {
-            userHandler.removeUser(request.getFromId());
-            IRCSocket ircSocket = getSocketMap().get(request.getFromId());
-            closeSocket(ircSocket);
+            // Create a pseudo JOIN 0 request and handle it
+            IRCMessage join0Request = new IRCMessage("JOIN 0", request.getFromId(), request.getToId());
+            handleJoinCommand(join0Request, parseRequest(join0Request.getMessage()));
         }
+
+        userHandler.removeUser(request.getFromId());
+        IRCSocket ircSocket = getSocketMap().get(request.getFromId());
+        closeSocket(ircSocket);
+
 
     }
 
@@ -320,7 +310,9 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
         if (requestParts.get(1).equals("0")) { // todo send to all members
             Set<String> channelNames = userHandler.getJoinedChannelNames(request.getFromId());
             for (String channelName : channelNames) {
-                getRequestQueue().add(new IRCMessage("PART " + channelName, request.getFromId(), 0));
+                // Create a pseudo PART request and handle it
+                IRCMessage partRequest = new IRCMessage("PART " + channelName, request.getFromId(), 0);
+                handlePartCommand(partRequest, parseRequest(partRequest.getMessage()));
             }
             return;
         }
@@ -487,7 +479,7 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
         getSendQueue().addAll(createResponse(Response.RPL_LISTEND, request, requestParts, userHandler));
     }
 
-    private void handleWhoCommand(IRCMessage request,  List<String> requestParts) {
+    private void handleWhoCommand(IRCMessage request, List<String> requestParts) {
         getSendQueue().addAll(createResponse(Response.RPL_WHOREPLY, request, requestParts, userHandler));
         getSendQueue().addAll(createResponse(Response.RPL_ENDOFWHO, request, requestParts, userHandler));
     }
@@ -499,7 +491,7 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
                 getSendQueue().addAll(createResponse(Response.RPL_ENDOFNAMES, request, requestParts, userHandler));
                 return;
             }
-            for (String channelName :  joinedChannels){
+            for (String channelName : joinedChannels) {
                 getRequestQueue().add(new IRCMessage("NAMES " + channelName, request.getFromId(), request.getToId()));
             }
             return;
@@ -571,8 +563,6 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
     }
 
 
-
-
     private void handleFileCommand(IRCMessage request, List<String> requestParts) {
         // If user has not yet registered
         if (!userHandler.isRegistered(request.getFromId())) {
@@ -621,8 +611,6 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
     }
 
 
-
-
     private void sendToChannel(String channelName, IRCMessage request) {
         Set<User> members = userHandler.getChannelMembers(channelName).keySet();
         for (User member : members) {
@@ -631,9 +619,8 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
     }
 
 
-
     @Override
-    protected void sendMessages(IRCSocket socket) throws IOException{
+    protected void sendMessages(IRCSocket socket) throws IOException {
         socket.sendMessages();
 
         if (socket.isWriterEmpty()) {

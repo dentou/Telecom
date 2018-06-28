@@ -1,6 +1,6 @@
 package com.github.dentou.model.file;
 
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -14,7 +14,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 public class FileReceiver {
 
-    public static final int BUFFER_SIZE = 1 * IRCConstants.MB;
+    public static final int BUFFER_SIZE = 1 * ClientConstants.MB;
 
     private final SocketChannel socketChannel;
 
@@ -83,7 +83,7 @@ public class FileReceiver {
     }
 
     private long transfer() throws IOException {
-//        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), IRCConstants.TRANSFER_MAX_SIZE);
+//        long transferred = this.fileChannel.transferFrom(socketChannel, fileMetadata.getPosition(), ClientConstants.TRANSFER_MAX_SIZE);
 //        bytesReceived += transferred;
 //        this.fileMetadata.addToPosition(transferred);
 //        return transferred;

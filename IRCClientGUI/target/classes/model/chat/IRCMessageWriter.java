@@ -1,6 +1,6 @@
 package com.github.dentou.model.chat;
 
-import com.github.dentou.utils.IRCConstants;
+import com.github.dentou.utils.ClientConstants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
@@ -11,7 +11,7 @@ import java.util.Queue;
 public class IRCMessageWriter {
     private Queue<String> writeQueue = new LinkedList<String>();
     private String currentMessage = null;
-    private ByteBuffer buffer = ByteBuffer.allocate(IRCConstants.MESSAGE_BUFFER_SIZE);
+    private ByteBuffer buffer = ByteBuffer.allocate(ClientConstants.MESSAGE_BUFFER_SIZE);
     private IRCSocket ircSocket;
 
     public IRCMessageWriter(IRCSocket ircSocket) {

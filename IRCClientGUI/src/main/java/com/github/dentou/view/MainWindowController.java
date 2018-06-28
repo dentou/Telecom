@@ -7,15 +7,13 @@ import com.github.dentou.model.file.FileMetadata;
 import com.github.dentou.model.file.FileTransferClient.FileSendTask;
 import com.github.dentou.model.file.FileTransferClient.FileReceiveTask;
 
-import com.github.dentou.utils.ClientUtils;
-import com.github.dentou.utils.IRCConstants.*;
+import com.github.dentou.utils.ClientConstants.*;
 import com.github.dentou.model.chat.PrivateMessage;
 import com.github.dentou.model.chat.User;
 import com.github.dentou.utils.FXUtils;
 import com.github.dentou.view.FileTransferItem.FileTransferStatus;
 import com.github.dentou.view.FileTransferItem.FileTransferType;
 import com.jfoenix.controls.JFXTabPane;
-import com.sun.security.ntlm.Client;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -1038,6 +1036,7 @@ public class MainWindowController extends Controller<String> {
                 @Override
                 public void handle(WindowEvent event) {
                     activeChatDialog.remove(chatter);
+                    dialogStage.close();
                 }
             });
 
