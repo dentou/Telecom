@@ -27,15 +27,14 @@ public class FileTransferProcessor extends SocketProcessor<IRCSocket, IRCMessage
     }
 
 
-
     @Override
-    protected void registerNewSocket(IRCSocket newSocket) throws ClosedChannelException{
+    protected void registerNewSocket(IRCSocket newSocket) throws ClosedChannelException {
         getSocketMap().put(newSocket.getId(), newSocket);
         subscribe(newSocket, getReadSelector(), SelectionKey.OP_READ);
     }
 
     @Override
-    protected void subscribe(IRCSocket socket, Selector selector, int keyOps) throws ClosedChannelException{
+    protected void subscribe(IRCSocket socket, Selector selector, int keyOps) throws ClosedChannelException {
         SelectionKey key = socket.register(selector, keyOps);
         key.attach(socket);
     }
@@ -79,10 +78,6 @@ public class FileTransferProcessor extends SocketProcessor<IRCSocket, IRCMessage
             closeSocket(socket);
         }
     }
-
-
-
-
 
 
     private void closeProxy(FileTransferProxy proxy) throws IOException {
@@ -166,7 +161,6 @@ public class FileTransferProcessor extends SocketProcessor<IRCSocket, IRCMessage
     }
 
 
-
     private void removeKeyFromWaitingMaps(String fileKey) {
         waitingToSendMap.remove(fileKey);
         waitingToReceiveMap.remove(fileKey);
@@ -220,7 +214,7 @@ public class FileTransferProcessor extends SocketProcessor<IRCSocket, IRCMessage
 
 
     @Override
-    protected void sendMessages(IRCSocket socket) throws IOException{
+    protected void sendMessages(IRCSocket socket) throws IOException {
         socket.sendMessages();
 
         if (socket.isWriterEmpty()) {

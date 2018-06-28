@@ -1,8 +1,6 @@
 package com.github.dentou.utils;
 
-import com.github.dentou.model.constants.IRCConstants;
 import com.github.dentou.model.file.FileMetadata;
-import com.github.dentou.model.file.FileReceiver;
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
 import com.google.gson.stream.JsonReader;
@@ -12,12 +10,22 @@ import java.lang.reflect.Type;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ClientUtils {
+
+    public static String readableFileSize(long size) {
+        if(size <= 0) return "0B";
+        final String[] units = new String[] { "B", "kB", "MB", "GB", "TB", "PB", "EB"};
+        int digitGroups = (int) (Math.log10(size)/Math.log10(1024));
+        return new DecimalFormat("#,##0.#").format(size/Math.pow(1024, Math.min(digitGroups, units.length)))
+                + " " + units[digitGroups];
+    }
+
 
     public static boolean createUserDataFile(String nick) throws IOException {
 

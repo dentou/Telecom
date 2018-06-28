@@ -1,6 +1,7 @@
 package com.github.dentou.view;
 
 import com.github.dentou.model.file.FileMetadata;
+import com.github.dentou.utils.ClientUtils;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.geometry.Insets;
@@ -15,6 +16,8 @@ import javafx.scene.layout.GridPane;
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+
+import static com.github.dentou.utils.ClientUtils.readableFileSize;
 
 public class FileTransferItem {
     private final FileTransferType fileTransferType;
@@ -73,7 +76,8 @@ public class FileTransferItem {
         fileNameLabel.setText(fileMetadata.getFilePath().getFileName().toString());
         fileNameLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
-        statusLabel.setText(fileTransferStatus.toString() + ": " + fileMetadata.getPosition() + "/" + fileMetadata.getSize() + " bytes");
+        statusLabel.setText(fileTransferStatus.toString() + " " + readableFileSize(fileMetadata.getPosition()) + "/"
+                + readableFileSize(fileMetadata.getSize()));
         statusLabel.setStyle("-fx-font-size: 12;");
     }
 

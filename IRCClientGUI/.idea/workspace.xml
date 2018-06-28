@@ -58,80 +58,7 @@
     <favorites_list name="JavaFxApplication" />
   </component>
   <component name="FileEditorManager">
-    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
-      <file leaf-file-name="MainApp.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/MainApp.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1216">
-              <caret line="216" column="33" selection-start-line="216" selection-start-column="29" selection-end-line="216" selection-end-column="33" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="FileTransferClient.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileTransferClient.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="624">
-              <caret line="59" column="7" selection-start-line="59" selection-start-column="7" selection-end-line="59" selection-end-column="7" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="MainWindowController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/MainWindowController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="-5497">
-              <caret line="225" column="87" selection-start-line="225" selection-start-column="87" selection-end-line="225" selection-end-column="87" />
-              <folding>
-                <element signature="imports" expanded="true" />
-              </folding>
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="IRCConstants.java" pinned="false" current-in-tab="true">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/constants/IRCConstants.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="222">
-              <caret line="31" column="31" lean-forward="true" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="ChatDialogController.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/ChatDialogController.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="640">
-              <caret line="65" column="24" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Controller.java" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Controller.java">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="526">
-              <caret line="129" column="16" selection-start-line="129" selection-start-column="16" selection-end-line="129" selection-end-column="16" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-      <file leaf-file-name="Application.css" pinned="false" current-in-tab="false">
-        <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Application.css">
-          <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="48">
-              <caret line="3" column="32" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="32" />
-            </state>
-          </provider>
-        </entry>
-      </file>
-    </leaf>
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300" />
   </component>
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
@@ -211,7 +138,6 @@
   <component name="IdeDocumentHistory">
     <option name="CHANGED_PATHS">
       <list>
-        <option value="$PROJECT_DIR$/src/com/github/dentou/model/User.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/view/LoginDialogController.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/view/ConnectionDialogController.java" />
         <option value="$PROJECT_DIR$/src/com/github/dentou/MainApp.java" />
@@ -248,11 +174,8 @@
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/IRCSocket.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileMetadata.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/FileTransferView.css" />
-        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/FileTransferItem.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/utils/ClientUtils.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileSender.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/ConnectionDialogController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileTransferClient.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/MessageReader.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/IRCMessageReader.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/IRCMessageWriter.java" />
@@ -260,8 +183,12 @@
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileReceiver.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/MainApp.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/ChatDialogController.java" />
-        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/MainWindowController.java" />
         <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/constants/IRCConstants.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/FileTransferItem.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/view/MainWindowController.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/utils/ClientUtils.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/utils/IRCConstants.java" />
+        <option value="$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileTransferClient.java" />
       </list>
     </option>
   </component>
@@ -291,7 +218,6 @@
       <foldersAlwaysOnTop value="true" />
     </navigator>
     <panes>
-      <pane id="Scope" />
       <pane id="PackagesPane" />
       <pane id="ProjectPane">
         <subPane>
@@ -299,6 +225,11 @@
             <path>
               <item name="IRCClientGUI" type="b2602c69:ProjectViewProjectNode" />
               <item name="IRCClientGUI" type="462c0819:PsiDirectoryNode" />
+            </path>
+            <path>
+              <item name="IRCClientGUI" type="b2602c69:ProjectViewProjectNode" />
+              <item name="IRCClientGUI" type="462c0819:PsiDirectoryNode" />
+              <item name="data" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="IRCClientGUI" type="b2602c69:ProjectViewProjectNode" />
@@ -353,7 +284,7 @@
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="dentou" type="462c0819:PsiDirectoryNode" />
               <item name="model" type="462c0819:PsiDirectoryNode" />
-              <item name="constants" type="462c0819:PsiDirectoryNode" />
+              <item name="file" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="IRCClientGUI" type="b2602c69:ProjectViewProjectNode" />
@@ -362,8 +293,7 @@
               <item name="main" type="462c0819:PsiDirectoryNode" />
               <item name="java" type="462c0819:PsiDirectoryNode" />
               <item name="dentou" type="462c0819:PsiDirectoryNode" />
-              <item name="model" type="462c0819:PsiDirectoryNode" />
-              <item name="file" type="462c0819:PsiDirectoryNode" />
+              <item name="utils" type="462c0819:PsiDirectoryNode" />
             </path>
             <path>
               <item name="IRCClientGUI" type="b2602c69:ProjectViewProjectNode" />
@@ -378,6 +308,7 @@
           <select />
         </subPane>
       </pane>
+      <pane id="Scope" />
     </panes>
   </component>
   <component name="PropertiesComponent">
@@ -401,11 +332,11 @@
   </component>
   <component name="RecentsManager">
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="com.github.dentou.utils" />
       <recent name="com.github.dentou.model.constants" />
       <recent name="com.github.dentou.model.chat" />
       <recent name="com.github.dentou.model" />
       <recent name="com.github.dentou.view" />
-      <recent name="com.github.dentou.controller" />
     </key>
     <key name="CopyClassDialog.RECENTS_KEY">
       <recent name="com.github.dentou.model.file" />
@@ -597,11 +528,17 @@
       <workItem from="1529929155864" duration="1756000" />
       <workItem from="1529987252668" duration="1885000" />
       <workItem from="1529989696433" duration="530000" />
+      <workItem from="1529991174070" duration="326000" />
+      <workItem from="1530014775458" duration="4875000" />
+      <workItem from="1530065937058" duration="690000" />
+      <workItem from="1530070035849" duration="1847000" />
+      <workItem from="1530103077590" duration="1398000" />
+      <workItem from="1530178255988" duration="113000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="305774000" />
+    <option name="totallyTimeSpent" value="315023000" />
   </component>
   <component name="TodoView">
     <todo-panel id="selected-file">
@@ -614,7 +551,6 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1382" height="744" extended-state="6" />
-    <editor active="true" />
     <layout>
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32838285" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
@@ -624,54 +560,54 @@
       <window_info anchor="bottom" id="Run" order="2" sideWeight="0.49848714" weight="0.32838285" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32838285" />
       <window_info id="Designer" order="2" />
-      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.25567323" />
+      <window_info active="true" content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.27836612" />
       <window_info id="Learn" order="4" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info id="Favorites" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
       <window_info anchor="right" id="JetGradle" order="4" />
-      <window_info anchor="bottom" id="Profiler" order="7" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
       <window_info anchor="bottom" id="Application Servers" order="10" />
       <window_info anchor="right" id="Database" order="5" />
       <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
       <window_info anchor="bottom" id="Problems" order="12" />
+      <window_info anchor="bottom" id="Messages" order="14" weight="0.32838285" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
+      <window_info anchor="bottom" id="Profiler" order="7" />
       <window_info anchor="right" id="Palette" order="6" />
       <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="bottom" id="Changes" order="13" />
       <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32838285" />
-      <window_info anchor="bottom" id="Messages" order="14" weight="0.32838285" />
     </layout>
     <layout-to-restore>
       <window_info anchor="right" id="JetGradle" order="4" />
-      <window_info id="Designer" order="2" />
+      <window_info anchor="bottom" id="Profiler" order="7" />
       <window_info anchor="right" content_ui="combo" id="Hierarchy" order="2" weight="0.25" />
-      <window_info anchor="bottom" id="Application Servers" order="10" />
+      <window_info id="Favorites" order="3" side_tool="true" />
       <window_info active="true" anchor="bottom" id="Run" order="2" sideWeight="0.49848714" visible="true" weight="0.32838285" />
       <window_info anchor="bottom" id="Problems" order="12" />
+      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
       <window_info anchor="bottom" id="Messages" order="14" weight="0.32838285" />
-      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.2526475" />
+      <window_info content_ui="combo" id="Project" order="0" sideWeight="0.6703755" visible="true" weight="0.2624811" />
       <window_info id="Structure" order="1" side_tool="true" weight="0.25" />
       <window_info anchor="right" id="Commander" internal_type="SLIDING" order="0" type="SLIDING" weight="0.4" />
       <window_info anchor="right" id="Ant Build" order="1" weight="0.25" />
       <window_info anchor="bottom" id="TODO" order="6" weight="0.32838285" />
-      <window_info anchor="bottom" id="Version Control" order="11" show_stripe_button="false" />
       <window_info anchor="bottom" id="Changes" order="13" />
-      <window_info anchor="bottom" id="Profiler" order="7" />
-      <window_info id="Favorites" order="3" side_tool="true" />
+      <window_info id="Designer" order="2" />
+      <window_info anchor="right" id="Palette" order="6" />
       <window_info anchor="bottom" id="Find" order="1" weight="0.32838285" />
       <window_info anchor="right" id="Database" order="5" />
       <window_info anchor="right" id="Palette&#9;" order="3" />
-      <window_info anchor="bottom" id="Message" order="0" />
-      <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
-      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
-      <window_info anchor="bottom" id="Cvs" order="4" weight="0.25" />
-      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5015129" side_tool="true" weight="0.32838285" />
-      <window_info anchor="right" id="Palette" order="6" />
       <window_info anchor="bottom" id="Terminal" order="9" weight="0.32838285" />
+      <window_info anchor="bottom" id="Event Log" order="8" sideWeight="0.5015129" side_tool="true" weight="0.32838285" />
+      <window_info anchor="bottom" id="Inspection" order="5" weight="0.4" />
+      <window_info anchor="bottom" id="Version Control" order="11" show_stripe_button="false" />
+      <window_info anchor="bottom" id="Debug" order="3" weight="0.39933994" />
+      <window_info anchor="bottom" id="Application Servers" order="10" />
+      <window_info anchor="bottom" id="Message" order="0" />
       <window_info anchor="right" id="Maven Projects" order="7" weight="0.32980332" />
       <window_info id="Learn" order="4" />
     </layout-to-restore>
@@ -685,7 +621,7 @@
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
-      <option name="time" value="1" />
+      <option name="time" value="4" />
     </breakpoint-manager>
   </component>
   <component name="antWorkspaceConfiguration">
@@ -847,13 +783,6 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/utils/ClientUtils.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="761">
-          <caret line="97" selection-start-line="97" selection-end-line="97" />
-        </state>
-      </provider>
-    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/ChatHistoryItem.java">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="224">
@@ -865,24 +794,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="208">
           <caret line="77" column="32" selection-start-line="77" selection-start-column="32" selection-end-line="77" selection-end-column="32" />
-          <folding>
-            <element signature="e#1175#1176#0" expanded="true" />
-            <element signature="e#1245#1246#0" expanded="true" />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/IRCSocket.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="16">
-          <caret line="29" column="5" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileMetadata.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="190">
-          <caret line="56" column="31" selection-start-line="56" selection-start-column="31" selection-end-line="56" selection-end-column="31" />
         </state>
       </provider>
     </entry>
@@ -905,13 +816,6 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="80">
           <caret line="10" column="31" selection-start-line="10" selection-start-column="31" selection-end-line="10" selection-end-column="31" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/FileTransferItem.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1536">
-          <caret line="130" column="19" selection-start-line="130" selection-start-column="19" selection-end-line="130" selection-end-column="19" />
         </state>
       </provider>
     </entry>
@@ -943,20 +847,58 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileTransferClient.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/MainApp.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="624">
-          <caret line="59" column="7" selection-start-line="59" selection-start-column="7" selection-end-line="59" selection-end-column="7" />
+        <state relative-caret-position="16">
+          <caret line="216" column="33" selection-start-line="216" selection-start-column="29" selection-end-line="216" selection-end-column="33" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/chat/IRCSocket.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="-514">
+          <caret line="29" column="5" selection-start-line="29" selection-start-column="5" selection-end-line="29" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/FileTransferItem.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="359">
+          <caret line="79" column="48" selection-start-line="79" selection-start-column="48" selection-end-line="79" selection-end-column="48" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileMetadata.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="181">
+          <caret line="40" column="20" selection-start-line="40" selection-start-column="16" selection-end-line="40" selection-end-column="23" />
+        </state>
+      </provider>
+    </entry>
     <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/ChatDialogController.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="640">
-          <caret line="65" column="24" selection-start-line="65" selection-start-column="24" selection-end-line="65" selection-end-column="24" />
+        <state relative-caret-position="-370">
+          <caret line="55" selection-start-line="55" selection-end-line="55" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Application.css">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="16">
+          <caret line="3" column="32" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="32" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/MainWindowController.java">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="208">
+          <caret line="1046" selection-start-line="1046" selection-end-line="1046" />
+          <folding>
+            <element signature="imports" expanded="true" />
+          </folding>
         </state>
       </provider>
     </entry>
@@ -967,37 +909,27 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/Application.css">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/file/FileTransferClient.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="48">
-          <caret line="3" column="32" selection-start-line="3" selection-start-column="25" selection-end-line="3" selection-end-column="32" />
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/MainApp.java">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1216">
-          <caret line="216" column="33" selection-start-line="216" selection-start-column="29" selection-end-line="216" selection-end-column="33" />
+        <state relative-caret-position="478">
+          <caret line="108" column="25" selection-start-line="108" selection-start-column="25" selection-end-line="108" selection-end-column="25" />
           <folding>
             <element signature="imports" expanded="true" />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/view/MainWindowController.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/utils/IRCConstants.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="-5497">
-          <caret line="225" column="87" selection-start-line="225" selection-start-column="87" selection-end-line="225" selection-end-column="87" />
-          <folding>
-            <element signature="imports" expanded="true" />
-          </folding>
+        <state relative-caret-position="272">
+          <caret line="19" selection-start-line="19" selection-end-line="19" />
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/model/constants/IRCConstants.java">
+    <entry file="file://$PROJECT_DIR$/src/main/java/com/github/dentou/utils/ClientUtils.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="222">
-          <caret line="31" column="31" lean-forward="true" selection-start-line="31" selection-start-column="31" selection-end-line="31" selection-end-column="31" />
+        <state relative-caret-position="208">
+          <caret line="27" selection-start-line="27" selection-end-line="27" />
         </state>
       </provider>
     </entry>

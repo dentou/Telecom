@@ -4,18 +4,18 @@ import com.github.dentou.MainApp;
 import com.github.dentou.model.chat.Channel;
 import com.github.dentou.model.chat.ChatHistoryItem;
 import com.github.dentou.model.file.FileMetadata;
-import com.github.dentou.model.file.FileTransferClient;
 import com.github.dentou.model.file.FileTransferClient.FileSendTask;
 import com.github.dentou.model.file.FileTransferClient.FileReceiveTask;
 
 import com.github.dentou.utils.ClientUtils;
-import com.github.dentou.model.constants.IRCConstants.*;
+import com.github.dentou.utils.IRCConstants.*;
 import com.github.dentou.model.chat.PrivateMessage;
 import com.github.dentou.model.chat.User;
 import com.github.dentou.utils.FXUtils;
 import com.github.dentou.view.FileTransferItem.FileTransferStatus;
 import com.github.dentou.view.FileTransferItem.FileTransferType;
 import com.jfoenix.controls.JFXTabPane;
+import com.sun.security.ntlm.Client;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
 import javafx.beans.property.IntegerProperty;
@@ -27,7 +27,6 @@ import javafx.collections.ObservableList;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
-import javafx.concurrent.WorkerStateEvent;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
@@ -54,6 +53,9 @@ import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
+
+import static com.github.dentou.utils.ClientUtils.*;
+import static com.github.dentou.utils.ClientUtils.readableFileSize;
 
 
 public class MainWindowController extends Controller<String> {
@@ -326,17 +328,17 @@ public class MainWindowController extends Controller<String> {
         });
         searchField.textProperty().addListener((observable, oldValue, newValue) ->
                 filteredJoinedChannelsData.setPredicate(channel ->
-                        ClientUtils.predicate(newValue, channel.getName(), channel.getTopic())));
+                        predicate(newValue, channel.getName(), channel.getTopic())));
 
         searchField.textProperty().addListener((observable, oldValue, newValue) ->
                 filteredHistoryData.setPredicate(item ->
-                        ClientUtils.predicate(newValue, item.getChatter())));
+                        predicate(newValue, item.getChatter())));
         searchField.textProperty().addListener((observable, oldValue, newValue) ->
                 filteredChannelsData.setPredicate(channel ->
-                        ClientUtils.predicate(newValue, channel.getName(), channel.getTopic())));
+                        predicate(newValue, channel.getName(), channel.getTopic())));
         searchField.textProperty().addListener((observable, oldValue, newValue) ->
                 filteredUsersData.setPredicate(user ->
-                        ClientUtils.predicate(newValue, user.getNick(), user.getUserName(), user.getFullName())));
+                        predicate(newValue, user.getNick(), user.getUserName(), user.getFullName())));
 
         // Wrap the FilteredList in a SortedList.
         SortedList<Channel> sortedJoinedChannelsData = new SortedList<>(filteredJoinedChannelsData);
@@ -368,7 +370,7 @@ public class MainWindowController extends Controller<String> {
         nickLabel.setText(user.getNick());
 
         try {
-            List<FileMetadata> fileMetadataList = ClientUtils.loadUserData(user.getNick());
+            List<FileMetadata> fileMetadataList = loadUserData(user.getNick());
             for (FileMetadata fileMetadata : fileMetadataList) {
                 this.fileReceiveMap.put(fileMetadata.getFilePath().getFileName().toString(), fileMetadata);
             }
@@ -580,9 +582,9 @@ public class MainWindowController extends Controller<String> {
 
     @Override
     public void processMessage(String message) {
-        List<String> messageParts = ClientUtils.parseMessage(message);
+        List<String> messageParts = parseMessage(message);
         System.out.println(messageParts);
-        String sender = ClientUtils.parseSender(messageParts.get(0));
+        String sender = parseSender(messageParts.get(0));
         String content = messageParts.get(messageParts.size() - 1);
         if (sender.equals("server")) { // Message is server's response
             // todo check for all responses
@@ -776,7 +778,7 @@ public class MainWindowController extends Controller<String> {
         boolean yes = getMainApp().showConfirmationDialog("File Transfer Confirmation",
                 "User " + sender + " wants to send you a file. Would you like to receive?",
                 "File Name: " + fileName + "\n" +
-                        "File size: " + fileSize + "bytes\n");
+                        "File size: " + readableFileSize(fileSize) + "\n");
 
         if (!yes) {
             getMainApp().getIrcClient().sendToServer("FILE_DENY", " ", sender, " ", "" + fileSize, " ", ":" + fileName);
@@ -824,7 +826,7 @@ public class MainWindowController extends Controller<String> {
         // Save file metadata
         try {
             List<FileMetadata> fileMetadataList = new ArrayList<>(this.fileReceiveMap.values());
-            ClientUtils.saveUserData(getMainApp().getUser().getNick(), fileMetadataList);
+            saveUserData(getMainApp().getUser().getNick(), fileMetadataList);
         } catch (IOException e) {
             getMainApp().showExceptionDialog("File Saving Error",
                     "Cannot save user metadata (interrupted transfers can't be resumed)", null, e);
@@ -885,7 +887,7 @@ public class MainWindowController extends Controller<String> {
             transferCount.set(transferCount.get() - 1);
             Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.INFORMATION, "File Transfer", "Transfer succeeded",
                     "File: " + fileMetadata.getFilePath() + "\n" +
-                            "Size: " + fileMetadata.getSize() + "\n" +
+                            "Size: " + readableFileSize(fileMetadata.getSize()) + "\n" +
                             "From: " + fileMetadata.getSender() + "\n" +
                             "To: " + fileMetadata.getReceiver() + "\n"));
             if (fileTransferType == FileTransferType.SEND) {
@@ -893,10 +895,10 @@ public class MainWindowController extends Controller<String> {
             } else if (fileTransferType == FileTransferType.RECEIVE) {
                 fileReceiveMap.remove(fileMetadata.getFilePath().getFileName().toString());
                 try {
-                    ClientUtils.emptyUserData(getMainApp().getUser().getNick());
+                    emptyUserData(getMainApp().getUser().getNick());
                     if (!fileReceiveMap.isEmpty()) {
                         List<FileMetadata> fileMetadataList = new ArrayList<>(this.fileReceiveMap.values());
-                        ClientUtils.saveUserData(getMainApp().getUser().getNick(), fileMetadataList);
+                        saveUserData(getMainApp().getUser().getNick(), fileMetadataList);
                     }
                 } catch (IOException e) {
                     getMainApp().showExceptionDialog("File Saving Error",
@@ -912,7 +914,7 @@ public class MainWindowController extends Controller<String> {
             transferCount.set(transferCount.get() - 1);
             Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.ERROR, "File Transfer", "Transfer failed",
                     "File: " + fileMetadata.getFilePath() + "\n" +
-                            "Size: " + fileMetadata.getSize() + "\n" +
+                            "Size: " + readableFileSize(fileMetadata.getSize()) + "\n" +
                             "From: " + fileMetadata.getSender() + "\n" +
                             "To: " + fileMetadata.getReceiver() + "\n"));
         });
@@ -923,7 +925,7 @@ public class MainWindowController extends Controller<String> {
             transferCount.set(transferCount.get() - 1);
             Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.INFORMATION, "File Transfer", "Transfer cancelled",
                     "File: " + fileMetadata.getFilePath() + "\n" +
-                            "Size: " + fileMetadata.getSize() + "\n" +
+                            "Size: " + readableFileSize(fileMetadata.getSize()) + "\n" +
                             "From: " + fileMetadata.getSender() + "\n" +
                             "To: " + fileMetadata.getReceiver() + "\n"));
 
@@ -1042,7 +1044,6 @@ public class MainWindowController extends Controller<String> {
 
             // Show the dialog
             dialogStage.show();
-            dialogStage.requestFocus();
             dialogStage.toFront();
 
             return controller;

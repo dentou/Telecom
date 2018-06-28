@@ -1,4 +1,4 @@
-package com.github.dentou.model.constants;
+package com.github.dentou.utils;
 
 import java.io.File;
 import java.util.HashMap;
@@ -16,6 +16,7 @@ public class IRCConstants {
     public static final int MB = 1024 * KB;
 
     public static final int MESSAGE_BUFFER_SIZE = 10 * KB; // bytes
+
 
     public static final long TRANSFER_MAX_SIZE = 1 * MB; // per transfer turn
 

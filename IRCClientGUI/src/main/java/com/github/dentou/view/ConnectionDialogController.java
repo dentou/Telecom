@@ -2,7 +2,7 @@ package com.github.dentou.view;
 
 
 import com.github.dentou.model.chat.IRCClient;
-import com.github.dentou.model.constants.IRCConstants;
+import com.github.dentou.utils.IRCConstants;
 import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.utils.FXUtils;
 import javafx.fxml.FXML;

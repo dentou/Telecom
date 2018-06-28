@@ -1,6 +1,6 @@
 package com.github.dentou.model.file;
 
-import com.github.dentou.model.constants.IRCConstants;
+import com.github.dentou.utils.IRCConstants;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
