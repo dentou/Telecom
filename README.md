@@ -5,7 +5,7 @@ Project for Fundamentals of Telecommunication course @ Vietnamese-German Univers
 [IRCServer](https://github.com/dentou/IRCServer/tree/aa0082f01279c5cae5e2138e16fd52bd8c11d8a0)\
 [IRCClient](https://github.com/dentou/IRCClient/tree/a4dd358c9c10c91f23ed54d3afde76cba52fc193)\
 [IRCClientGUI](https://github.com/dentou/IRCClientGUI/tree/dd616c35ae93c4fdab254966af73c9d01e5ca043)\
-[Protocol Descriptions](https://github.com/dentou/Telecom/blob/master/IRCServer/README.md)
+[Protocol Descriptions](https://github.com/dentou/Telecom/blob/master/docs/ProtocolDescriptions.md)
 
 # Installation instructions
 1. Install [Maven](https://maven.apache.org/guides/).
