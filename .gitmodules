@@ -1,3 +1,6 @@
 [submodule "IRCServer"]
 	path = IRCServer
 	url = https://github.com/dentou/IRCServer
+[submodule "IRCClientGUI"]
+	path = IRCClientGUI
+	url = https://github.com/dentou/IRCClientGUI
