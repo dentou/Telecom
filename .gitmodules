@@ -4,3 +4,6 @@
 [submodule "IRCClientGUI"]
 	path = IRCClientGUI
 	url = https://github.com/dentou/IRCClientGUI
+[submodule "IRCClient"]
+	path = IRCClient
+	url = https://github.com/dentou/IRCClient
