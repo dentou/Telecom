@@ -18,7 +18,6 @@
             <groupId>de.jensd</groupId>
             <artifactId>fontawesomefx</artifactId>
             <version>8.9</version>
-            <!--<systemPath>${project.basedir}/src/main/resources/fontawesomefx-8.9.jar</systemPath>-->
         </dependency>
         <dependency>
             <groupId>org.controlsfx</groupId>
@@ -30,6 +29,7 @@
             <artifactId>commons-lang3</artifactId>
             <version>3.7</version>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/commons-io/commons-io -->
         <dependency>
             <groupId>commons-io</groupId>
             <artifactId>commons-io</artifactId>

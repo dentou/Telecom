@@ -3,7 +3,6 @@ package com.github.dentou.model.file;
 import com.github.dentou.MainApp;
 import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.utils.ClientConstants;
-import com.sun.security.ntlm.Client;
 import javafx.concurrent.Task;
 import org.apache.commons.lang3.StringUtils;
 
