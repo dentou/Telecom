@@ -1,0 +1,3 @@
+[submodule "IRCServer"]
+	path = IRCServer
+	url = https://github.com/dentou/IRCServer
