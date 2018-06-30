@@ -10,6 +10,9 @@ Project for Fundamentals of Telecommunication course @ Vietnamese-German Univers
 # Installation instructions
 1. Install [Maven](https://maven.apache.org/guides/).
 2. Clone this project.
+```
+git clone --recurse-submodules https://github.com/dentou/Telecom
+```
 3. Open command prompt/terminal and change directory to the module you want to run (IRCServer, IRCClient or IRCClientGUI).
 
 In Windows
