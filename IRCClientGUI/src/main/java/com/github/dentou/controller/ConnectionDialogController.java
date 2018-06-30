@@ -1,10 +1,11 @@
-package com.github.dentou.view;
+package com.github.dentou.controller;
 
 
 import com.github.dentou.model.chat.IRCClient;
 import com.github.dentou.utils.ClientConstants;
 import com.github.dentou.model.chat.IRCSocket;
 import com.github.dentou.utils.FXUtils;
+import com.github.dentou.view.WorkIndicatorDialog;
 import javafx.fxml.FXML;
 import javafx.scene.control.Button;
 import javafx.scene.control.MenuButton;
@@ -15,6 +16,7 @@ import javafx.scene.control.Alert.AlertType;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.channels.SocketChannel;
+import java.util.function.Function;
 import java.util.regex.Pattern;
 
 public class ConnectionDialogController extends Controller<String>{
@@ -96,17 +98,19 @@ public class ConnectionDialogController extends Controller<String>{
 
         });
 
-        wd.execute(inetAddress, inputParam -> {
-            try {
-                disableAll();
-                SocketChannel channel = SocketChannel.open(inetAddress);
-                channel.configureBlocking(false);
-                return channel;
-            } catch (IOException e) {
-                //e.printStackTrace();
-                return null;
+        wd.execute(inetAddress, new Function<InetSocketAddress, SocketChannel>() {
+            @Override
+            public SocketChannel apply(InetSocketAddress inetSocketAddress) {
+                try {
+                    disableAll();
+                    SocketChannel channel = SocketChannel.open(inetSocketAddress);
+                    channel.configureBlocking(false);
+                    return channel;
+                } catch (IOException e) {
+                    //e.printStackTrace();
+                    return null;
+                }
             }
-
         });
     }
 

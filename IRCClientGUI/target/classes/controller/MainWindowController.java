@@ -1,4 +1,4 @@
-package com.github.dentou.view;
+package com.github.dentou.controller;
 
 import com.github.dentou.MainApp;
 import com.github.dentou.model.chat.Channel;
@@ -11,8 +11,10 @@ import com.github.dentou.utils.ClientConstants.*;
 import com.github.dentou.model.chat.PrivateMessage;
 import com.github.dentou.model.chat.User;
 import com.github.dentou.utils.FXUtils;
+import com.github.dentou.view.FileTransferItem;
 import com.github.dentou.view.FileTransferItem.FileTransferStatus;
 import com.github.dentou.view.FileTransferItem.FileTransferType;
+import com.github.dentou.view.WorkIndicatorDialog;
 import com.jfoenix.controls.JFXTabPane;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.application.Platform;
@@ -38,6 +40,9 @@ import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.*;
 import javafx.scene.control.Alert.AlertType;
+import javafx.stage.FileChooser.ExtensionFilter;
+import org.apache.commons.io.FilenameUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.controlsfx.control.PopOver;
 import org.controlsfx.control.TaskProgressView;
 
@@ -50,11 +55,11 @@ import java.nio.file.Paths;
 import java.time.LocalDateTime;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.function.Predicate;
 
 import static com.github.dentou.utils.ClientUtils.*;
 import static com.github.dentou.utils.ClientUtils.readableFileSize;
-
 
 public class MainWindowController extends Controller<String> {
 
@@ -260,7 +265,7 @@ public class MainWindowController extends Controller<String> {
         fileTransferView.getChildren().add(tabPane);
 
         //AnchorPane anchorPane = new AnchorPane(tabPane);
-        fileTransferView.getStylesheets().add("view/FileTransferView.css");
+        fileTransferView.getStylesheets().add("/style/FileTransferView.css");
         fileTransferView.setPrefWidth(viewWidth);
         fileTransferView.setPrefHeight(viewHeight);
         fileTransferView.setLeftAnchor(tabPane, 0d);
@@ -367,21 +372,61 @@ public class MainWindowController extends Controller<String> {
         setTitle("IRCClient: " + user.getNick());
         nickLabel.setText(user.getNick());
 
-        try {
-            List<FileMetadata> fileMetadataList = loadUserData(user.getNick());
-            for (FileMetadata fileMetadata : fileMetadataList) {
-                this.fileReceiveMap.put(fileMetadata.getFilePath().getFileName().toString(), fileMetadata);
+//        try {
+//            List<FileMetadata> fileMetadataList = loadUserData(user.getNick());
+//            for (FileMetadata fileMetadata : fileMetadataList) {
+//                this.fileReceiveMap.put(fileMetadata.getFilePath().getFileName().toString(), fileMetadata);
+//            }
+//        } catch (IOException e) {
+//            getMainApp().showExceptionDialog("File Loading Error",
+//                    "Cannot load user metadata (interrupted downloads cannot be resumed)", null, e);
+//        }
+        WorkIndicatorDialog<String, List<FileMetadata>> wd = new WorkIndicatorDialog<>(getMainApp().getPrimaryStage(),
+                "Loading user data");
+
+        wd.addTaskEndNotification(fileMetadataList -> {
+            if (Objects.isNull(fileMetadataList)) {
+                getMainApp().showAlertDialog(AlertType.ERROR,
+                        "File Loading Error",
+                        "Cannot load user metadata (interrupted downloads cannot be resumed)",
+                        null);
+                return;
             }
-        } catch (IOException e) {
-            getMainApp().showExceptionDialog("File Loading Error",
-                    "Cannot load user metadata (interrupted downloads cannot be resumed)", null, e);
-        }
+            for (FileMetadata fileMetadata : fileMetadataList) {
+                File file = fileMetadata.getFilePath().toFile();
+                FileMetadata updated = new FileMetadata(fileMetadata.getFilePath(), fileMetadata.getSize(),
+                        file.length(), fileMetadata.getSender(), fileMetadata.getReceiver());
+                fileReceiveMap.put(updated.getFilePath().getFileName().toString(), updated);
+
+                FileTransferItem fileTransferItem = new FileTransferItem(FileTransferType.RECEIVE,
+                        updated, updated.done() ? FileTransferStatus.SUCCEEDED : FileTransferStatus.FAILED, getMainApp());
+                fileFinishedVBox.getChildren().add(fileTransferItem.getGUINode());
+            }
+            if (!fileMetadataList.isEmpty()) {
+                getMainApp().showAlertDialog(AlertType.ERROR, "File transfer error",
+                        "Your file transfer didn't finish correctly",
+                        "Please review by clicking the number on bottom right corner");
+                transferCount.setValue(fileMetadataList.size());
+            }
+        });
+
+        wd.execute(user.getNick(), new Function<String, List<FileMetadata>>() {
+            @Override
+            public List<FileMetadata> apply(String nick) {
+                try {
+                    List<FileMetadata> fileMetadataList = loadUserData(nick);
+                    return fileMetadataList;
+                } catch (IOException e) {
+                    return null;
+                }
+            }
+        });
+
 
 
         progressBar.setProgress(0);
 
         onRefresh();
-
     }
 
 
@@ -446,7 +491,9 @@ public class MainWindowController extends Controller<String> {
     @FXML
     private void onLogout() {
         // Confirm
-        boolean yes = getMainApp().showConfirmationDialog("Logout Confirmation", "Are you sure want to log out?", null);
+        boolean yes = getMainApp().showConfirmationDialog("Logout Confirmation",
+                "Are you sure want to log out?",
+                "You will need to register again");
         if (!yes) {
             return;
         }
@@ -859,20 +906,126 @@ public class MainWindowController extends Controller<String> {
     private void processFILE_DENY(String denier, List<String> messageParts) {
         getMainApp().showAlertDialog(AlertType.ERROR, "File Transfer Error", "File Transfer Error",
                 "Your transfer request has been denied by " + denier);
-        this.fileSendMap.remove(messageParts.get(3));
+        this.fileSendMap.remove(messageParts.get(4));
     }
 
 
     private void processFILE_RESUME(String requester, List<String> messageParts) {
         // todo
+        String fileName = messageParts.get(5);
+        long position = Long.parseLong(messageParts.get(4));
+        long fileSize = Long.parseLong(messageParts.get(3));
+
+        // User confirm resume request
+        boolean yes = getMainApp().showConfirmationDialog("File Transfer Confirmation",
+                "User " + requester + " wants you to resend a file",
+                "File Name: " + fileName + "\n" +
+                        "File size: " + readableFileSize(fileSize) + "\n" +
+                        "Remaining to send: " + readableFileSize(fileSize - position));
+        if (!yes) {
+            yes = getMainApp().showConfirmationDialog("File Transfer Confirmation",
+                    "You chose to cancel their request", "Are you sure?");
+        }
+
+        if (!yes) {
+            getMainApp().getIrcClient().sendToServer("FILE_RESUME_DENY", " ",
+                    requester, " ",
+                    "" + fileSize, " ",
+                    "" + position, " ",
+                    ":" + fileName);
+            return;
+        }
+
+        // Get file extension from file name
+        // todo
+        String extension = FilenameUtils.getExtension(fileName);
+
+        // User choose file to resend (only the requested file is valid
+        File selectedFile = null;
+        while (true) {
+            FileChooser fileChooser = new FileChooser();
+            fileChooser.setTitle("Open file to resend");
+            if (StringUtils.isNotEmpty(extension)) {
+                fileChooser.getExtensionFilters().add(new ExtensionFilter("Requested file", "*." + extension));
+            }
+            fileChooser.setInitialDirectory(new File("."));
+
+            selectedFile = fileChooser.showOpenDialog(getMainApp().getPrimaryStage());
+            if (selectedFile == null) {
+                break;
+            }
+
+            if (fileName.equals(selectedFile.getName().toString())) {
+                break;
+            }
+
+            boolean continued = getMainApp().showConfirmationDialog("You selected the wrong file.",
+                    "Do you want to select again?", null);
+            if (!continued) {
+                break;
+            }
+        }
+
+        // If no file selected
+        if (Objects.isNull(selectedFile)) {
+            getMainApp().getIrcClient().sendToServer("FILE_RESUME_DENY", " ",
+                    requester, " ",
+                    "" + fileSize, " ",
+                    "" + position, " ",
+                    ":" + fileName);
+            return;
+        }
+
+        // Accept chosen file
+        System.out.println("File selected for send: " + selectedFile.getAbsolutePath() + ", size in bytes: " + fileSize);
+        FileMetadata fileMetadata = new FileMetadata(Paths.get(selectedFile.getAbsolutePath()),
+                fileSize, position, getMainApp().getUser().getNick(), requester);
+        this.addFileSend(fileMetadata);
+
+        getMainApp().getIrcClient().sendToServer("FILE_RESEND", " ",
+                requester, " ",
+                "" + fileSize, " ",
+                "" + position, " ",
+                ":", fileName);
+
+        // Open file send task
+        FileSendTask task = getMainApp().getFileTransferClient().sendFile(fileMetadata, getMainApp().getUser().getNick(), requester);
+
+        setupTransferTask(FileTransferType.SEND, fileMetadata, task);
+
+        fileProgressView.getTasks().add(task);
+        transferCount.setValue(transferCount.getValue() + 1);
+        onTransferCountLabelClicked();
+
     }
 
-    private void processFILE_RESEND(String recipient, List<String> messageParts) {
+    private void processFILE_RESEND(String sender, List<String> messageParts) {
         // todo
+        String fileName = messageParts.get(5);
+        FileMetadata fileMetadata = fileReceiveMap.get(fileName);
+
+        if (fileMetadata == null) {
+            System.out.println("File metadata not exist:" + messageParts);
+            return;
+        }
+
+        // Setup file receiver task
+        FileReceiveTask task = getMainApp().getFileTransferClient().receiveFile(fileMetadata, sender, getMainApp().getUser().getNick());
+
+        setupTransferTask(FileTransferType.RECEIVE, fileMetadata, task);
+
+        fileProgressView.getTasks().add(task);
+        transferCount.setValue(transferCount.getValue() + 1);
+        onTransferCountLabelClicked();
+
     }
 
-    private void processFILE_RESUME_DENY(String recipient, List<String> messageParts) {
+    private void processFILE_RESUME_DENY(String denier, List<String> messageParts) {
         // todo
+        getMainApp().showAlertDialog(AlertType.ERROR, "File Transfer Error", "File Transfer Error",
+                "Your resume request has been denied by " + denier);
+        String fileName = messageParts.get(5);
+        this.fileReceiveMap.remove(fileName);
     }
 
     /**
@@ -880,10 +1033,13 @@ public class MainWindowController extends Controller<String> {
      */
     private void setupTransferTask(FileTransferType fileTransferType, FileMetadata fileMetadata, Task task) {
         task.setOnSucceeded(event -> {
-            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata, FileTransferStatus.SUCCEEDED);
+            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata,
+                    FileTransferStatus.SUCCEEDED, getMainApp());
             fileFinishedVBox.getChildren().add(fileTransferItem.getGUINode());
             transferCount.set(transferCount.get() - 1);
-            Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.INFORMATION, "File Transfer", "Transfer succeeded",
+            Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.INFORMATION,
+                    "File Transfer",
+                    "Transfer succeeded",
                     "File: " + fileMetadata.getFilePath() + "\n" +
                             "Size: " + readableFileSize(fileMetadata.getSize()) + "\n" +
                             "From: " + fileMetadata.getSender() + "\n" +
@@ -907,7 +1063,7 @@ public class MainWindowController extends Controller<String> {
         });
 
         task.setOnFailed(event -> {
-            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata, FileTransferStatus.FAILED);
+            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata, FileTransferStatus.FAILED, getMainApp());
             fileFinishedVBox.getChildren().add(fileTransferItem.getGUINode());
             transferCount.set(transferCount.get() - 1);
             Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.ERROR, "File Transfer", "Transfer failed",
@@ -918,7 +1074,7 @@ public class MainWindowController extends Controller<String> {
         });
 
         task.setOnCancelled(event -> {
-            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata, FileTransferStatus.CANCELLED);
+            FileTransferItem fileTransferItem = new FileTransferItem(fileTransferType, fileMetadata, FileTransferStatus.CANCELLED, getMainApp());
             fileFinishedVBox.getChildren().add(fileTransferItem.getGUINode());
             transferCount.set(transferCount.get() - 1);
             Platform.runLater(() -> getMainApp().showAlertDialog(AlertType.INFORMATION, "File Transfer", "Transfer cancelled",

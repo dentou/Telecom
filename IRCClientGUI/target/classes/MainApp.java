@@ -3,7 +3,7 @@ package com.github.dentou;
 import com.github.dentou.model.chat.IRCClient;
 import com.github.dentou.model.chat.User;
 import com.github.dentou.model.file.FileTransferClient;
-import com.github.dentou.view.Controller;
+import com.github.dentou.controller.Controller;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.event.EventHandler;

@@ -1,5 +1,6 @@
 package com.github.dentou.view;
 
+import com.github.dentou.MainApp;
 import com.github.dentou.model.file.FileMetadata;
 import com.github.dentou.utils.ClientUtils;
 import javafx.event.ActionEvent;
@@ -12,25 +13,32 @@ import javafx.scene.control.MenuItem;
 import javafx.scene.input.ContextMenuEvent;
 import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.GridPane;
+import org.apache.commons.lang3.StringUtils;
 
 import java.awt.*;
 import java.io.File;
 import java.io.IOException;
+import java.util.Objects;
 
 import static com.github.dentou.utils.ClientUtils.readableFileSize;
 
 public class FileTransferItem {
+
+    private final MainApp mainApp;
+
     private final FileTransferType fileTransferType;
     private final FileMetadata fileMetadata;
+
+    private final File file;
 
     private final FileTransferStatus fileTransferStatus;
 
 
     private final Label fileNameLabel = new Label();
+    private final Label errorLabel = new Label();
     private final Label statusLabel = new Label();
 
     private final GridPane gridPane = new GridPane();
-
 
 
     public enum FileTransferType {
@@ -54,10 +62,13 @@ public class FileTransferItem {
         }
     }
 
-    public FileTransferItem(FileTransferType fileTransferType, FileMetadata fileMetadata, FileTransferStatus fileTransferStatus) {
+    public FileTransferItem(FileTransferType fileTransferType, FileMetadata fileMetadata, FileTransferStatus fileTransferStatus, MainApp mainApp) {
         this.fileTransferType = fileTransferType;
         this.fileMetadata = fileMetadata;
         this.fileTransferStatus = fileTransferStatus;
+        this.mainApp = mainApp;
+
+        this.file = fileMetadata.getFilePath().toFile();
 
         initializeLabels();
         initializeGridPane();
@@ -73,12 +84,24 @@ public class FileTransferItem {
     }
 
     private void initializeLabels() {
-        fileNameLabel.setText(fileMetadata.getFilePath().getFileName().toString());
+        String sendOrReceive = "";
+        if (fileTransferType == FileTransferType.SEND) {
+            sendOrReceive += " - to " + fileMetadata.getReceiver();
+        } else {
+            sendOrReceive += " - from " + fileMetadata.getSender();
+        }
+        fileNameLabel.setText(fileMetadata.getFilePath().getFileName().toString() + sendOrReceive);
         fileNameLabel.setStyle("-fx-font-size: 14; -fx-font-weight: bold;");
 
         statusLabel.setText(fileTransferStatus.toString() + " " + readableFileSize(fileMetadata.getPosition()) + "/"
                 + readableFileSize(fileMetadata.getSize()));
         statusLabel.setStyle("-fx-font-size: 12;");
+
+        errorLabel.setStyle("-fx-text-fill: red;");
+        if (!file.exists()) {
+            errorLabel.setText("File has been moved to other directory");
+        }
+
     }
 
     private void initializeGridPane() {
@@ -104,6 +127,12 @@ public class FileTransferItem {
 
         gridPane.add(fileNameLabel, 0, 0);
         gridPane.add(statusLabel, 0, 1);
+
+        if (StringUtils.isNotEmpty(errorLabel.getText())) {
+            gridPane.add(errorLabel, 0, 2);
+            gridPane.setColumnSpan(errorLabel, GridPane.REMAINING);
+        }
+
     }
 
     private void initializeContextMenu() {
@@ -111,17 +140,27 @@ public class FileTransferItem {
         MenuItem openFileLocation = new MenuItem("Open file location");
         MenuItem resume = new MenuItem("Resume");
 
-        if (fileTransferType == FileTransferType.SEND) {
+        if (!file.exists()) {
+            openFileLocation.setDisable(true);
             resume.setDisable(true);
         } else {
-            resume.setDisable(fileTransferStatus == FileTransferStatus.SUCCEEDED);
+            if (fileTransferType == FileTransferType.SEND) {
+                resume.setDisable(true);
+            } else {
+                resume.setDisable(fileTransferStatus == FileTransferStatus.SUCCEEDED);
+            }
         }
+
 
         openFileLocation.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
                 try {
-                    Desktop.getDesktop().open(fileMetadata.getFilePath().getParent().toFile());
+                    if (!file.exists()) {
+                        openFileLocation.setDisable(true);
+                        resume.setDisable(true);
+                    }
+                    Desktop.getDesktop().open(file);
                 } catch (IOException e) {
                     e.printStackTrace();
                     // todo show error dialog
@@ -132,7 +171,19 @@ public class FileTransferItem {
         resume.setOnAction(new EventHandler<ActionEvent>() {
             @Override
             public void handle(ActionEvent event) {
+                if (!file.exists()) {
+                    openFileLocation.setDisable(true);
+                    resume.setDisable(true);
+                }
                 // todo
+                if (!Objects.isNull(mainApp)) {
+                    mainApp.getIrcClient().sendToServer("FILE_RESUME", " ",
+                            fileMetadata.getSender(), " ",
+                            "" + fileMetadata.getSize(), " ",
+                            "" + fileMetadata.getPosition(), " ",
+                            ":" + fileMetadata.getFilePath().getFileName());
+
+                }
             }
         });
 

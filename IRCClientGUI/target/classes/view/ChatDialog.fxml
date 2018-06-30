@@ -10,7 +10,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<VBox fx:id="root" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ChatDialogController">
+<VBox fx:id="root" prefHeight="500.0" prefWidth="400.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.controller.ChatDialogController">
    <children>
       <VBox>
          <children>
@@ -71,7 +71,7 @@
       </HBox>
    </children>
    <stylesheets>
-      <URL value="@Application.css" />
-      <URL value="@ChatDialog.css" />
+      <URL value="@../style/Application.css" />
+      <URL value="@../style/ChatDialog.css" />
    </stylesheets>
 </VBox>

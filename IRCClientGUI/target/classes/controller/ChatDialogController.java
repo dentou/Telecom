@@ -1,4 +1,4 @@
-package com.github.dentou.view;
+package com.github.dentou.controller;
 
 import com.github.dentou.model.chat.PrivateMessage;
 import com.github.dentou.model.file.FileMetadata;
@@ -6,7 +6,6 @@ import com.github.dentou.utils.FXUtils;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;
 import javafx.event.EventHandler;
 import javafx.fxml.FXML;
-import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.Node;
 import javafx.scene.control.*;
@@ -136,11 +135,11 @@ public class ChatDialogController extends Controller<PrivateMessage>{
 
         FileChooser fileChooser = new FileChooser();
         fileChooser.setTitle("Open File for transfer");
-        fileChooser.getExtensionFilters().addAll(
-                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
-                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
-                new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.aac"),
-                new FileChooser.ExtensionFilter("All Files", "*.*"));
+//        fileChooser.getExtensionFilters().addAll(
+//                new FileChooser.ExtensionFilter("Text Files", "*.txt"),
+//                new FileChooser.ExtensionFilter("Image Files", "*.png", "*.jpg", "*.gif"),
+//                new FileChooser.ExtensionFilter("Audio Files", "*.wav", "*.mp3", "*.aac"),
+//                new FileChooser.ExtensionFilter("All Files", "*.*"));
         fileChooser.setInitialDirectory(new File("."));
 
         File selectedFile = fileChooser.showOpenDialog(chatStage);

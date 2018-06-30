@@ -14,7 +14,7 @@
 <?import javafx.scene.text.Font?>
 <?import org.controlsfx.control.textfield.CustomTextField?>
 
-<VBox fx:id="root" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.view.ChannelDialogController">
+<VBox fx:id="root" prefWidth="640.0" xmlns="http://javafx.com/javafx/8.0.141" xmlns:fx="http://javafx.com/fxml/1" fx:controller="com.github.dentou.controller.ChannelDialogController">
    <children>
       <HBox style="-fx-background-color: primary-dark-color;">
          <children>
@@ -90,7 +90,7 @@
                            <font>
                               <Font name="System Bold" size="14.0" />
                            </font></Label>
-                        <Label fx:id="channelTopicLabel" style="-fx-font-size: 14; -fx-text-fill: #4A6572;" text="Topic" />
+                        <Label fx:id="channelTopicLabel" style="-fx-font-size: 14; -fx-font-style: italic; -fx-text-fill: #4A6572;" text="Topic" />
                      </children>
                      <VBox.margin>
                         <Insets bottom="10.0" top="10.0" />
@@ -133,7 +133,7 @@
       </HBox>
    </children>
    <stylesheets>
-      <URL value="@Application.css" />
-      <URL value="@ChatDialog.css" />
+      <URL value="@../style/Application.css" />
+      <URL value="@../style/ChatDialog.css" />
    </stylesheets>
 </VBox>

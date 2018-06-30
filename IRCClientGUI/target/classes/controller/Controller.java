@@ -1,4 +1,4 @@
-package com.github.dentou.view;
+package com.github.dentou.controller;
 
 import com.github.dentou.MainApp;
 import de.jensd.fx.glyphs.fontawesome.FontAwesomeIconView;

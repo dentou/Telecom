@@ -1,4 +1,4 @@
-package com.github.dentou.view;
+package com.github.dentou.controller;
 
 import com.github.dentou.model.chat.Channel;
 import com.github.dentou.utils.FXUtils;
