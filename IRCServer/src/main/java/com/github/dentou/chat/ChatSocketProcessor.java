@@ -57,6 +57,7 @@ public class ChatSocketProcessor extends SocketProcessor<IRCSocket, IRCMessage> 
         }
         System.out.println("Socket closed: " + socket.getId());
         getSocketMap().remove(socket.getId());
+        this.userHandler.removeUserFromAllChannels(socket.getId());
         this.userHandler.removeUser(socket.getId()); // todo check this new adds
         unsubscribe(socket, getReadSelector());
         socket.getSocketChannel().close();

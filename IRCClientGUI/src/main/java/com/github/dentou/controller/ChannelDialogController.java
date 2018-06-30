@@ -3,6 +3,8 @@ package com.github.dentou.controller;
 import com.github.dentou.model.chat.Channel;
 import com.github.dentou.utils.FXUtils;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
+import javafx.collections.SetChangeListener;
 import javafx.fxml.FXML;
 import javafx.scene.control.*;
 
@@ -50,9 +52,20 @@ public class ChannelDialogController extends ChatDialogController {
         FXUtils.setDisabled(false, leaveButton);
     }
 
-    public synchronized void setChannel(Channel channel, ObservableList<String> memberList) {
+    public synchronized void setChannel(Channel channel, ObservableSet<String> memberSet) {
         this.channel = channel;
-        this.channelListView.setItems(memberList);
+
+        channelListView.getItems().addAll(memberSet);
+
+        memberSet.addListener((SetChangeListener.Change<? extends String> c) -> {
+            if (c.wasAdded()) {
+                channelListView.getItems().add(c.getElementAdded());
+            }
+            if (c.wasRemoved()) {
+                channelListView.getItems().remove(c.getElementRemoved());
+            }
+        });
+
         channelNameLabel.setText(channel.getName());
         channelTopicLabel.setText(channel.getTopic());
     }

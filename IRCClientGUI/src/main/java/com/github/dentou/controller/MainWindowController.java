@@ -24,6 +24,7 @@ import javafx.beans.value.ChangeListener;
 import javafx.beans.value.ObservableValue;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
+import javafx.collections.ObservableSet;
 import javafx.collections.transformation.FilteredList;
 import javafx.collections.transformation.SortedList;
 import javafx.concurrent.Task;
@@ -150,9 +151,9 @@ public class MainWindowController extends Controller<String> {
     private Map<Tab, TableView> tabTableMap = new HashMap<>();
 
     private Map<String, Channel> allChannelsMap = new HashMap<>();
-    private Map<String, ObservableList<String>> channelMembersMap = new HashMap<>();
-    private Map<String, ChatHistoryItem> chatHistoryMap = new HashMap<String, ChatHistoryItem>();
-    private Map<String, ChatDialogController> activeChatDialog = new HashMap<String, ChatDialogController>();
+    private Map<String, ObservableSet<String>> channelMembersMap = new ConcurrentHashMap<>();
+    private Map<String, ChatHistoryItem> chatHistoryMap = new ConcurrentHashMap<>();
+    private Map<String, ChatDialogController> activeChatDialog = new ConcurrentHashMap<>();
 
     private boolean waitingForList = false;
     private boolean waitingForWho = false;
@@ -752,16 +753,14 @@ public class MainWindowController extends Controller<String> {
 
     private void processRPL_NAMEREPLY(List<String> messageParts) {
         String channelName = messageParts.get(4);
-        ObservableList<String> memberList = channelMembersMap.get(channelName);
+        ObservableSet<String> memberList = channelMembersMap.get(channelName);
         // todo implement this
         if (waitingForNames) {
-            channelMembersMap.get(channelName).clear();
+            memberList.clear();
             waitingForNames = false;
         }
         String[] nicks = messageParts.get(messageParts.size() - 1).split(" ");
-        for (String nick : nicks) {
-            memberList.add(nick);
-        }
+        memberList.addAll(Arrays.asList(nicks));
     }
 
 
@@ -784,7 +783,7 @@ public class MainWindowController extends Controller<String> {
 
     private void processJOIN(String sender, String channelName) {
         if (getMainApp().getUser().getNick().equals(sender)) {
-            channelMembersMap.put(channelName, FXCollections.observableArrayList());
+            channelMembersMap.put(channelName, FXCollections.observableSet());
             if (!allChannelsMap.containsKey(channelName)) {
                 allChannelsMap.put(channelName, new Channel(channelName, 0, ""));
             }
